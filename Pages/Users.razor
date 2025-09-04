@@ -1,0 +1,177 @@
+﻿@page "/Users"
+@using Applet.Nat.Ux
+@using Applet.Nat.Ux.Models
+@using MudBlazor
+@using Nat.Ux.Properties
+@using Newtonsoft.Json
+@using System.IO.Compression
+@using System.Text
+@using Microsoft.JSInterop;
+@using System.Reflection
+
+@inject NavigationManager NavigationManager
+@inject IConfiguration Configuration
+@inject State ioState
+@inject IJSRuntime iIJS;
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+<PageTitle>@Resources.lioL_Documents</PageTitle>
+@if (mcoUsers == null || ioState.ioStatics == null)
+{
+    <p><em>@Resources.lioL_Wait</em></p>
+}
+else
+{
+    <div class="nat-page">
+        <div class="nat-filter-container">
+            <div class="nat-col15">
+                <MudTextField Typo=Typo.body2 @bind-Value=mivstrUser Label=@Resources.lioL_User Class="nat-text3" Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.Start"></MudTextField>
+            </div>
+            <MudSpacer />
+            <div class="nat-bocmd-container">
+                <MudIconButton Icon="@Icons.Material.Filled.Add" Class="nat-icon-verde" title=@Resources.lioL_Add @onclick="Add" Edge="Edge.End"></MudIconButton>
+                <MudIconButton Icon="@Icons.Material.Filled.Search" title=@Resources.lioL_Find Class="nat-icon-fondoverde" @onclick="Find" Edge="Edge.End"></MudIconButton>
+                <MudIconButton Icon="@Icons.Material.Filled.FilterAltOff" Class="nat-icon-rojoborde" title=@Resources.lioL_Clr @onclick="Clr" Edge="Edge.End"></MudIconButton>
+            </div>
+        </div>
+        <div>
+            <MudTable T="User" HeaderClass="nat-header-table" @ref="mudTable" Items="@mcoUsers.OrderByDescending(x => x.ioDcModel?.ivstrUserId)" SelectionChangeable=true Hover="true" SortLabel="Sort By" OnRowClick="Detail">
+                <HeaderContent>
+                    <MudTh><MudTableSortLabel Class="nat-textN" SortBy="new Func<User, object>(x => x.ioDcModel?.ivstrUserId)">@Resources.lioL_UserId</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel Class="nat-textN" SortBy="new Func<User, object>(x => x.ioDcModel?.ivstrUserName)">@Resources.lioL_UserName</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel Class="nat-textN" SortBy="new Func<User, object>(x => x.ioDcModel?.ivstrUserEmail)">@Resources.lioL_Email</MudTableSortLabel></MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="@Resources.lioL_UserId">@context.ioDcModel?.ivstrUserId</MudTd>
+                    <MudTd DataLabel="@Resources.lioL_UserName">@context.ioDcModel?.ivstrUserName</MudTd>
+                    <MudTd DataLabel="@Resources.lioL_Rs">@context.ioDcModel?.ivstrUserEmail</MudTd>
+                </RowTemplate>
+            </MudTable>
+        </div>
+    </div>
+
+}
+@code {
+    private long mivlngCuit { get; set; }
+    private string[] costrColHeaders { get; set; }
+    private string? mivstrUser { get; set; }
+    private User[]? mcoUsers { get; set; }
+    private Filter? mioFilter { get; set; }
+    private DialogModel? mioDialogModel { get; set; }
+    public static bool mivblnSession;
+    private bool mivblnSelectAll { get; set; }
+    private MudTable<User> mudTable;
+
+    protected override void OnInitialized()
+    {
+        if (!ioState.ivblnLogin)
+            NavigationManager.NavigateTo("login");
+        ioState.ivstrName = Resources.lioL_Cnfg;
+        mioDialogModel = new DialogModel();
+        Clr();
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        await Find();
+    }
+
+    #region Tareas Header
+    public async Task Find()
+    {
+        try
+        {
+            mioFilter = new Filter { coFilterItems = new List<FilterItem>() };
+            mioFilter.coFilterItems.Clear();
+            if (!string.IsNullOrEmpty(mivstrUser))
+            {
+                mioFilter.coFilterItems.Add(
+                new FilterItem
+                {
+                    ivstrOper = "LIKE",
+                    ivstrPropName = "ivstrUser",
+                    ivstrPropValue = mivstrUser
+                }
+                );
+                mcoUsers = await Service.Post<User[]>(EAuthType.Token, ioState.ioLogin.ivstrToken, Configuration, "UsersGet", mioFilter);
+            }
+            else
+                mcoUsers = [];
+        }
+        catch (Exception lioE)
+        {
+            Snackbar.Add(lioE.Message, Severity.Error);
+            StateHasChanged();
+        }
+    }
+    public void Clr()
+    {
+        mivstrUser = string.Empty;
+    }
+
+    #endregion
+    #region Tareas Rows
+    public async Task Detail(TableRowClickEventArgs<User> vioArg)
+    {
+        if (vioArg == null || vioArg.Item == null)
+            return;
+        await Do(vioArg.Item);
+    }
+    public async Task Add()
+    {
+        await Do(new User
+        {
+            ieTask = eTask.Save,
+            coCuitsModels = [],
+            ioDcModel = new UserModel
+            {
+                ivstrUserId = string.Empty,
+                ivstrUserName = string.Empty,
+                ivstrUserEmail = string.Empty
+            },
+            ivstrPass = string.Empty
+        });
+    }
+    public async Task Do(User vioUser)
+    {
+        try
+        {
+            vioUser.GetStrCuit();
+            mioDialogModel.ieDialogType = eDialogType.User;
+            mioDialogModel.ioUser = vioUser;
+            mioDialogModel.ieDialogButtoms = eDialogButtoms.OkCancel;
+            bool livblnEnable = vioUser.ioDcModel.ivblnEnable;
+            DialogParameters lioDialogParameters = new DialogParameters<NatDialog> { { x => x.vioDialogModel, mioDialogModel } };
+            DialogOptions lioDialogOptions = new DialogOptions
+            {
+                MaxWidth = MaxWidth.ExtraLarge
+            };
+            IDialogReference lioDialogResponse = await DialogService.ShowAsync<NatDialog>(Resources.lioL_Cnfg, lioDialogParameters, lioDialogOptions);
+            DialogResult lioDialogResult = await lioDialogResponse.Result;
+            if (!lioDialogResult.Canceled)
+            {
+                User lioUser = mioDialogModel.ioUser;
+                if (lioUser.ioDcModel.ivblnEnable && !livblnEnable)
+                    lioUser.ioDcModel.ivnrologonFails = 0;
+                lioUser.SetStrCuit();
+                lioUser.ieTask = eTask.Save;
+                string livstr = await Service.PostToStr(EAuthType.Token, ioState.ioLogin.ivstrToken, Configuration, "UserTask", lioUser);
+                int livnum;
+                if (!string.IsNullOrEmpty(lioUser.ivstrPass))
+                {
+                    if (int.TryParse(livstr, out livnum))
+                        lioUser.ioDcModel.ivnumUser = livnum;
+                    lioUser.ieTask = eTask.Pass;
+                    await Service.PostToStr(EAuthType.Token, ioState.ioLogin.ivstrToken, Configuration, "UserTask", lioUser);
+                    Snackbar.Add(Resources.lioL_OperOK, Severity.Success);
+                }
+            }
+        }
+        catch (Exception lioE)
+        {
+            Snackbar.Add(lioE.Message, Severity.Error);
+            StateHasChanged();
+        }
+
+    }
+    #endregion
+}

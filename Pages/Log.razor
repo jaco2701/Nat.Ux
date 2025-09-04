@@ -1,0 +1,80 @@
+﻿@page "/Log"
+@using Applet.Nat.Ux
+@using Applet.Nat.Ux.Models
+@using MudBlazor
+@using Nat.Ux.Properties
+@using Newtonsoft.Json
+@using System.IO.Compression
+@using System.Text
+@using Microsoft.JSInterop;
+@using System.Reflection
+
+@inject NavigationManager NavigationManager
+@inject IConfiguration Configuration
+@inject State ioState
+@inject IJSRuntime iIJS;
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+<PageTitle>@Resources.lioL_Documents</PageTitle>
+<div class="nat-page">
+    <div class="nat-cmdbar-container">
+        <div class="nat-col15">
+            <MudSelect Typo=Typo.body2 Class="nat-text3" @bind-Value="mivdtm" Variant="Variant.Outlined" Margin="Margin.Dense" Label=@Resources.lioL_DateLog>
+                @foreach (DateTime livdtm in mcvdtms)
+                {
+                    <MudSelectItem Class="nat-text" Value=livdtm>@livdtm.ToString(@ioState.Getparam("format", "UxDtm"))</MudSelectItem>
+                }
+            </MudSelect>
+        </div>
+        <MudSpacer />
+            <MudIconButton Icon="@Icons.Material.Filled.CopyAll" Class="nat-icon-verde" title=@Resources.lioL_Copy @onclick="Copy" Edge="Edge.End"></MudIconButton>
+            <MudIconButton Icon="@Icons.Material.Filled.Search" title=@Resources.lioL_Find Class="nat-icon-verde" @onclick="Find" Edge="Edge.End"></MudIconButton>
+    </div>
+    <div class="nat-log-container">
+            <spam>@mivstrLog</spam>
+    </div>
+</div>
+
+@code {
+    private string? mivstrLog { get; set; }
+    private DateTime mivdtm { get; set; }
+    private List<DateTime>? mcvdtms { get; set; }
+    protected override void OnInitialized()
+    {
+        if (!ioState.ivblnLogin)
+            NavigationManager.NavigateTo("login");
+        mcvdtms = new List<DateTime>();
+        mcvdtms.Add(DateTime.Today);
+        mcvdtms.Add(DateTime.Today.AddDays(-1));
+        mcvdtms.Add(DateTime.Today.AddDays(-2));
+        mcvdtms.Add(DateTime.Today.AddDays(-3));
+        mivdtm = mcvdtms[0];
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        await Find();
+    }
+    #region Tareas Header
+    public async Task Find()
+    {
+        try
+        {
+            string livstr = await Service.PostToStr(EAuthType.Token, ioState.ioLogin.ivstrToken, Configuration, "Log", $"{mivdtm.ToString("yyyyMMdd")}.log");
+            mivstrLog = string.Empty;
+            if (!string.IsNullOrEmpty(livstr))
+                mivstrLog = Encoding.UTF8.GetString(Convert.FromBase64String(livstr));
+        }
+        catch (Exception lioE)
+        {
+            Snackbar.Add(lioE.Message, Severity.Error);
+            StateHasChanged();
+        }
+    }
+    public async Task Copy()
+    {
+        await iIJS.InvokeVoidAsync("navigator.clipboard.writeText", mivstrLog);
+    }
+    #endregion
+    #region Tareas Rows
+    #endregion
+}

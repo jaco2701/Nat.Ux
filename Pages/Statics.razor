@@ -1,0 +1,199 @@
+﻿@page "/Statics"
+@using Applet.Nat.Ux
+@using Applet.Nat.Ux.Models
+@using MudBlazor
+@using Nat.Ux.Properties
+@using Newtonsoft.Json
+@using System.IO.Compression
+@using System.Text
+@using Microsoft.JSInterop;
+@using System.Reflection
+
+@inject NavigationManager NavigationManager
+@inject IConfiguration Configuration
+@inject State ioState
+@inject IJSRuntime iIJS;
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+<PageTitle>@Resources.lioL_Documents</PageTitle>
+@if (!ioState.ivblnReady)
+{
+    <p><em>@Resources.lioL_Wait</em></p>
+}
+else
+{
+    <div class="nat-page">
+        <div class="nat-cmdbar-container">
+            <div class="nat-col50">
+                <MudSelect Typo=Typo.body2 Class="nat-text3" @bind-Value="mivcodType" Variant="Variant.Outlined" Margin="Margin.Dense" Label=@Resources.lioL_Type1>
+                    @foreach (List lioListModel in mcoMetalists.OrderBy(x => x.ioDcModel.ivstrDesc))
+                    {
+                        <MudSelectItem Class="nat-text" Value=lioListModel.ioDcModel.ivcodId>@lioListModel.ioDcModel.ivstrDesc</MudSelectItem>
+                    }
+                </MudSelect>
+            </div>
+            @if (mcoSelectedLists != null && mcoSelectedLists.Count() == 1)
+            {
+                <MudIconButton Icon="@Icons.Material.Outlined.Delete" Class="nat-icon-rojo" title=@Resources.lioL_Delete @onclick="Delete" Edge="Edge.Start"></MudIconButton>
+                <MudIconButton Icon="@Icons.Material.Outlined.Edit" Class="nat-icon-verde" title=@Resources.lioL_Edit @onclick="Do" Edge="Edge.Start"></MudIconButton>
+            }
+            <MudSpacer />
+            <MudIconButton Icon="@Icons.Material.Filled.Add" Class="nat-icon-verde" title=@Resources.lioL_Add @onclick="Add" Edge="Edge.End"></MudIconButton>
+            <MudIconButton Icon="@Icons.Material.Outlined.Search" title=@Resources.lioL_Find Class="nat-icon-verde" @onclick="Find" Edge="Edge.End"></MudIconButton>
+        </div>
+        <div>
+            <MudTable T="List" FixedHeader="true" RowClass="nat-tr" FixedFooter="true" HorizontalScrollbar="false" MultiSelection="true" Items="@mcoLists.OrderByDescending(x => x.ioDcModel?.ivcodId)" SelectionChangeable=true SortLabel="Sort By" Dense="true" @bind-SelectedItems="mcoSelectedLists">
+                <HeaderContent>
+                    <MudTh Style="text-align:center;"><MudTableSortLabel Class="nat-textN nat-th" SortBy="new Func<List, object>(x => x.ioDcModel?.ivcodId)">@Resources.lioL_Id</MudTableSortLabel></MudTh>
+                    <MudTh Style="text-align:center;"><MudTableSortLabel Class="nat-textN nat-th" SortBy="new Func<List, object>(x => x.ioDcModel?.ivstrDesc)">@Resources.lioL_Desc</MudTableSortLabel></MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd Style="max-width: 30vw;" Class="nat-text nat-td" DataLabel="@Resources.lioL_Id">@context.ioDcModel.ivcodId </MudTd>
+                    <MudTd Style="max-width: 50vw;" Class="nat-text nat-td" DataLabel="@Resources.lioL_Desc">@context.ioDcModel.ivstrDesc</MudTd>
+                </RowTemplate>
+                <PagerContent>
+                    <MudTablePager RowsPerPageString="Registros por Pagina:" PageSizeOptions="new int[] { 10, 25, 50, 100 }" />
+                </PagerContent>
+            </MudTable>
+        </div>
+    </div>
+
+}
+@code {
+    private long mivlngCuit { get; set; }
+    private string[] costrColHeaders { get; set; }
+    private string? mivstrUser { get; set; }
+    private string? mivcodType { get; set; }
+    private List[]? mcoLists { get; set; }
+    private HashSet<List> mcoSelectedLists { get; set; }
+    private List[]? mcoMetalists { get; set; }
+    private Filter? mioFilter { get; set; }
+    private DialogModel? mioDialogModel { get; set; }
+    public static bool mivblnSession;
+    private bool mivblnSelectAll { get; set; }
+    private MudTable<List> mudTable;
+
+    protected override void OnInitialized()
+    {
+        ioState.ivblnReady = false;
+        if (!ioState.ivblnLogin)
+            NavigationManager.NavigateTo("login");
+        ioState.ivstrName = Resources.lioL_Statics;
+        mioDialogModel = new DialogModel();
+        Clr();
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        ioState.ivblnReady = false;
+        mivcodType = "META"; //busca metalistas
+        await Find();
+        mcoMetalists = JsonConvert.DeserializeObject<List[]>(JsonConvert.SerializeObject(mcoLists));
+        mcoLists = [];
+        mivcodType = string.Empty;
+        ioState.ivblnReady = true;
+    }
+    #region Tareas Header
+    public async Task Find()
+    {
+        try
+        {
+            mioFilter = new Filter { coFilterItems = new List<FilterItem>() };
+            mioFilter.coFilterItems.Clear();
+            if (!string.IsNullOrEmpty(mivcodType))
+            {
+                mioFilter.coFilterItems.Add(
+                new FilterItem
+                {
+                    ivstrOper = "EQ",
+                    ivstrPropName = "ivcodType",
+                    ivstrPropValue = mivcodType ?? string.Empty
+                }
+                );
+                mcoLists = await Service.Post<List[]>(EAuthType.Token, ioState.ioLogin.ivstrToken, Configuration, "ListGet", mioFilter);
+            }
+            else
+                mcoLists = [];
+            if (mcoSelectedLists != null)
+                mcoSelectedLists.Clear();
+        }
+        catch (Exception lioE)
+        {
+            Snackbar.Add(lioE.Message, Severity.Error);
+            StateHasChanged();
+        }
+    }
+    public void Clr()
+    {
+        mivstrUser = string.Empty;
+    }
+
+    #endregion
+    #region Tareas Rows
+    public async Task Add()
+    {
+        mcoSelectedLists.Clear();
+        await Do();
+    }
+    public async Task Delete()
+    {
+        mioDialogModel.ivstrClass = string.Empty;
+        mioDialogModel.ieDialogType = eDialogType.Text;
+        mioDialogModel.ivstrBody = Resources.lioL_DeleteBody;
+        mioDialogModel.ieDialogButtoms = eDialogButtoms.OkCancel;
+        DialogParameters lioDialogParameters = new DialogParameters<NatDialog> { { x => x.vioDialogModel, mioDialogModel } };
+        DialogOptions lioDialogOptions = new DialogOptions
+        {
+            MaxWidth = MaxWidth.Small
+        };
+        IDialogReference lioDialogResponse = await DialogService.ShowAsync<NatDialog>(Resources.lioL_Delete, lioDialogParameters, lioDialogOptions);
+        DialogResult lioDialogResult = await lioDialogResponse.Result;
+        if (!lioDialogResult.Canceled)
+        {
+            mcoSelectedLists.First().ieTask = eTask.Delete;
+            await Post(mcoSelectedLists.First());
+        }
+    }
+    public async Task Do()
+    {
+        try
+        {
+            mioDialogModel.ivstrClass = string.Empty;
+            mioDialogModel.ieDialogType = eDialogType.List;
+            if (mcoSelectedLists.Count() > 0)
+                mioDialogModel.ioList = mcoSelectedLists.First();
+            else
+                mioDialogModel.ioList = new List
+                {
+                    ioDcModel = new ListModel
+                    {
+                        ivcodType = mivcodType,
+                        ivcodId = string.Empty,
+                        ivstrDesc = string.Empty
+                    },
+                };
+            mioDialogModel.ioList.ieTask = eTask.Save;
+            mioDialogModel.ieDialogButtoms = eDialogButtoms.OkCancel;
+            DialogParameters lioDialogParameters = new DialogParameters<NatDialog> { { x => x.vioDialogModel, mioDialogModel } };
+            DialogOptions lioDialogOptions = new DialogOptions
+            {
+                MaxWidth = MaxWidth.ExtraLarge
+            };
+            IDialogReference lioDialogResponse = await DialogService.ShowAsync<NatDialog>(Resources.lioL_Cnfg, lioDialogParameters, lioDialogOptions);
+            DialogResult lioDialogResult = await lioDialogResponse.Result;
+            if (!lioDialogResult.Canceled)
+                await Post(mioDialogModel.ioList);
+        }
+        catch (Exception lioE)
+        {
+            Snackbar.Add(lioE.Message, Severity.Error);
+            StateHasChanged();
+        }
+
+    }
+    public async Task Post(List vioList)
+    {
+        await Service.PostToStr(EAuthType.Token, ioState.ioLogin.ivstrToken, Configuration, "ListTask", vioList);
+        await Find();
+    }
+    #endregion
+}

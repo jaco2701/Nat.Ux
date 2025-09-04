@@ -1,0 +1,13 @@
+wwwroot\css\app.css
+wwwroot\css\bootstrap\bootstrap.min.css
+wwwroot\css\bootstrap\bootstrap.min.css.map
+wwwroot\favicon.png
+wwwroot\font\Figtree-Italic-VariableFont_wght.ttf
+wwwroot\font\Figtree-VariableFont_wght.ttf
+wwwroot\functions.js
+wwwroot\icon-192.png
+wwwroot\icon-512.png
+wwwroot\index.html
+wwwroot\manifest.webmanifest
+wwwroot\nat.png
+wwwroot\appsettings.json
