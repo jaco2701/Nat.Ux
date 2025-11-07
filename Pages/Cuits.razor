@@ -135,10 +135,13 @@ else
                 },
                 ioCnfg = new CuitCnfg
                 {
-                    ivblnAdmin = false,
-                    ivstrInFolder = string.Empty,
-                    ivstrOutFolder = string.Empty,
-                    ivstrEncoding = "UTF-8",
+                    coParameters =
+                    [
+                        new CuitParameter { ivstrId = "Encoding", ivstrValue = "UTF-8" },
+                        new CuitParameter { ivstrId = "LoadMethod", ivstrValue = "0" },
+                        new CuitParameter { ivstrId = "Days", ivstrValue = "2" },
+                        new CuitParameter { ivstrId = "Rows", ivstrValue = "100" }
+                    ]
                 }
             });
         }
@@ -159,13 +162,6 @@ else
         mioDialogModel.ivstrClass = string.Empty;
         mioDialogModel.ieDialogType = eDialogType.Cuit;
         mioDialogModel.ioCuit = vioCuit;
-        if (mioDialogModel.ioCuit.ioCnfg == null)
-            mioDialogModel.ioCuit.ioCnfg = new CuitCnfg
-            {
-                ivblnAdmin = false,
-                ivstrInFolder = string.Empty,
-                ivstrOutFolder = string.Empty,
-            };
         DialogOptions lioDialogOptions = new DialogOptions
         {
             MaxWidth = MaxWidth.ExtraLarge

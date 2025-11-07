@@ -9,6 +9,7 @@
 @inject NavigationManager NavigationManager
 @inject State ioState
 @inject ISnackbar Snackbar
+@inject IDialogService DialogService
 
 <PageTitle>@Resources.lioL_login</PageTitle>
 <div class="nat-page">
@@ -23,6 +24,9 @@
                     <span class="nat-text1N">@Resources.lioL_login</span>
                     <div class="nat-usrpass-container">
                         <div class="nat-w100">
+                            <MudButton Class="nat-button2" FullWidth=true StartIcon="@Icons.Material.Filled.AirlineStops" OnClick="Oidc">@Resources.lioL_Oidc</MudButton>
+                        </div>
+                        <div class="nat-w100">
                             <MudTextField Typo=Typo.body1 @bind-Value="lioModel.ivstrUser" Class="nat-text" Label="@Resources.lioL_User" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Person" />
                         </div>
                         <div class="nat-w100">
@@ -31,6 +35,7 @@
                         <div class="nat-w100">
                             <MudButton Class="nat-button" FullWidth=true StartIcon="@Icons.Material.Filled.Login" ButtonType="ButtonType.Submit">@Resources.lioL_In</MudButton>
                         </div>
+
                         <span class="nat-text">@mivstrDisc</span>
                     </div>
                 </div>
@@ -45,8 +50,8 @@
     }
 </div>
 @code {
-    [Parameter]
-    public string? vivstrTimeOut { get; set; }
+        [Parameter]
+        public string? vivstrTimeOut { get; set; }
     #region Propiedades
     public LoginModel lioModel { get; set; }
     private int livnumCaptchaLetters = 5;
@@ -59,7 +64,7 @@
     protected override void OnInitialized()
     {
         if (!string.IsNullOrEmpty(vivstrTimeOut))
-            Snackbar.Add(Resources.lioE_TokenExp, Severity.Error, vioOpt=>{ vioOpt.RequireInteraction = true; } );
+            Snackbar.Add(Resources.lioE_TokenExp, Severity.Error, vioOpt => { vioOpt.RequireInteraction = true; });
         lioModel = new LoginModel();
         mivnumFail = 0;
         ioState.reset();
@@ -84,7 +89,7 @@
                 ioState.ioLogin.ivlngCurrentCuit = 0;
             else
             {
-                ioState.ioLogin.ivlngCurrentCuit =  ioState.ioLogin.ioUser.coCuitsModels[0].ivlngCuit;
+                ioState.ioLogin.ivlngCurrentCuit = ioState.ioLogin.ioUser.coCuitsModels[0].ivlngCuit;
                 foreach (UserCuitModel lioO in ioState.ioLogin.ioUser.coCuitsModels)
                     if (lioO.ivblnDefaut)
                     {
@@ -117,26 +122,34 @@
         StateHasChanged();
     }
 
-    // public async Task GetRS(ChangeEventArgs vioChangeEventArgs)
-    // {
-    //     if (string.IsNullOrEmpty(vioChangeEventArgs?.Value?.ToString()))
-    //     {
-    //         ioState.ivstrRs = string.Empty;
-    //         return;
-    //     }
-    //     if (vioChangeEventArgs?.Value?.ToString()?.Length < 11)
-    //     {
-    //         ioState.ivstrRs = string.Empty;
-    //         return;
-    //     }
-    //     if (!long.TryParse(vioChangeEventArgs?.Value?.ToString(), out long livlngCuit))
-    //     {
-    //         ioState.ivstrRs = string.Empty;
-    //         return;
-    //     }
-    //     ioState.ivstrRs = await Service.PostToStr(EAuthType.UserAndPass, "0:0", Configuration, "RS", livlngCuit);
-    //     ioState.ivstrRs = $" ({ioState.ivstrRs})";
+    public async void Oidc()
+    {
+        DialogModel lioDialogModel = new DialogModel();
+        lioDialogModel.ivstrClass = string.Empty;
+        lioDialogModel.ieDialogType = eDialogType.Oidc;
+        lioDialogModel.ivstrBody = string.Empty;
+        lioDialogModel.ieDialogButtoms = eDialogButtoms.Ok;
+        DialogParameters lioDialogParameters = new DialogParameters<NatDialog> { { x => x.vioDialogModel, lioDialogModel } };
+        DialogOptions lioDialogOptions = new DialogOptions
+        {
+            MaxWidth = MaxWidth.Small
+        };
 
-    // }
+        IDialogReference lioDialogResponse = await DialogService.ShowAsync<NatDialog>(Resources.lioL_IdProv, lioDialogParameters, lioDialogOptions);
+        DialogResult lioDialogResult = await lioDialogResponse.Result;
+        if (!string.IsNullOrEmpty(lioDialogModel.ivstrBody) && int.TryParse(lioDialogModel.ivstrBody, out int livnumIdentityProvider))
+        {
+            IdentityProviderModel lioIdentityProviderModel = ioState.ioStatics.coIdentityProviders.FirstOrDefault(x => x.ivnumIdentityProvider == livnumIdentityProvider);
+            if (lioIdentityProviderModel != null)
+            {
+                string livstrEnv = ioState.ioStatics.coLists.FirstOrDefault(x => x.ivcodType == "FORMAT" && x.ivcodId == "ENV").ivstrDesc == "P" ? string.Empty : "qa";
+                string livstrUrl = lioIdentityProviderModel.ivstrIdentityProviderUrl
+                                    .Replace("{RU}", Uri.EscapeDataString($"https://nat{livstrEnv}.signature-services.com.ar/authentication/login-callback"))
+                                    .Replace("{NON}", "NATSTS123")
+                                    .Replace("{STS}", "NON123");
+                NavigationManager.NavigateTo(livstrUrl, true);
+            }
+        }
+    }
     #endregion
 }

@@ -432,4 +432,37 @@
   <data name="lioL_Encoding" xml:space="preserve">
     <value>Encoding</value>
   </data>
+  <data name="lioL_UrlEgreso" xml:space="preserve">
+    <value>URL Egreso Docs.</value>
+  </data>
+  <data name="lioL_UrlIngreso" xml:space="preserve">
+    <value>URL Ingreso Docs.</value>
+  </data>
+  <data name="lioL_LoadMethod" xml:space="preserve">
+    <value>Tipo de Ingreso</value>
+  </data>
+  <data name="lioL_Days" xml:space="preserve">
+    <value>Días de búsqueda hacia atrás</value>
+  </data>
+  <data name="lioL_Rows" xml:space="preserve">
+    <value>Cantidad de Documentos </value>
+  </data>
+  <data name="lioL_EntityID" xml:space="preserve">
+    <value>ID entidad Oracle</value>
+  </data>
+  <data name="lioL_Oidc" xml:space="preserve">
+    <value>Ingresar con OpenID</value>
+  </data>
+  <data name="lioL_Or" xml:space="preserve">
+    <value>O</value>
+  </data>
+  <data name="lioE_NoOidcClients" xml:space="preserve">
+    <value>No se encontraron proveedores de identidad</value>
+  </data>
+  <data name="lioL_IdProv" xml:space="preserve">
+    <value>Proveedores Disponibles</value>
+  </data>
+  <data name="lioL_LDs" xml:space="preserve">
+    <value>Destinatarios Correo (separados por ;)</value>
+  </data>
 </root>

@@ -35,7 +35,8 @@ namespace Applet.Nat.Ux.Models
         Me = 4,
         User = 5,
         Cuit=6,
-        List = 7
+        List = 7,
+        Oidc = 8
     }
     public enum eDialogButtoms : short
     {

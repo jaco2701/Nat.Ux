@@ -1,7 +1,7 @@
 {
   "mainAssemblyName": "Nat.Ux",
   "resources": {
-    "hash": "sha256-ncgxPAITt23ZFcIhaQ7ivq5xxoz3mZd13dsKY4VcnJQ=",
+    "hash": "sha256-lAsTe21yOJiq4vToOQDZmB0PsprcvyjcglBha6M8irg=",
     "jsModuleNative": {
       "dotnet.native.js": "sha256-O/NCYcAN9uPocD7ns7AzF/cqx7f5vL1PTJCQs0vEXyk="
     },
@@ -89,7 +89,7 @@
       "System.wasm": "sha256-/Ib2sECJIp5OmAw2FVP/3jA36Bh6yA6fac798DlmOd8=",
       "netstandard.wasm": "sha256-pirQJNblkuGBpwQ06uu+db0O1Ufy3SQ/8JCBjl0AkV0=",
       "System.Private.CoreLib.wasm": "sha256-OEry7P5DGGfJofQcWKnizn1xd8Dy+m4Q9ff60n//6FU=",
-      "Nat.Ux.wasm": "sha256-EBN/p/5vPQugo1ioNpiM7yNnG1yvdshGsflgYHAZG24="
+      "Nat.Ux.wasm": "sha256-duVmQyBx8mcQ2sDplzpC0neMlCZS9EUz0v4nPXCKMUw="
     }
   },
   "cacheBootResources": true,

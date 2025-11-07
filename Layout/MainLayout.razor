@@ -21,23 +21,26 @@
                    NoHeader="false"
                    Position="DialogPosition.Center"
                    CloseOnEscapeKey="true"
-                   BackgroundClass="nat-text3N"
-                   />
+                   BackgroundClass="nat-text3N" />
 <MudSnackbarProvider />
-@if (ioState.ivblnLogin && ioState.ioStatics?.coLists != null)
+
+@if (ioState.ioStatics?.coLists != null)
 {
     <div class="nat-header-container">
-        @if (ioState.ioLogin.ioUser.ioDcModel.ivblnAdmin)
+        @if (ioState.ivblnLogin)
         {
-            <MudIconButton Icon="@Icons.Material.Filled.Menu" Edge="Edge.Start" OnClick="ButtonClicked" />
-        }
-        <img src="./nat.png" class="nat-logo-bar" />
-        <span class="nat-space"></span>
-        <MudText Align=Align.Left class="nat-text3N">@ioState.ivstrName </MudText>
-        <span class="nat-space"></span>
-        @if (ioState.ioLogin.ivlngCurrentCuit != 0 && ioState.ioLogin.ioUser.coCuitsModels!=null)
-        {
-            <MudText Align=Align.Left class="nat-text2">@ioState.ioLogin.ioUser.coCuitsModels.FirstOrDefault(x => x.ivlngCuit == ioState.ioLogin.ivlngCurrentCuit).ivstrRS</MudText>
+            @if (ioState.ioLogin.ioUser.ioDcModel.ivblnAdmin)
+            {
+                <MudIconButton Icon="@Icons.Material.Filled.Menu" Edge="Edge.Start" OnClick="ButtonClicked" />
+            }
+            <img src="./nat.png" class="nat-logo-bar" />
+            <span class="nat-space"></span>
+            <MudText Align=Align.Left class="nat-text3N">@ioState.ivstrName </MudText>
+            <span class="nat-space"></span>
+            @if (ioState.ioLogin.ivlngCurrentCuit != 0 && ioState.ioLogin.ioUser.coCuitsModels != null)
+            {
+                <MudText Align=Align.Left class="nat-text2">@ioState.ioLogin.ioUser.coCuitsModels.FirstOrDefault(x => x.ivlngCuit == ioState.ioLogin.ivlngCurrentCuit).ivstrRS</MudText>
+            }
         }
         <MudSpacer />
         @if (ioState.ioStatics.coLists.FirstOrDefault(x => x.ivcodType == "FORMAT" && x.ivcodId == "ENV").ivstrDesc == "P")
@@ -48,9 +51,12 @@
         {
             <MudChip T="string" Icon="@Icons.Material.Filled.Error" Text=@Resources.lioL_Homo class="nat-homo"></MudChip>
         }
-        <MudIconButton Icon="@Icons.Material.Outlined.Settings" title=@Resources.lioL_Cnfg @onclick="(() => Show(2))" Edge="Edge.End"></MudIconButton>
-        <MudIconButton Icon="@Icons.Material.Outlined.AccountCircle" title=@Resources.lioL_MisDatos @onclick="(() => Show(1))" Edge="Edge.End"></MudIconButton>
-        <MudIconButton Icon="@Icons.Material.Filled.Logout" title=@Resources.lioL_Exit @onclick="Exit" Edge="Edge.End"></MudIconButton>
+        @if (ioState.ivblnLogin)
+        {
+            <MudIconButton Icon="@Icons.Material.Outlined.Settings" title=@Resources.lioL_Cnfg @onclick="(() => Show(2))" Edge="Edge.End"></MudIconButton>
+            <MudIconButton Icon="@Icons.Material.Outlined.AccountCircle" title=@Resources.lioL_MisDatos @onclick="(() => Show(1))" Edge="Edge.End"></MudIconButton>
+            <MudIconButton Icon="@Icons.Material.Filled.Logout" title=@Resources.lioL_Exit @onclick="Exit" Edge="Edge.End"></MudIconButton>
+        }
     </div>
     <MudDrawer @bind-Open="@livblnOpen" Anchor="Anchor.Start" Elevation="1" Variant="@DrawerVariant.Temporary" OverlayAutoClose="true">
         <MudNavMenu Class="nat-menu-container">
@@ -109,7 +115,10 @@
     protected override async Task OnInitializedAsync()
     {
         if (ioState.ioStatics == null || ioState.ioStatics.coLists == null)
+        {
             await ioState.getStatics(Configuration);
+            StateHasChanged();
+        }
     }
 
     void ButtonClicked()

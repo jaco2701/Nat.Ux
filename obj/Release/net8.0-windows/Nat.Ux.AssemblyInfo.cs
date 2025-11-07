@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Nat.Ux")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+085e387dc979a871de45d004c5d6109be5138db3")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e95fd1f925bdb9bde44f9262c9b8c1e8da35aa29")]
 [assembly: System.Reflection.AssemblyProductAttribute("Nat.Ux")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Nat.Ux")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

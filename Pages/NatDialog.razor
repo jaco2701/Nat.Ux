@@ -15,298 +15,337 @@
         @switch (vioDialogModel.ieDialogType)
         {
             case eDialogType.Text:
+                foreach (string livstrLine in vioDialogModel.ivstrBody.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None))
                 {
-                    foreach (string livstrLine in vioDialogModel.ivstrBody.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None))
+                    <p>
+                        @livstrLine
+                    </p>
+                    if (!string.IsNullOrEmpty(vioDialogModel.ivstrFullBody))
                     {
-                        <p>
-                            @livstrLine
-                        </p>
-                        if (!string.IsNullOrEmpty(vioDialogModel.ivstrFullBody))
-                        {
-                            <MudIconButton Icon="playlist_add" title=@Resources.lioL_Detail OnClick="@ShowFullError"></MudIconButton>
-                        }
+                        <MudIconButton Icon="playlist_add" title=@Resources.lioL_Detail OnClick="@ShowFullError"></MudIconButton>
                     }
-                    if (livblnshowFullError)
-                    {
-                        <p>
-                            @vioDialogModel.ivstrFullBody
-                        </p>
-                    }
-                    break;
                 }
+                if (livblnshowFullError)
+                {
+                    <p>
+                        @vioDialogModel.ivstrFullBody
+                    </p>
+                }
+                break;
             case eDialogType.FileUpload:
-                {
-                    <div>
-                        <MudFileUpload T="IBrowserFile" FilesChanged="FilesReady" Label="@Resources.lioL_Drag">
-                            <ActivatorContent>
-                                <MudButton Variant="Variant.Filled"
-                                           Color="Color.Primary"
-                                           StartIcon="@Icons.Material.Filled.CloudUpload">
-                                    @Resources.lioL_Uploads
-                                </MudButton>
-                            </ActivatorContent>
-                        </MudFileUpload>
-                    </div>
-                    @if (vioDialogModel.coDocumentsUpload != null)
-                        @foreach (DocumentUploadRequest lioDoc in vioDialogModel.coDocumentsUpload)
-                        {
-                            <p>@lioDoc.ivstrName</p>
-                        }
-                    break;
-                }
+                <div>
+                    <MudFileUpload T="IBrowserFile" FilesChanged="FilesReady" Label="@Resources.lioL_Drag">
+                        <ActivatorContent>
+                            <MudButton Variant="Variant.Filled"
+                                       Color="Color.Primary"
+                                       StartIcon="@Icons.Material.Filled.CloudUpload">
+                                @Resources.lioL_Uploads
+                            </MudButton>
+                        </ActivatorContent>
+                    </MudFileUpload>
+                </div>
+                @if (vioDialogModel.coDocumentsUpload != null)
+                    @foreach (DocumentUploadRequest lioDoc in vioDialogModel.coDocumentsUpload)
+                    {
+                        <p>@lioDoc.ivstrName</p>
+                    }
+                break;
             case eDialogType.Tracking:
+                @foreach (DocumentTracking lioTracking in vioDialogModel.coDocumentTracking?.OrderByDescending(x => x.ioDcModel.ivnumtrack))
                 {
-                    @foreach (DocumentTracking lioTracking in vioDialogModel.coDocumentTracking?.OrderByDescending(x => x.ioDcModel.ivnumtrack))
-                    {
-                        <div class="nat-track-container">
-                            <div class="nat-trackheader-container">
-                                <div class="nat-col15">
-                                    @lioTracking.ioDcModel.ivdtmTrack.ToString(ioState.Getparam("Format", "UxDtm"))
+                    <div class="nat-track-container">
+                        <div class="nat-trackheader-container">
+                            <div class="nat-col15">
+                                @lioTracking.ioDcModel.ivdtmTrack.ToString(ioState.Getparam("Format", "UxDtm"))
+                                <br />
+                                @lioTracking.ioDcModel.ivdtmTrack.ToString("HH:mm:ss")
+                            </div>
+
+                            <div class="nat-col35">
+                                @if (lioTracking.ioDcModel?.ivnroStatus == 10)
+                                {
+                                    <span style="color:#424242">@ioState.Getparam("STATUS", lioTracking.ioDcModel.ivnroStatus.ToString())</span>
+                                }
+                                @if (new short[] { 20, 35, 40, 65 }.Contains(lioTracking.ioDcModel?.ivnroStatus ?? 0))
+                                {
+                                    <span style="color:#F44336">@ioState.Getparam("STATUS", lioTracking.ioDcModel.ivnroStatus.ToString())</span>
+                                }
+                                @if (new short[] { 30, 50, 70, 100 }.Contains(lioTracking.ioDcModel?.ivnroStatus ?? 0))
+                                {
+                                    <span style="color:#00973F">@ioState.Getparam("STATUS", lioTracking.ioDcModel.ivnroStatus.ToString())</span>
+                                }
+                                @if (new short[] { 55, 60 }.Contains(lioTracking.ioDcModel?.ivnroStatus ?? 0))
+                                {
+                                    <span style="color:#008DAF">@ioState.Getparam("STATUS", lioTracking.ioDcModel.ivnroStatus.ToString())</span>
+                                }
+                                @if (lioTracking.ioDcModel?.ivnroStatus == 80)
+                                {
+                                    <span style="color:#FF9800">@ioState.Getparam("STATUS", lioTracking.ioDcModel.ivnroStatus.ToString())</span>
+                                }
+
+                            </div>
+                            <div class="nat-col35">
+                                @if (!string.IsNullOrEmpty(lioTracking.ivstrTrackDescr))
+                                {
+                                    @lioTracking.ivstrTrackDescr?.Split(':')[0]
                                     <br />
-                                    @lioTracking.ioDcModel.ivdtmTrack.ToString("HH:mm:ss")
-                                </div>
-
-                                <div class="nat-col35">
-                                    @if (lioTracking.ioDcModel?.ivnroStatus == 10)
-                                    {
-                                        <span style="color:#424242">@ioState.Getparam("STATUS", lioTracking.ioDcModel.ivnroStatus.ToString())</span>
-                                    }
-                                    @if (new short[] { 20, 35, 40, 65 }.Contains(lioTracking.ioDcModel?.ivnroStatus ?? 0))
-                                    {
-                                        <span style="color:#F44336">@ioState.Getparam("STATUS", lioTracking.ioDcModel.ivnroStatus.ToString())</span>
-                                    }
-                                    @if (new short[] { 30, 50, 70, 100 }.Contains(lioTracking.ioDcModel?.ivnroStatus ?? 0))
-                                    {
-                                        <span style="color:#00973F">@ioState.Getparam("STATUS", lioTracking.ioDcModel.ivnroStatus.ToString())</span>
-                                    }
-                                    @if (new short[] { 55, 60 }.Contains(lioTracking.ioDcModel?.ivnroStatus ?? 0))
-                                    {
-                                        <span style="color:#008DAF">@ioState.Getparam("STATUS", lioTracking.ioDcModel.ivnroStatus.ToString())</span>
-                                    }
-                                    @if (lioTracking.ioDcModel?.ivnroStatus == 80)
-                                    {
-                                        <span style="color:#FF9800">@ioState.Getparam("STATUS", lioTracking.ioDcModel.ivnroStatus.ToString())</span>
-                                    }
-
-                                </div>
-                                <div class="nat-col35">
-                                    @if (!string.IsNullOrEmpty(lioTracking.ivstrTrackDescr))
-                                    {
-                                        @lioTracking.ivstrTrackDescr?.Split(':')[0]
-                                        <br />
-                                        @lioTracking.ivstrTrackDescr?.Split(':')[1]
-                                    }
-                                </div>
-                                @if (!string.IsNullOrEmpty(lioTracking.ioDcModel.ivstrData))
-                                {
-                                    @if (lioTracking.ivblnShowData)
-                                    {
-                                        <div class="nat-col8">
-                                            <MudIconButton Icon="@Icons.Material.Filled.ExpandLess" Class="nat-icon-verde" @onclick="(() => ShowData(lioTracking))" Edge="Edge.End"></MudIconButton>
-                                        </div>
-                                    }
-                                    else
-                                    {
-                                        <div class="nat-col8">
-                                            <MudIconButton Icon="@Icons.Material.Filled.ExpandMore" Class="nat-icon-verde" @onclick="(() => ShowData(lioTracking))" Edge="Edge.End"></MudIconButton>
-                                        </div>
-                                    }
+                                    @lioTracking.ivstrTrackDescr?.Split(':')[1]
                                 }
                             </div>
-                            @if (lioTracking.ivblnShowData)
+                            @if (!string.IsNullOrEmpty(lioTracking.ioDcModel.ivstrData))
                             {
-                                <div class="nat-trackdetail-container ">
-                                    <div class="nat-trackdetail">
-                                        @foreach (Tuple<string, string, int> lioO in mcoTrackDetail)
-                                        {
-                                            <spam style="color:@lioO.Item1; font-weight:@lioO.Item3">
-                                                @lioO.Item2
-                                            </spam>
-                                        }
+                                @if (lioTracking.ivblnShowData)
+                                {
+                                    <div class="nat-col8">
+                                        <MudIconButton Icon="@Icons.Material.Filled.ExpandLess" Class="nat-icon-verde" @onclick="(() => ShowData(lioTracking))" Edge="Edge.End"></MudIconButton>
                                     </div>
-                                    <MudIconButton Icon="@Icons.Material.Filled.CopyAll" Class="nat-icon-verde" title=@Resources.lioL_Copy @onclick="(() => Copy(lioTracking))"></MudIconButton>
-                                </div>
-                            }
-                        </div>
-
-                    }
-                    break;
-                }
-            case eDialogType.Cuit:
-                {
-                    @if (vioDialogModel?.ioCuit?.ioCnfg != null)
-                    {
-                        @if (vioDialogModel.ioCuit.ioDcModel.ivlngCuit > 0)
-                        {
-                            <div>
-                                <MudTextField Disabled=true Typo=Typo.body1 @bind-Value="@vioDialogModel.ioCuit.ioDcModel.ivlngCuit" Class="nat-text" Label="@Resources.lioL_Cuit1" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Person" />
-                            </div>
-                        }
-                        else
-                        {
-                            <div>
-                                <MudTextField Typo=Typo.body1 @bind-Value="@vioDialogModel.ioCuit.ioDcModel.ivlngCuit" Class="nat-text" Label="@Resources.lioL_Cuit1" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Person" />
-                            </div>
-                        }
-                        <div class="nat-borow-container">
-                            <MudTextField Typo=Typo.body1 @bind-Value="@vioDialogModel.ioCuit.ioDcModel.ivstrCuitRS" Class="nat-text" Label="@Resources.lioL_Rs" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Person" />
-                            <MudSelect Typo=Typo.body2 Class="nat-text3" @bind-Value="@vioDialogModel.ioCuit.ioCnfg.ivstrEncoding" Variant="Variant.Outlined" Margin="Margin.Dense" Label=@Resources.lioL_Encoding>
-                                @foreach (ListModel lioListModel in ioState.ioStatics.coLists.Where(x => x.ivcodType == "ENCOD").OrderBy(x => int.Parse(x.ivcodId)))
-                                {
-                                    <MudSelectItem Class="nat-text" Value=@lioListModel.ivstrDesc>@lioListModel.ivstrDesc</MudSelectItem>
                                 }
-                            </MudSelect>
-                        </div>
-                        <div>
-                            <MudTextField Typo=Typo.body1 @bind-Value="@vioDialogModel.ioCuit.ioCnfg.ivstrInFolder" Class="nat-text" Label="@Resources.lioL_FtpIn" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Person" />
-                        </div>
-                        <div>
-                            <MudTextField Typo=Typo.body1 @bind-Value="@vioDialogModel.ioCuit.ioCnfg.ivstrOutFolder" Class="nat-text" Label="@Resources.lioL_FtpOut" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Person" />
-                        </div>
-                        <div class="nat-mixaling-container">
-                            <spam>@Resources.lioL_Mapper</spam>
-                            <MudIconButton Icon="@Icons.Material.Filled.FileDownload" @onclick="Download" Class="nat-icon-verde" title=@Resources.lioL_FileDownload></MudIconButton>
-                            <MudIconButton Icon="@Icons.Material.Filled.FileUpload" @onclick="Upload" Class="nat-icon-verde" title=@Resources.lioL_FileUpload></MudIconButton>
-                        </div>
-                        @if (mivblnShowUploadMapper)
-                        {
-                            <div>
-                                <MudFileUpload T="IBrowserFile" FilesChanged="FileReadyMapper" Label="@Resources.lioL_Drag">
-                                    <ActivatorContent>
-                                        <MudButton Variant="Variant.Filled"
-                                                   Color="Color.Primary"
-                                                   StartIcon="@Icons.Material.Filled.CloudUpload">
-                                            @Resources.lioL_Upload
-                                        </MudButton>
-                                    </ActivatorContent>
-                                </MudFileUpload>
-                            </div>
-                            <p>@mivstrFileNameMapper</p>
-                        }
-                        <div class="nat-mixaling-container">
-                            <spam>@Resources.lioL_Templates</spam>
-                            <MudIconButton Icon="@Icons.Material.Filled.FileDownload" @onclick="DownloadTemplates" Class="nat-icon-verde" title=@Resources.lioL_FileDownload></MudIconButton>
-                            <MudIconButton Icon="@Icons.Material.Filled.FileUpload" @onclick="UploadTemplates" Class="nat-icon-verde" title=@Resources.lioL_FileUpload></MudIconButton>
-                        </div>
-                        @if (mivblnShowUploadTemplate)
-                        {
-                            <div>
-                                <MudFileUpload T="IBrowserFile" FilesChanged="FileReadyTemplate" Label="@Resources.lioL_Drag">
-                                    <ActivatorContent>
-                                        <MudButton Variant="Variant.Filled"
-                                                   Color="Color.Primary"
-                                                   StartIcon="@Icons.Material.Filled.CloudUpload">
-                                            @Resources.lioL_Upload
-                                        </MudButton>
-                                    </ActivatorContent>
-                                </MudFileUpload>
-
-                            </div>
-                            <p>@mivstrFileNameTemplate</p>
-                        }
-                    }
-                    break;
-                }
-            case eDialogType.List:
-                {
-                    @if (vioDialogModel?.ioList != null)
-                    {
-                        <MudTextField Disabled=true Typo=Typo.body1 @bind-Value="@vioDialogModel.ioList.ioDcModel.ivcodType" Class="nat-text" Label="@Resources.lioL_Type1" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.ListAlt" />
-                        @if (!string.IsNullOrEmpty(vioDialogModel?.ioList.ioDcModel.ivcodId))
-                        {
-                            <div>
-                                <MudTextField Disabled=true Typo=Typo.body1 @bind-Value="@vioDialogModel.ioList.ioDcModel.ivcodId" Class="nat-text" Label="@Resources.lioL_Id" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.ListAlt" />
-                            </div>
-                        }
-                        else
-                        {
-                            <div>
-                                <MudTextField Typo=Typo.body1 @bind-Value="@vioDialogModel.ioList.ioDcModel.ivcodId" Class="nat-text" Label="@Resources.lioL_Id" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.ListAlt" />
-                            </div>
-                        }
-                        <div>
-                            <MudTextField Typo=Typo.body1 @bind-Value="@vioDialogModel.ioList.ioDcModel.ivstrDesc" Class="nat-text" Label="@Resources.lioL_Desc" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Person" />
-                        </div>
-                    }
-                    break;
-                }
-            case eDialogType.User:
-                {
-                    @if (vioDialogModel?.ioUser != null)
-                    {
-                        @if (vioDialogModel.ioUser.ioDcModel.ivnumUser > 0)
-                        {
-                            <div>
-                                <MudTextField Disabled=true Typo=Typo.body1 @bind-Value="@vioDialogModel.ioUser.ioDcModel.ivstrUserId" Class="nat-text" Label="@Resources.lioL_UserId" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Person" />
-                            </div>
-                        }
-                        else
-                        {
-                            <div>
-                                <MudTextField Typo=Typo.body1 @bind-Value="@vioDialogModel.ioUser.ioDcModel.ivstrUserId" Class="nat-text" Label="@Resources.lioL_UserId" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Person" />
-                            </div>
-                        }
-                        <div>
-                        </div>
-                        <MudTextField Typo=Typo.body1 @bind-Value="@vioDialogModel.ioUser.ioDcModel.ivstrUserName" Class="nat-text" Label="@Resources.lioL_UserName" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.InsertDriveFile" />
-                        <div class="nat-borow-container">
-                            <MudTextField Typo=Typo.body1 @bind-Value="@vioDialogModel.ioUser.ioDcModel.ivstrUserEmail" Class="nat-text" Label="@Resources.lioL_Email" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Email" />
-                            <MudTextField Disabled="true" Typo=Typo.body1 @bind-Value="vioDialogModel.ioUser.ivstrPass" Class="nat-text" Label="@Resources.lioL_Pass" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Key" />
-                            <MudIconButton Icon="@Icons.Material.Filled.RotateRight" Class="nat-icon-verde" @onclick="GenPass"></MudIconButton>
-                            <MudIconButton Icon="@Icons.Material.Filled.RemoveDone" Class="nat-icon-verde" @onclick="ClrPass"></MudIconButton>
-                            <MudTextField Disabled="true" Typo=Typo.body1 @bind-Value="vioDialogModel.ioUser.ioDcModel.ivnrologonFails" Class="nat-text" Label="@Resources.lioL_NroFails" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Key" />
-                            <MudCheckBox Label=@Resources.lioL_Enable LabelPlacement="Placement.Start" @bind-Value="@vioDialogModel.ioUser.ioDcModel.ivblnEnable" />
-                        </div>
-                        <div class="nat-borow-container">
-                            <MudTextField Typo=Typo.body1 @bind-Value="@vioDialogModel.ioUser.ivstrCuits" Class="nat-text" Label="@Resources.lioL_UsrCuit" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Factory" />
-                            <span>@Resources.lioL_Coma</span>
-                        </div>
-                    }
-                    break;
-                }
-            case eDialogType.Me:
-                {
-                    <div class="nat-text2N">@Resources.lioL_UserId</div>
-                    <div class="nat-text2">@ioState.ioLogin?.ioUser.ioDcModel.ivstrUserId</div>
-                    <div class="nat-text2N">@Resources.lioL_Email</div>
-                    <div class="nat-text2">@ioState.ioLogin?.ioUser.ioDcModel.ivstrUserEmail</div>
-                    <div class="nat-text2N">@Resources.lioL_UserName</div>
-                    <div class="nat-text2">@ioState.ioLogin?.ioUser.ioDcModel.ivstrUserName</div>
-                    <div class="nat-text2N">@Resources.lioL_DefaultCuit</div>
-                    <div class="nat-text2">@ioState.ioLogin.ivlngCurrentCuit</div>
-                    @if (ioState.ioLogin.ioUser.coCuitsModels.Count > 1)
-                    {
-                        <div class="nat-text2N">@Resources.lioL_CurrentCuit</div>
-                        <MudSelect Typo=Typo.body2 @bind-Value="@ioState.ioLogin.ivlngCurrentCuit" Variant="Variant.Outlined" Class="nat-text3" Margin="Margin.Dense">
-                            @foreach (UserCuitModel lio in ioState.ioLogin.ioUser.coCuitsModels)
-                            {
-                                <MudSelectItem Class="nat-text" Value=lio.ivlngCuit>@lio.ivlngCuit - @lio.ivstrRS</MudSelectItem>
+                                else
+                                {
+                                    <div class="nat-col8">
+                                        <MudIconButton Icon="@Icons.Material.Filled.ExpandMore" Class="nat-icon-verde" @onclick="(() => ShowData(lioTracking))" Edge="Edge.End"></MudIconButton>
+                                    </div>
+                                }
                             }
-                        </MudSelect>
-                    }
-                    <div class="nat-space2">
+                        </div>
+                        @if (lioTracking.ivblnShowData)
+                        {
+                            <div class="nat-trackdetail-container ">
+                                <div class="nat-trackdetail">
+                                    @foreach (Tuple<string, string, int> lioO in mcoTrackDetail)
+                                    {
+                                        <spam style="color:@lioO.Item1; font-weight:@lioO.Item3">
+                                            @lioO.Item2
+                                        </spam>
+                                    }
+                                </div>
+                                <MudIconButton Icon="@Icons.Material.Filled.CopyAll" Class="nat-icon-verde" title=@Resources.lioL_Copy @onclick="(() => Copy(lioTracking))"></MudIconButton>
+                            </div>
+                        }
                     </div>
-                    @if (livblnPass)
+                }
+                break;
+            case eDialogType.Cuit:
+                @if (vioDialogModel?.ioCuit?.ioCnfg != null)
+                {
+                    @if (vioDialogModel.ioCuit.ioDcModel.ivlngCuit > 0)
                     {
-                        <div class="nat-usrpass-container">
-                            <div class="nat-w100">
-                                <MudTextField Typo=Typo.body1 @bind-Value="mivstrPass" InputType="InputType.Password" class="nat-text" Label="@Resources.lioL_Pass" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Key" />
-                            </div>
-                            <div class="nat-w100">
-                                <MudTextField Typo=Typo.body1 @bind-Value="mivstrPass2" InputType="InputType.Password" class="nat-text" Label="@Resources.lioL_Pass2" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Key" />
-                            </div>
-                            <div class="nat-cw100">
-                                <MudButton Class="nat-buttontrans" FullWidth=true OnClick="Pass">@Resources.lioL_Cancel</MudButton>
-                                <MudButton Class="nat-button" FullWidth=true OnClick="PassChg">@Resources.lioL_Ok</MudButton>
-                            </div>
+                        <div>
+                            <MudTextField Disabled=true Typo=Typo.body1 @bind-Value="@vioDialogModel.ioCuit.ioDcModel.ivlngCuit" Class="nat-text" Label="@Resources.lioL_Cuit1" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Factory" />
                         </div>
                     }
                     else
                     {
-                        <MudButton Class="nat-buttontrans" StartIcon="@Icons.Material.Filled.Key" FullWidth=true OnClick="Pass">@Resources.lioL_PassChg</MudButton>
+                        <div>
+                            <MudTextField Typo=Typo.body1 @bind-Value="@vioDialogModel.ioCuit.ioDcModel.ivlngCuit" Class="nat-text" Label="@Resources.lioL_Cuit1" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Factory" />
+                        </div>
                     }
-                    break;
+                    <div>
+                        <MudTextField Typo=Typo.body1 @bind-Value="@vioDialogModel.ioCuit.ioDcModel.ivstrCuitRS" Class="nat-text" Label="@Resources.lioL_Rs" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Article" />
+                    </div>
+                    <div>
+                        <MudTextField Typo=Typo.body1 @bind-Value="@mivstrEmail" Class="nat-text" Label="@Resources.lioL_LDs" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Article" />
+                    </div>
+                    <div class="nat-borow-container">
+                        <MudSelect Typo=Typo.body2 Class="nat-text3" @bind-Value="@mivstrEncoding" Variant="Variant.Outlined" Margin="Margin.Dense" Label=@Resources.lioL_Encoding Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.FontDownload">
+                            @foreach (ListModel lioListModel in ioState.ioStatics.coLists.Where(x => x.ivcodType == "ENCOD").OrderBy(x => int.Parse(x.ivcodId)))
+                            {
+                                <MudSelectItem Class="nat-text" Value=@lioListModel.ivstrDesc>@lioListModel.ivstrDesc</MudSelectItem>
+                            }
+                        </MudSelect>
+                        <MudSelect Typo=Typo.body2 Class="nat-text3" @bind-Value="@mivstrLoadMethod" Variant="Variant.Outlined" Margin="Margin.Dense" Label=@Resources.lioL_LoadMethod Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Input">
+                            @foreach (ListModel lioListModel in ioState.ioStatics.coLists.Where(x => x.ivcodType == "LOADMTH").OrderBy(x => int.Parse(x.ivcodId)))
+                            {
+                                <MudSelectItem Class="nat-text" Value=@lioListModel.ivcodId>@lioListModel.ivstrDesc</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </div>
+                    @switch (mivstrLoadMethod)
+                    {
+                        case "1":
+                            {
+                                <div>
+                                    <MudTextField Typo=Typo.body1 @bind-Value="@mivstrInFolder" Class="nat-text" Label="@Resources.lioL_FtpIn" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Folder" />
+                                </div>
+                                <div>
+                                    <MudTextField Typo=Typo.body1 @bind-Value="@mivstrOutFolder" Class="nat-text" Label="@Resources.lioL_FtpOut" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Folder" />
+                                </div>
+                                break;
+                            }
+                        case "2":
+                            {
+                                <div>
+                                    <MudTextField Typo=Typo.body1 @bind-Value="@mivstrInFolder" Class="nat-text" Label="@Resources.lioL_UrlIngreso" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Language" />
+                                </div>
+                                <div>
+                                    <MudTextField Typo=Typo.body1 @bind-Value="@mivstrOutFolder" Class="nat-text" Label="@Resources.lioL_UrlEgreso" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Language" />
+                                </div>
+                                <div class="nat-borow-container">
+                                    <MudTextField Typo=Typo.body1 @bind-Value="@mivstrUser" Class="nat-text" Label="@Resources.lioL_UserId" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Person" />
+                                    <MudTextField Typo=Typo.body1 @bind-Value="@mivstrPass" InputType="InputType.Password" class="nat-text" Label="@Resources.lioL_Pass" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Key" />
+                                </div>
+                                <div class="nat-borow-container">
+                                    <MudTextField Typo=Typo.body1 @bind-Value="@mivstrEntityID" Class="nat-text" Label="@Resources.lioL_EntityID" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Info" />
+                                    <MudTextField Typo=Typo.body1 @bind-Value="@mivnroDays" Class="nat-text" Label="@Resources.lioL_Days" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.AccessTime" />
+                                    <MudTextField Typo=Typo.body1 @bind-Value="@mivnroRows" Class="nat-text" Label="@Resources.lioL_Rows" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Dehaze" />
+                                </div>
+                                break;
+                            }
+                    }
+
+                    <div class="nat-mixaling-container">
+                        <spam>@Resources.lioL_Mapper</spam>
+                        <MudIconButton Icon="@Icons.Material.Filled.FileDownload" @onclick="Download" Class="nat-icon-verde" title=@Resources.lioL_FileDownload></MudIconButton>
+                        <MudIconButton Icon="@Icons.Material.Filled.FileUpload" @onclick="Upload" Class="nat-icon-verde" title=@Resources.lioL_FileUpload></MudIconButton>
+                    </div>
+                    @if (mivblnShowUploadMapper)
+                    {
+                        <div>
+                            <MudFileUpload T="IBrowserFile" FilesChanged="FileReadyMapper" Label="@Resources.lioL_Drag">
+                                <ActivatorContent>
+                                    <MudButton Variant="Variant.Filled"
+                                               Color="Color.Primary"
+                                               StartIcon="@Icons.Material.Filled.CloudUpload">
+                                        @Resources.lioL_Upload
+                                    </MudButton>
+                                </ActivatorContent>
+                            </MudFileUpload>
+                        </div>
+                        <p>@mivstrFileNameMapper</p>
+                    }
+                    <div class="nat-mixaling-container">
+                        <spam>@Resources.lioL_Templates</spam>
+                        <MudIconButton Icon="@Icons.Material.Filled.FileDownload" @onclick="DownloadTemplates" Class="nat-icon-verde" title=@Resources.lioL_FileDownload></MudIconButton>
+                        <MudIconButton Icon="@Icons.Material.Filled.FileUpload" @onclick="UploadTemplates" Class="nat-icon-verde" title=@Resources.lioL_FileUpload></MudIconButton>
+                    </div>
+                    @if (mivblnShowUploadTemplate)
+                    {
+                        <div>
+                            <MudFileUpload T="IBrowserFile" FilesChanged="FileReadyTemplate" Label="@Resources.lioL_Drag">
+                                <ActivatorContent>
+                                    <MudButton Variant="Variant.Filled"
+                                               Color="Color.Primary"
+                                               StartIcon="@Icons.Material.Filled.CloudUpload">
+                                        @Resources.lioL_Upload
+                                    </MudButton>
+                                </ActivatorContent>
+                            </MudFileUpload>
+
+                        </div>
+                        <p>@mivstrFileNameTemplate</p>
+                    }
                 }
+                break;
+            case eDialogType.List:
+                @if (vioDialogModel?.ioList != null)
+                {
+                    <MudTextField Disabled=true Typo=Typo.body1 @bind-Value="@vioDialogModel.ioList.ioDcModel.ivcodType" Class="nat-text" Label="@Resources.lioL_Type1" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.ListAlt" />
+                    @if (!string.IsNullOrEmpty(vioDialogModel?.ioList.ioDcModel.ivcodId))
+                    {
+                        <div>
+                            <MudTextField Disabled=true Typo=Typo.body1 @bind-Value="@vioDialogModel.ioList.ioDcModel.ivcodId" Class="nat-text" Label="@Resources.lioL_Id" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.ListAlt" />
+                        </div>
+                    }
+                    else
+                    {
+                        <div>
+                            <MudTextField Typo=Typo.body1 @bind-Value="@vioDialogModel.ioList.ioDcModel.ivcodId" Class="nat-text" Label="@Resources.lioL_Id" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.ListAlt" />
+                        </div>
+                    }
+                    <div>
+                        <MudTextField Typo=Typo.body1 @bind-Value="@vioDialogModel.ioList.ioDcModel.ivstrDesc" Class="nat-text" Label="@Resources.lioL_Desc" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Person" />
+                    </div>
+                }
+                break;
+            case eDialogType.User:
+                @if (vioDialogModel?.ioUser != null)
+                {
+                    @if (vioDialogModel.ioUser.ioDcModel.ivnumUser > 0)
+                    {
+                        <div>
+                            <MudTextField Disabled=true Typo=Typo.body1 @bind-Value="@vioDialogModel.ioUser.ioDcModel.ivstrUserId" Class="nat-text" Label="@Resources.lioL_UserId" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Person" />
+                        </div>
+                    }
+                    else
+                    {
+                        <div>
+                            <MudTextField Typo=Typo.body1 @bind-Value="@vioDialogModel.ioUser.ioDcModel.ivstrUserId" Class="nat-text" Label="@Resources.lioL_UserId" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Person" />
+                        </div>
+                    }
+                    <div>
+                    </div>
+                    <MudTextField Typo=Typo.body1 @bind-Value="@vioDialogModel.ioUser.ioDcModel.ivstrUserName" Class="nat-text" Label="@Resources.lioL_UserName" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.InsertDriveFile" />
+                    <div class="nat-borow-container">
+                        <MudTextField Typo=Typo.body1 @bind-Value="@vioDialogModel.ioUser.ioDcModel.ivstrUserEmail" Class="nat-text" Label="@Resources.lioL_Email" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Email" />
+                        <MudTextField Disabled="true" Typo=Typo.body1 @bind-Value="vioDialogModel.ioUser.ivstrPass" Class="nat-text" Label="@Resources.lioL_Pass" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Key" />
+                        <MudIconButton Icon="@Icons.Material.Filled.RotateRight" Class="nat-icon-verde" @onclick="GenPass"></MudIconButton>
+                        <MudIconButton Icon="@Icons.Material.Filled.RemoveDone" Class="nat-icon-verde" @onclick="ClrPass"></MudIconButton>
+                        <MudTextField Disabled="true" Typo=Typo.body1 @bind-Value="vioDialogModel.ioUser.ioDcModel.ivnrologonFails" Class="nat-text" Label="@Resources.lioL_NroFails" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Key" />
+                        <MudCheckBox Label=@Resources.lioL_Enable LabelPlacement="Placement.Start" @bind-Value="@vioDialogModel.ioUser.ioDcModel.ivblnEnable" />
+                    </div>
+                    <div class="nat-borow-container">
+                        <MudTextField Typo=Typo.body1 @bind-Value="@vioDialogModel.ioUser.ivstrCuits" Class="nat-text" Label="@Resources.lioL_UsrCuit" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Factory" />
+                        <span>@Resources.lioL_Coma</span>
+                    </div>
+                }
+                break;
+            case eDialogType.Me:
+                <div class="nat-text2N">@Resources.lioL_UserId</div>
+                <div class="nat-text2">@ioState.ioLogin?.ioUser.ioDcModel.ivstrUserId</div>
+                <div class="nat-text2N">@Resources.lioL_Email</div>
+                <div class="nat-text2">@ioState.ioLogin?.ioUser.ioDcModel.ivstrUserEmail</div>
+                <div class="nat-text2N">@Resources.lioL_UserName</div>
+                <div class="nat-text2">@ioState.ioLogin?.ioUser.ioDcModel.ivstrUserName</div>
+                <div class="nat-text2N">@Resources.lioL_DefaultCuit</div>
+                <div class="nat-text2">@ioState.ioLogin.ivlngCurrentCuit</div>
+                @if (ioState.ioLogin.ioUser.coCuitsModels.Count > 1)
+                {
+                    <div class="nat-text2N">@Resources.lioL_CurrentCuit</div>
+                    <MudSelect Typo=Typo.body2 @bind-Value="@ioState.ioLogin.ivlngCurrentCuit" Variant="Variant.Outlined" Class="nat-text3" Margin="Margin.Dense">
+                        @foreach (UserCuitModel lio in ioState.ioLogin.ioUser.coCuitsModels)
+                        {
+                            <MudSelectItem Class="nat-text" Value=lio.ivlngCuit>@lio.ivlngCuit - @lio.ivstrRS</MudSelectItem>
+                        }
+                    </MudSelect>
+                }
+                <div class="nat-space2">
+                </div>
+                @if (livblnPass)
+                {
+                    <div class="nat-usrpass-container">
+                        <div class="nat-w100">
+                            <MudTextField Typo=Typo.body1 @bind-Value="mivstrPass" InputType="InputType.Password" class="nat-text" Label="@Resources.lioL_Pass" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Key" />
+                        </div>
+                        <div class="nat-w100">
+                            <MudTextField Typo=Typo.body1 @bind-Value="mivstrPass2" InputType="InputType.Password" class="nat-text" Label="@Resources.lioL_Pass2" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Key" />
+                        </div>
+                        <div class="nat-cw100">
+                            <MudButton Class="nat-buttontrans" FullWidth=true OnClick="Pass">@Resources.lioL_Cancel</MudButton>
+                            <MudButton Class="nat-button" FullWidth=true OnClick="PassChg">@Resources.lioL_Ok</MudButton>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <MudButton Class="nat-buttontrans" StartIcon="@Icons.Material.Filled.Key" FullWidth=true OnClick="Pass">@Resources.lioL_PassChg</MudButton>
+                }
+                break;
+            case eDialogType.Oidc:
+                @if (ioState.ioStatics.coIdentityProviders != null)
+                {
+                    <MudRadioGroup @bind-Value="vioDialogModel.ivstrBody">
+                        @foreach (IdentityProviderModel lioIdentityProviderModel in ioState.ioStatics.coIdentityProviders)
+                        {
+                            <MudRadio Color="Color.Primary" Value="@(lioIdentityProviderModel.ivnumIdentityProvider.ToString())">@lioIdentityProviderModel.ivstrIdentityProvider</MudRadio>
+                        }
+                    </MudRadioGroup>
+                }
+                else
+                {
+                    <p>@Resources.lioE_NoOidcClients</p>
+                }
+                break;
+
         }
         @if (!string.IsNullOrEmpty(mivstrError))
         {
@@ -358,11 +397,20 @@
     [Parameter]
     public DialogModel vioDialogModel { get; set; }
     #region Props
+    private string mivstrUser { get; set; }
+    private string mivstrInFolder { get; set; }
+    private string mivstrOutFolder { get; set; }
+    private string mivstrEncoding { get; set; }
+    private string mivstrLoadMethod { get; set; }
     private string mivstrFileNameTemplate { get; set; }
     private string mivstrFileNameMapper { get; set; }
     private string mivstrError { get; set; }
     private string mivstrPass { get; set; }
     private string mivstrPass2 { get; set; }
+    private string mivstrEntityID { get; set; }
+    private string mivstrEmail { get; set; }
+    private short mivnroDays { get; set; }
+    private short mivnroRows { get; set; }
     private string livstrRes { get; set; }
     private List<Tuple<string, string, int>> mcoTrackDetail { get; set; }
     private bool livblnshowFullError { get; set; }
@@ -389,9 +437,65 @@
         livblnshowFullError = false;
         livblnPass = false;
         livstrRes = string.Empty;
+        if (vioDialogModel.ioCuit != null)
+        {
+            mivstrEncoding = vioDialogModel.ioCuit.ioCnfg.coParameters?.FirstOrDefault(x => x.ivstrId == "Encoding")?.ivstrValue;
+            mivstrLoadMethod = vioDialogModel.ioCuit.ioCnfg.coParameters?.FirstOrDefault(x => x.ivstrId == "LoadMethod")?.ivstrValue;
+            mivstrUser = vioDialogModel.ioCuit.ioCnfg.coParameters?.FirstOrDefault(x => x.ivstrId == "User")?.ivstrValue;
+            mivstrPass = vioDialogModel.ioCuit.ioCnfg.coParameters?.FirstOrDefault(x => x.ivstrId == "Pass")?.ivstrValue;
+            mivstrInFolder = vioDialogModel.ioCuit.ioCnfg.coParameters?.FirstOrDefault(x => x.ivstrId == "InFolder")?.ivstrValue;
+            mivstrOutFolder = vioDialogModel.ioCuit.ioCnfg.coParameters?.FirstOrDefault(x => x.ivstrId == "OutFolder")?.ivstrValue;
+            mivstrEntityID = vioDialogModel.ioCuit.ioCnfg.coParameters?.FirstOrDefault(x => x.ivstrId == "EntityID")?.ivstrValue;
+            mivnroDays = short.Parse(vioDialogModel.ioCuit.ioCnfg.coParameters?.FirstOrDefault(x => x.ivstrId == "Days")?.ivstrValue ?? "2");
+            mivnroRows = short.Parse(vioDialogModel.ioCuit.ioCnfg.coParameters?.FirstOrDefault(x => x.ivstrId == "Rows")?.ivstrValue ?? "100");
+            mivstrEmail = vioDialogModel.ioCuit.ioCnfg.coParameters?.FirstOrDefault(x => x.ivstrId == "Email")?.ivstrValue;
+        }
     }
     private void Cancel() => vioMudDialog.Cancel();
-    private void OK() => vioMudDialog.Close(DialogResult.Ok(DialogResult.Ok(true)));
+    private void OK()
+    {
+        if (vioDialogModel.ioCuit != null)
+        {
+            List<CuitParameter> lcoParams = new List<CuitParameter>();
+            if (string.IsNullOrEmpty(mivstrLoadMethod))
+                lcoParams.Add(new CuitParameter { ivstrId = "Encoding", ivstrValue = "UTF-8" });
+            else
+                lcoParams.Add(new CuitParameter { ivstrId = "Encoding", ivstrValue = mivstrEncoding });
+            if (!string.IsNullOrEmpty(mivstrLoadMethod))
+            {
+                lcoParams.Add(new CuitParameter { ivstrId = "LoadMethod", ivstrValue = mivstrLoadMethod });
+                switch (mivstrLoadMethod)
+                {
+                    case "1":
+                        if (!string.IsNullOrEmpty(mivstrInFolder))
+                            lcoParams.Add(new CuitParameter { ivstrId = "InFolder", ivstrValue = mivstrInFolder });
+                        if (!string.IsNullOrEmpty(mivstrOutFolder))
+                            lcoParams.Add(new CuitParameter { ivstrId = "OutFolder", ivstrValue = mivstrOutFolder });
+                        break;
+                    case "2":
+                        if (!string.IsNullOrEmpty(mivstrInFolder))
+                            lcoParams.Add(new CuitParameter { ivstrId = "InFolder", ivstrValue = mivstrInFolder });
+                        if (!string.IsNullOrEmpty(mivstrOutFolder))
+                            lcoParams.Add(new CuitParameter { ivstrId = "OutFolder", ivstrValue = mivstrOutFolder });
+                        if (!string.IsNullOrEmpty(mivstrUser))
+                            lcoParams.Add(new CuitParameter { ivstrId = "User", ivstrValue = mivstrUser });
+                        if (!string.IsNullOrEmpty(mivstrPass))
+                            lcoParams.Add(new CuitParameter { ivstrId = "Pass", ivstrValue = mivstrPass });
+                        if (!string.IsNullOrEmpty(mivstrEntityID))
+                            lcoParams.Add(new CuitParameter { ivstrId = "EntityID", ivstrValue = mivstrEntityID });
+                        if (mivnroDays > 0)
+                            lcoParams.Add(new CuitParameter { ivstrId = "Days", ivstrValue = mivnroDays.ToString() });
+                        if (mivnroRows > 0)
+                            lcoParams.Add(new CuitParameter { ivstrId = "Rows", ivstrValue = mivnroRows.ToString() });
+                        break;
+                }
+            }
+            if (!string.IsNullOrEmpty(mivstrEmail))
+                lcoParams.Add(new CuitParameter { ivstrId = "Email", ivstrValue = mivstrEmail });
+            vioDialogModel.ioCuit.ioCnfg.coParameters = lcoParams.ToArray();
+        }
+        vioMudDialog.Close(DialogResult.Ok(DialogResult.Ok(true)));
+    }
     private void ShowFullError()
     {
         livblnshowFullError = !livblnshowFullError;

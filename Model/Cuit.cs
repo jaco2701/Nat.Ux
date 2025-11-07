@@ -22,11 +22,8 @@ namespace Applet.Nat.Ux.Models
     public class CuitCnfg
     {
         public ServiceMapper[]? coServiceMappers { get; set; }
-        public string? ivstrInFolder { get; set; }
-        public string? ivstrOutFolder { get; set; }
-        public bool? ivblnAdmin { get; set; }
+        public CuitParameter[] coParameters { get; set; }
         public TemplateVersion[]? coTemplateVersions { get; set; }
-        public string? ivstrEncoding { get; set; }
     }
     public class ServiceMapper
     {
@@ -59,6 +56,12 @@ namespace Applet.Nat.Ux.Models
     {
         public short ivnroTipo { get; set; }
         public short ivnroTemplateVersion { get; set; }
+
+    }
+    public class CuitParameter
+    {
+        public string ivstrId { get; set; }
+        public string ivstrValue { get; set; }
 
     }
 }

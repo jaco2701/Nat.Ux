@@ -106,6 +106,15 @@ namespace Nat.Ux.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No se encontraron proveedores de identidad.
+        /// </summary>
+        internal static string lioE_NoOidcClients {
+            get {
+                return ResourceManager.GetString("lioE_NoOidcClients", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Documento No Encontrado.
         /// </summary>
         internal static string lioE_NoPdf {
@@ -331,6 +340,15 @@ namespace Nat.Ux.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Días de búsqueda hacia atrás.
+        /// </summary>
+        internal static string lioL_Days {
+            get {
+                return ResourceManager.GetString("lioL_Days", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to CUIT predeterminado.
         /// </summary>
         internal static string lioL_DefaultCuit {
@@ -444,6 +462,15 @@ namespace Nat.Ux.Properties {
         internal static string lioL_Encoding {
             get {
                 return ResourceManager.GetString("lioL_Encoding", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ID entidad Oracle.
+        /// </summary>
+        internal static string lioL_EntityID {
+            get {
+                return ResourceManager.GetString("lioL_EntityID", resourceCulture);
             }
         }
         
@@ -574,6 +601,15 @@ namespace Nat.Ux.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Proveedores Disponibles.
+        /// </summary>
+        internal static string lioL_IdProv {
+            get {
+                return ResourceManager.GetString("lioL_IdProv", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Importe.
         /// </summary>
         internal static string lioL_Importe {
@@ -592,11 +628,29 @@ namespace Nat.Ux.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Destinatarios Correo (separados por ;).
+        /// </summary>
+        internal static string lioL_LDs {
+            get {
+                return ResourceManager.GetString("lioL_LDs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Letra.
         /// </summary>
         internal static string lioL_Letra {
             get {
                 return ResourceManager.GetString("lioL_Letra", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tipo de Ingreso.
+        /// </summary>
+        internal static string lioL_LoadMethod {
+            get {
+                return ResourceManager.GetString("lioL_LoadMethod", resourceCulture);
             }
         }
         
@@ -700,6 +754,15 @@ namespace Nat.Ux.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Ingresar con OpenID.
+        /// </summary>
+        internal static string lioL_Oidc {
+            get {
+                return ResourceManager.GetString("lioL_Oidc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Aceptar.
         /// </summary>
         internal static string lioL_Ok {
@@ -714,6 +777,15 @@ namespace Nat.Ux.Properties {
         internal static string lioL_OperOK {
             get {
                 return ResourceManager.GetString("lioL_OperOK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to O.
+        /// </summary>
+        internal static string lioL_Or {
+            get {
+                return ResourceManager.GetString("lioL_Or", resourceCulture);
             }
         }
         
@@ -813,6 +885,15 @@ namespace Nat.Ux.Properties {
         internal static string lioL_Result {
             get {
                 return ResourceManager.GetString("lioL_Result", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cantidad de Documentos .
+        /// </summary>
+        internal static string lioL_Rows {
+            get {
+                return ResourceManager.GetString("lioL_Rows", resourceCulture);
             }
         }
         
@@ -930,6 +1011,24 @@ namespace Nat.Ux.Properties {
         internal static string lioL_Uploads {
             get {
                 return ResourceManager.GetString("lioL_Uploads", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to URL Egreso Docs..
+        /// </summary>
+        internal static string lioL_UrlEgreso {
+            get {
+                return ResourceManager.GetString("lioL_UrlEgreso", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to URL Ingreso Docs..
+        /// </summary>
+        internal static string lioL_UrlIngreso {
+            get {
+                return ResourceManager.GetString("lioL_UrlIngreso", resourceCulture);
             }
         }
         

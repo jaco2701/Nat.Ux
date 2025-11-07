@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor;
 using MudBlazor.Services;
 using Nat.Ux;
+using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);

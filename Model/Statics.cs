@@ -8,6 +8,7 @@ namespace Applet.Nat.Ux.Models
     public class Statics
     {
         public List<ListModel> coLists { get; set; }
+        public List<IdentityProviderModel> coIdentityProviders { get; set; }
 
     }
     public static class Format

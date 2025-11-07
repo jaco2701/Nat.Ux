@@ -1,0 +1,92 @@
+﻿@page "/authentication/login-callback"
+@using Applet.Nat.Ux.Models
+@using Applet.Nat.Ux
+@using MudBlazor
+@using Nat.Ux.Properties
+@using DNTCaptcha.Blazor
+
+@inject IConfiguration Configuration
+@inject NavigationManager NavigationManager
+@inject State ioState
+@inject ISnackbar Snackbar
+
+<PageTitle>@Resources.lioL_login</PageTitle>
+<div class="nat-page">
+    @if (lioModel != null && ioState != null)
+    {
+        <EditForm Model="@lioModel" OnValidSubmit="@doLogin">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="nat-login-content">
+                <img src="./nat.png" class="nat-logo" />
+                <div class="nat-loginusrpass-container">
+                    <span class="nat-text1N">@Resources.lioL_login</span>
+                    <div class="nat-usrpass-container">
+                        <div class="nat-w100">
+                            <MudButton Class="nat-button" FullWidth=true StartIcon="@Icons.Material.Filled.Login" ButtonType="ButtonType.Submit">@Resources.lioL_In</MudButton>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </EditForm>
+    }
+</div>
+@code {
+    [Parameter]
+    public string? vivstrTimeOut { get; set; }
+    #region Propiedades
+    public LoginModel lioModel { get; set; }
+    private int livnumCaptchaLetters = 5;
+    private string livstrRes { get; set; }
+    private string mivstrDisc { get; set; }
+    private int mivnumFail { get; set; }
+
+    #endregion
+    #region Metodos
+
+    public async Task doLogin()
+    {
+        try
+        {
+            ioState.ivblnLogin = false;
+            ioState.ioLogin = await Service.Fetch<LoginResponse>(EAuthType.UserAndPass, $"{lioModel.ivstrUser}:{lioModel.ivstrPass}", Configuration, "login", null);
+            ioState.ivblnLogin = true;
+            ioState.ioLogin.ivlngCurrentCuit = 0;
+            if (ioState.ioLogin.ioUser.coCuitsModels == null || ioState.ioLogin.ioUser.coCuitsModels.Count == 0)
+                ioState.ioLogin.ivlngCurrentCuit = 0;
+            else
+            {
+                ioState.ioLogin.ivlngCurrentCuit =  ioState.ioLogin.ioUser.coCuitsModels[0].ivlngCuit;
+                foreach (UserCuitModel lioO in ioState.ioLogin.ioUser.coCuitsModels)
+                    if (lioO.ivblnDefaut)
+                    {
+                        ioState.ioLogin.ivlngCurrentCuit = lioO.ivlngCuit;
+                        break;
+                    }
+            }
+            NavigationManager.NavigateTo("Docs/0");
+        }
+        catch (Exception lioE)
+        {
+            ioState.ivblnLogin = false;
+            Snackbar.Add(lioE.Message, Severity.Error);
+            mivnumFail++;
+        }
+    }
+    public void CheckCaptcha()
+    {
+        if (lioModel.ivstrCaptcha == lioModel.ivstrCaptchaResponse)
+        {
+            mivnumFail = 0;
+            livstrRes = string.Empty;
+        }
+        else
+        {
+            lioModel.ivstrCaptchaResponse = string.Empty;
+            livstrRes = Resources.lioE_CaptchaNo;
+            mivnumFail++;
+        }
+        StateHasChanged();
+    }
+    #endregion
+}

@@ -1,6 +1,8 @@
 ﻿@page "/docs/{livstrpar}"
+@attribute [Authorize]
 @using Applet.Nat.Ux
 @using Applet.Nat.Ux.Models
+@using Microsoft.AspNetCore.Authorization
 @using MudBlazor
 @using Nat.Ux.Properties
 @using Newtonsoft.Json
@@ -127,7 +129,7 @@
                     <MudTd Style="max-width: 8vw;" Class="nat-text nat-td" DataLabel="@Resources.lioL_PV">@context.ioDcModel?.ivnumPvta.ToString().PadLeft(5, '0')</MudTd>
                     <MudTd Style="max-width: 8vw;" Class="nat-text nat-td nat-right" DataLabel="@Resources.lioL_Nbr">@context.ioDcModel?.ivlngCbte</MudTd>
                     <MudTd Style="max-width: 8vw;" Class="nat-text nat-td" DataLabel="@Resources.lioL_Date">@context.ioDcModel?.ivdtmEmision?.ToString(ioState.Getparam("Format", "UxDtm"))</MudTd>
-                    <MudTd Style="max-width: 10vw;" Class="nat-text nat-td nat-right" DataLabel="@Resources.lioL_User" title="@context.ioDcModel?.ivlngCuitReceptor">@context.ioDcModel?.ivlngCuitReceptor</MudTd>
+                    <MudTd Style="max-width: 10vw;" Class="nat-text nat-td nat-right" DataLabel="@Resources.lioL_User" title="@context.ioDcModel?.ivlngDoc">@context.ioDcModel?.ivlngCuitReceptor</MudTd>
                     <MudTd Style="max-width: 30vw;" Class="nat-text nat-td" DataLabel="@Resources.lioL_Rs">@context.ioDcModel?.ivstrRazonSocial</MudTd>
                     <MudTd Style="max-width: 10vw;" Class="nat-text nat-td nat-right" DataLabel="@Resources.lioL_Importe">@context.ioDcModel?.ivdblImporte.ToString("N2", System.Globalization.CultureInfo.GetCultureInfo("es-AR"))</MudTd>
                     <MudTd Style="max-width: 5vw; text-align:center" Class="nat-text nat-td " DataLabel="@Resources.lioL_Moneda">@context.ioDcModel?.ivstrMoneda</MudTd>
@@ -213,7 +215,7 @@
     }
     #region Tareas Header
     public async Task Find()
-    {
+     {
         try
         {
             mioFilter = new Filter { coFilterItems = new List<FilterItem>() };
