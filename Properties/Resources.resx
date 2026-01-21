@@ -465,4 +465,34 @@
   <data name="lioL_LDs" xml:space="preserve">
     <value>Destinatarios Correo (separados por ;)</value>
   </data>
+  <data name="lioL_ProcessingLogin" xml:space="preserve">
+    <value>Iniciando Autientificacion desde Proveedor de Identidad</value>
+  </data>
+  <data name="lioL_IdentityProvider" xml:space="preserve">
+    <value>Proveedor de Identidad</value>
+  </data>
+  <data name="lioE_OIDC" xml:space="preserve">
+    <value>Error en validación de identidad externa</value>
+  </data>
+  <data name="lioE_OIDCUserNo" xml:space="preserve">
+    <value>Usuario no encntrado</value>
+  </data>
+  <data name="lioL_Cuitr" xml:space="preserve">
+    <value>Receptores</value>
+  </data>
+  <data name="lioL_DeleteCuitR" xml:space="preserve">
+    <value>Desea eliminar los receptores seleccionados</value>
+  </data>
+  <data name="lioL_ClrLog" xml:space="preserve">
+    <value>Desea Borrar el Log?</value>
+  </data>
+  <data name="lioL_GetCallBackQuery" xml:space="preserve">
+    <value>Recuperando Parametros</value>
+  </data>
+  <data name="lioL_GetToken" xml:space="preserve">
+    <value>Gestionando Token</value>
+  </data>
+  <data name="GetNatUser" xml:space="preserve">
+    <value>Recuperando Usuario NAT</value>
+  </data>
 </root>

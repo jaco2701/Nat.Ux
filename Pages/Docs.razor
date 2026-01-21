@@ -27,7 +27,7 @@
     else
     {
         <div class="nat-filter-container">
-            @if (ioState.ioLogin.ioUser.ioDcModel.ivblnAdmin)
+            @if (ioState.ioUser.ioDcModel.ivblnAdmin)
             {
                 <div class="nat-col10">
                     <MudTextField Typo=Typo.body2 @bind-Value=mivlngCuitEmisor Variant="Variant.Outlined" Class="nat-text3" Adornment="Adornment.Start" Margin="Margin.Dense" Label=@Resources.lioL_Emisor></MudTextField>
@@ -105,7 +105,7 @@
             <MudTable FixedHeader="true" RowClass="nat-tr" FixedFooter="true"  HorizontalScrollbar="false" MultiSelection="true" Items="@mcoDocuments.OrderByDescending(x => x.ioDcModel?.ivlngDoc)" SelectionChangeable=true SortLabel="Sort By" Dense="true" @bind-SelectedItems="mcoSelectedDocuments">
 
                 <HeaderContent>
-                    @if (ioState.ioLogin.ioUser.ioDcModel.ivblnAdmin)
+                    @if (ioState.ioUser.ioDcModel.ivblnAdmin)
                     {
                         <MudTh Style="max-width: 8vw; text-align:center;"><MudTableSortLabel Class="nat-textN nat-th" SortBy="new Func<Document, object>(x => x.ioDcModel?.ivlngCuitEmisor)">@Resources.lioL_Emisor</MudTableSortLabel></MudTh>
                     }
@@ -121,7 +121,7 @@
                     <MudTh Style="max-width: 8vw; text-align:center;"><MudTableSortLabel Class="nat-textN nat-th" SortBy="new Func<Document, object>(x => x.ioDcModel?.ivstrIdCliente)">@Resources.lioL_IdCliente</MudTableSortLabel></MudTh>
                 </HeaderContent>
                 <RowTemplate >
-                    @if (ioState.ioLogin.ioUser.ioDcModel.ivblnAdmin)
+                    @if (ioState.ioUser.ioDcModel.ivblnAdmin)
                     {
                         <MudTd DataLabel="Nr">@context.ioDcModel?.ivlngCuitEmisor</MudTd>
                     }
@@ -221,7 +221,7 @@
             mioFilter = new Filter { coFilterItems = new List<FilterItem>() };
             mioFilter.coFilterItems.Clear();
 
-            if (ioState.ioLogin.ioUser.ioDcModel.ivblnAdmin && mivlngCuitEmisor != null && mivlngCuitEmisor != 0)
+            if (ioState.ioUser.ioDcModel.ivblnAdmin && mivlngCuitEmisor != null && mivlngCuitEmisor != 0)
                 mioFilter.coFilterItems.Add(
                     new FilterItem
                     {
@@ -236,7 +236,7 @@
                     {
                         ivstrOper = "EQ",
                         ivstrPropName = "ivlngCuitEmisor",
-                        ivstrPropValue = ioState.ioLogin.ivlngCurrentCuit.ToString()
+                        ivstrPropValue = ioState.ioUser.ivlngCurrentCuit.ToString()
                     }
                     );
             mioFilter.coFilterItems.Add(
@@ -319,7 +319,7 @@
                     }
                 );
             ioState.ivblnReady = false;
-            DocumentModel[] lcoOs = await Service.Post<DocumentModel[]>(EAuthType.Token, ioState.ioLogin.ivstrToken, Configuration, "DocsGet", mioFilter);
+            DocumentModel[] lcoOs = await ioState.Post<DocumentModel[]>(EAuthType.Token, ioState.ioIdentityProvider.ivstrToken, Configuration, "DocsGet", mioFilter);
             mcoDocuments = new List<Document>();
             foreach (DocumentModel lioDocumentModel in lcoOs.OrderByDescending(x => x.ivdtmEmision))
             {
@@ -363,8 +363,8 @@
                     continue;
                 if (string.IsNullOrEmpty(lioDocumentUpload.ivstrName))
                     continue;
-                lioDocumentUpload.ivlngCuit = ioState.ioLogin.ivlngCurrentCuit;
-                DocumentUploadResponse[] lcoDocumentUploadResponses = await Service.Post<DocumentUploadResponse[]>(EAuthType.Token, ioState.ioLogin.ivstrToken, Configuration, "DocSave", lioDocumentUpload);
+                lioDocumentUpload.ivlngCuit = ioState.ioUser.ivlngCurrentCuit;
+                DocumentUploadResponse[] lcoDocumentUploadResponses = await ioState.Post<DocumentUploadResponse[]>(EAuthType.Token, ioState.ioIdentityProvider.ivstrToken, Configuration, "DocSave", lioDocumentUpload);
                 foreach (DocumentUploadResponse lioDocumentUploadResponse in lcoDocumentUploadResponses)
                 {
                     livstrMsg += $"{lioDocumentUploadResponse.ivlngCuitEmisor}_{lioDocumentUploadResponse.ivnroTipoDoc}_{lioDocumentUploadResponse.ivnumPvta}_{lioDocumentUploadResponse.ivlngCbte}: {lioDocumentUploadResponse.ivstrDescStatus}";
@@ -395,7 +395,7 @@
         await iIJS.InvokeVoidAsync(
             "downloadBase64File",
             $"Export_{DateTime.Now.ToString("yyyyMMddhhmmss")}.xlsx",
-            await Service.PostToStr(EAuthType.Token, ioState.ioLogin.ivstrToken, Configuration, "Export", mioFilter));
+            await ioState.PostToStr(EAuthType.Token, ioState.ioIdentityProvider.ivstrToken, Configuration, "Export", mioFilter));
     }
     #endregion
     #region Tareas Rows
@@ -404,7 +404,7 @@
         try
         {
             long[] livlngDoc = mcoSelectedDocuments.Select(x => x.ioDcModel.ivlngDoc).ToArray();
-            DocumentTaskResponse[] lcoDocumentTaskResponses = await Service.Post<DocumentTaskResponse[]>(EAuthType.Token, ioState.ioLogin.ivstrToken, Configuration, "DocTask", new DocumentTask { ieTask = vieTask, cvlngDocs = livlngDoc });
+            DocumentTaskResponse[] lcoDocumentTaskResponses = await ioState.Post<DocumentTaskResponse[]>(EAuthType.Token, ioState.ioIdentityProvider.ivstrToken, Configuration, "DocTask", new DocumentTask { ieTask = vieTask, cvlngDocs = livlngDoc });
             StringBuilder lioSb = new StringBuilder();
             switch (vieTask)
             {

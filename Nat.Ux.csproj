@@ -8,9 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Services\**" />
     <Compile Remove="src\**" />
+    <Content Remove="Services\**" />
     <Content Remove="src\**" />
+    <EmbeddedResource Remove="Services\**" />
     <EmbeddedResource Remove="src\**" />
+    <None Remove="Services\**" />
     <None Remove="src\**" />
   </ItemGroup>
 
@@ -35,6 +39,7 @@
     <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="8.0.4" />
     <PackageReference Include="MudBlazor" Version="8.10.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.14.0" />
     <PackageReference Include="Ude.NetStandard" Version="1.2.0" />
   </ItemGroup>
 

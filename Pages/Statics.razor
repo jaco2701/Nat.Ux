@@ -15,7 +15,7 @@
 @inject IJSRuntime iIJS;
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
-<PageTitle>@Resources.lioL_Documents</PageTitle>
+<PageTitle>@Resources.lioL_Statics</PageTitle>
 @if (!ioState.ivblnReady)
 {
     <p><em>@Resources.lioL_Wait</em></p>
@@ -109,7 +109,7 @@ else
                     ivstrPropValue = mivcodType ?? string.Empty
                 }
                 );
-                mcoLists = await Service.Post<List[]>(EAuthType.Token, ioState.ioLogin.ivstrToken, Configuration, "ListGet", mioFilter);
+                mcoLists = await ioState.Post<List[]>(EAuthType.Token, ioState.ioIdentityProvider.ivstrToken, Configuration, "ListGet", mioFilter);
             }
             else
                 mcoLists = [];
@@ -192,7 +192,7 @@ else
     }
     public async Task Post(List vioList)
     {
-        await Service.PostToStr(EAuthType.Token, ioState.ioLogin.ivstrToken, Configuration, "ListTask", vioList);
+        await ioState.PostToStr(EAuthType.Token, ioState.ioIdentityProvider.ivstrToken, Configuration, "ListTask", vioList);
         await Find();
     }
     #endregion

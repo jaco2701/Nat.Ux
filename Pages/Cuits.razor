@@ -16,7 +16,7 @@
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
 
-<PageTitle>@Resources.lioL_Documents</PageTitle>
+<PageTitle>@Resources.lioL_Cuit1</PageTitle>
 @if (mcoCuits == null || ioState.ioStatics == null)
 {
     <p><em>@Resources.lioL_Wait</em></p>
@@ -102,7 +102,7 @@ else
                     ivstrPropValue = mivstrRs
                 }
                 );
-            mcoCuits = await Service.Post<Cuit[]>(EAuthType.Token, ioState.ioLogin.ivstrToken, Configuration, "CuitsGet", mioFilter);
+            mcoCuits = await ioState.Post<Cuit[]>(EAuthType.Token, ioState.ioIdentityProvider.ivstrToken, Configuration, "CuitsGet", mioFilter);
             mcoCuits = mcoCuits.OrderByDescending(x => x.ioDcModel.ivstrCuitRS).ToArray();
         }
         catch (Exception lioE)
@@ -175,7 +175,7 @@ else
             Cuit lioCuit = mioDialogModel.ioCuit;
             lioCuit.ioDcModel.ivstrCnfg = Format.Compress(Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(lioCuit.ioCnfg))));
             lioCuit.ieTask = eTask.Save;
-            await Service.PostToStr(EAuthType.Token, ioState.ioLogin.ivstrToken, Configuration, "CuitTask", lioCuit);
+            await ioState.PostToStr(EAuthType.Token, ioState.ioIdentityProvider.ivstrToken, Configuration, "CuitTask", lioCuit);
         }
     }
     #endregion

@@ -31,19 +31,25 @@ namespace Applet.Nat.Ux.Models
         public ServiceMapperItem[] coItems { get; set; }
         public int? ivnumRecLen { get; set; }
         public string? ivstrTemplate { get; set; }
+        public string? ivstrSplitter { get; set; }
         public string? ivstrInputType { get; set; }
         public short[] cvnroDocTypes { get; set; }
-        
+        public bool? ivblnTaxInLines { get; set; }
+        public bool? ivblnCalcPermisoExistente { get; set; }
     }
     public class ServiceMapperItem
     {
         public string? ivstrProperty { get; set; }
         public ServiceMapperItemXPath[]? coXPaths { get; set; }
+		public short[]? coStatus { get; set; }  
+		public Dictionary<string, string>? coConversion { get; set; }
         public int? ivnumLen { get; set; }
         public string? ivstrLPad { get; set; }
         public string? ivstrRPad { get; set; }
         public string? ivstrformat { get; set; }
         public string? ivstrCoord { get; set; }
+        public bool? ivblnRequired { get; set; }
+        public string? ivstrDefault { get; set; }
 
     }
     public class ServiceMapperItemXPath
@@ -51,6 +57,7 @@ namespace Applet.Nat.Ux.Models
         public string? ivstrParent { get; set; }
         public string? ivstrData { get; set; }
         public string? ivstrEnum { get; set; }
+        public string? ivstrCoord { get; set; }
     }
     public class TemplateVersion
     {

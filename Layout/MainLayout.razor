@@ -29,21 +29,18 @@
     <div class="nat-header-container">
         @if (ioState.ivblnLogin)
         {
-            @if (ioState.ioLogin.ioUser.ioDcModel.ivblnAdmin)
-            {
-                <MudIconButton Icon="@Icons.Material.Filled.Menu" Edge="Edge.Start" OnClick="ButtonClicked" />
-            }
+            <MudIconButton Icon="@Icons.Material.Filled.Menu" Edge="Edge.Start" OnClick="ButtonClicked" />
             <img src="./nat.png" class="nat-logo-bar" />
             <span class="nat-space"></span>
             <MudText Align=Align.Left class="nat-text3N">@ioState.ivstrName </MudText>
             <span class="nat-space"></span>
-            @if (ioState.ioLogin.ivlngCurrentCuit != 0 && ioState.ioLogin.ioUser.coCuitsModels != null)
+            @if (ioState.ioUser.ivlngCurrentCuit != 0 && ioState.ioUser.coCuitsModels != null)
             {
-                <MudText Align=Align.Left class="nat-text2">@ioState.ioLogin.ioUser.coCuitsModels.FirstOrDefault(x => x.ivlngCuit == ioState.ioLogin.ivlngCurrentCuit).ivstrRS</MudText>
+                <MudText Align=Align.Left class="nat-text2">@ioState.ioUser.coCuitsModels.FirstOrDefault(x => x.ivlngCuit == ioState.ioUser.ivlngCurrentCuit).ivstrRS</MudText>
             }
         }
         <MudSpacer />
-        @if (ioState.ioStatics.coLists.FirstOrDefault(x => x.ivcodType == "FORMAT" && x.ivcodId == "ENV").ivstrDesc == "P")
+        @if (ioState.ioStatics.coLists.FirstOrDefault(x => x.ivcodType == "FORMAT" && x.ivcodId == "ENV")?.ivstrDesc == "P")
         {
             <MudChip T="string" Icon="@Icons.Material.Filled.Error" Text=@Resources.lioL_Prod class="nat-prod "></MudChip>
         }
@@ -58,16 +55,27 @@
             <MudIconButton Icon="@Icons.Material.Filled.Logout" title=@Resources.lioL_Exit @onclick="Exit" Edge="Edge.End"></MudIconButton>
         }
     </div>
-    <MudDrawer @bind-Open="@livblnOpen" Anchor="Anchor.Start" Elevation="1" Variant="@DrawerVariant.Temporary" OverlayAutoClose="true">
-        <MudNavMenu Class="nat-menu-container">
-            <img src="./nat.png" class="nat-logo-menu" />
-            <MudNavLink Icon="@Icons.Material.Outlined.Factory" Href="cuits">@Resources.lioL_Bo</MudNavLink>
-            <MudNavLink Icon="@Icons.Material.Outlined.ManageAccounts" Href="users">@Resources.lioL_Users</MudNavLink>
-            <MudNavLink Icon="@Icons.Material.Outlined.Article" Href="docs/3">@Resources.lioL_Documents</MudNavLink>
-            <MudNavLink Icon="@Icons.Material.Outlined.BlurOn" Href="statics">@Resources.lioL_Statics</MudNavLink>
-            <MudNavLink Icon="@Icons.Material.Outlined.BugReport" Href="log">@Resources.lioL_Log</MudNavLink>
-        </MudNavMenu>
-    </MudDrawer>
+    @if (ioState.ivblnLogin)
+    {
+        <MudDrawer @bind-Open="@livblnOpen" Anchor="Anchor.Start" Elevation="1" Variant="@DrawerVariant.Temporary" OverlayAutoClose="true">
+            <MudNavMenu Class="nat-menu-container">
+                <img src="./nat.png" class="nat-logo-menu" />
+                @if (ioState.ioUser.ioDcModel.ivblnAdmin)
+                {
+                    <MudNavLink Icon="@Icons.Material.Outlined.Factory" Href="cuits">@Resources.lioL_Bo</MudNavLink>
+                    <MudNavLink Icon="@Icons.Material.Outlined.ManageAccounts" Href="users">@Resources.lioL_Users</MudNavLink>
+                    <MudNavLink Icon="@Icons.Material.Outlined.Article" Href="docs/3">@Resources.lioL_Documents</MudNavLink>
+                    <MudNavLink Icon="@Icons.Material.Outlined.BlurOn" Href="statics">@Resources.lioL_Statics</MudNavLink>
+                    <MudNavLink Icon="@Icons.Material.Outlined.BugReport" Href="log">@Resources.lioL_Log</MudNavLink>
+                }
+                else
+                {
+                    <MudNavLink Icon="@Icons.Material.Outlined.Badge" Href="cuitsr">@Resources.lioL_Cuitr</MudNavLink>
+                    <MudNavLink Icon="@Icons.Material.Outlined.Article" Href="docs/5">@Resources.lioL_Documents</MudNavLink>
+                }
+            </MudNavMenu>
+        </MudDrawer>
+    }
     <main>
         @Body
     </main>
@@ -114,7 +122,7 @@
     };
     protected override async Task OnInitializedAsync()
     {
-        if (ioState.ioStatics == null || ioState.ioStatics.coLists == null)
+        if (ioState.ioStatics.coLists.Count() == 0)
         {
             await ioState.getStatics(Configuration);
             StateHasChanged();
@@ -140,10 +148,10 @@
                         Position = DialogPosition.Custom,
                     };
                     DialogParameters lioDialogParameters = new DialogParameters<NatDialog> { { x => x.vioDialogModel, mioDialogModel } };
-                    long livlngCuit = ioState.ioLogin.ivlngCurrentCuit;
+                    long livlngCuit = ioState.ioUser.ivlngCurrentCuit;
                     IDialogReference lioDialogResponse = await DialogService.ShowAsync<NatDialog>(Resources.lioL_MisDatos, lioDialogParameters, lioDialogOptions);
                     DialogResult lioDialogResult = await lioDialogResponse.Result;
-                    if (livlngCuit != ioState.ioLogin.ivlngCurrentCuit)
+                    if (livlngCuit != ioState.ioUser.ivlngCurrentCuit)
                     {
                         Guid guid = Guid.NewGuid();
                         NavigationManager.NavigateTo($"docs/{guid.ToString("N").Substring(0, 4)}");

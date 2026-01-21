@@ -1,92 +1,90 @@
 ﻿@page "/authentication/login-callback"
-@using Applet.Nat.Ux.Models
 @using Applet.Nat.Ux
-@using MudBlazor
+@using Applet.Nat.Ux.Models
+@using Microsoft.IdentityModel.Tokens
+@using Newtonsoft.Json
 @using Nat.Ux.Properties
-@using DNTCaptcha.Blazor
-
-@inject IConfiguration Configuration
+@using System.IdentityModel.Tokens.Jwt
 @inject NavigationManager NavigationManager
-@inject State ioState
 @inject ISnackbar Snackbar
+@inject IConfiguration Configuration
+@inject State ioState
+@inject IDialogService DialogService
 
 <PageTitle>@Resources.lioL_login</PageTitle>
+
 <div class="nat-page">
-    @if (lioModel != null && ioState != null)
+    @foreach (string livstrLoginMessage in mcvstrLoginMessage)
     {
-        <EditForm Model="@lioModel" OnValidSubmit="@doLogin">
-            <DataAnnotationsValidator />
-            <ValidationSummary />
-            <div class="nat-login-content">
-                <img src="./nat.png" class="nat-logo" />
-                <div class="nat-loginusrpass-container">
-                    <span class="nat-text1N">@Resources.lioL_login</span>
-                    <div class="nat-usrpass-container">
-                        <div class="nat-w100">
-                            <MudButton Class="nat-button" FullWidth=true StartIcon="@Icons.Material.Filled.Login" ButtonType="ButtonType.Submit">@Resources.lioL_In</MudButton>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </EditForm>
+        <p>@livstrLoginMessage</p>
     }
+)
 </div>
+
 @code {
-    [Parameter]
-    public string? vivstrTimeOut { get; set; }
-    #region Propiedades
-    public LoginModel lioModel { get; set; }
-    private int livnumCaptchaLetters = 5;
-    private string livstrRes { get; set; }
-    private string mivstrDisc { get; set; }
-    private int mivnumFail { get; set; }
-
-    #endregion
-    #region Metodos
-
-    public async Task doLogin()
+    private DialogModel? mioDialogModel { get; set; }
+    private List<string> mcvstrLoginMessage { get; set; } 
+    protected override void OnInitialized()
+    {
+        mcvstrLoginMessage = new List<string>();
+        mcvstrLoginMessage.Add($"{Resources.lioL_ProcessingLogin}...");
+        mioDialogModel = new DialogModel();
+    }
+    protected override async Task OnInitializedAsync()
     {
         try
         {
-            ioState.ivblnLogin = false;
-            ioState.ioLogin = await Service.Fetch<LoginResponse>(EAuthType.UserAndPass, $"{lioModel.ivstrUser}:{lioModel.ivstrPass}", Configuration, "login", null);
-            ioState.ivblnLogin = true;
-            ioState.ioLogin.ivlngCurrentCuit = 0;
-            if (ioState.ioLogin.ioUser.coCuitsModels == null || ioState.ioLogin.ioUser.coCuitsModels.Count == 0)
-                ioState.ioLogin.ivlngCurrentCuit = 0;
-            else
+            mcvstrLoginMessage.Add($"{Resources.lioL_GetCallBackQuery}...");
+            Uri lioUri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+            Dictionary<string, Microsoft.Extensions.Primitives.StringValues> lcoQParams = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(lioUri.Query);
+            if (lcoQParams.TryGetValue("error", out var lioError))
+                throw new Exception($"{Resources.lioE_OIDC}: {lcoQParams["error"]}");
+            if (!lcoQParams.TryGetValue("code", out var lioCode) || !lcoQParams.TryGetValue("state", out var lioState))
+                throw new Exception($"{Resources.lioE_OIDC}: code or state invalid");
+            if (lioState != ioState.ioIdentityProvider.ivstrConnSts)
+                throw new Exception($"{Resources.lioE_OIDC}: state invalid [{lioState} <> {ioState.ioIdentityProvider.ivstrConnSts}]");
+            mcvstrLoginMessage.Add($"{Resources.lioL_GetToken}...");
+            await ioState.ioIdentityProvider?.GetToken(lioCode);
+            JwtSecurityTokenHandler lioJwtSecurityTokenHandler = new JwtSecurityTokenHandler();
+            JwtSecurityToken jsonToken = lioJwtSecurityTokenHandler.ReadToken(ioState.ioIdentityProvider.ivstrToken) as JwtSecurityToken;
+            string vivstrUserId = jsonToken?.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
+            Filter lioFilter = new Filter
             {
-                ioState.ioLogin.ivlngCurrentCuit =  ioState.ioLogin.ioUser.coCuitsModels[0].ivlngCuit;
-                foreach (UserCuitModel lioO in ioState.ioLogin.ioUser.coCuitsModels)
-                    if (lioO.ivblnDefaut)
+                coFilterItems =
+                [
+                    new FilterItem
                     {
-                        ioState.ioLogin.ivlngCurrentCuit = lioO.ivlngCuit;
-                        break;
+                        ivstrOper = "=",
+                        ivstrPropName = "ivstrUserEmail",
+                        ivstrPropValue = vivstrUserId
                     }
-            }
+                ]
+            };
+            mcvstrLoginMessage.Add($"{Resources.GetNatUser}...");
+            User[] lcoUsers = await ioState.Post<User[]>(EAuthType.Token, ioState.ioIdentityProvider.ivstrToken, Configuration, "UsersGet", null);
+            if (lcoUsers == null || lcoUsers.Length != 1)
+                throw new Exception($"{Resources.lioE_OIDCUserNo}[livstruserId]");
+            ioState.Login(new LoginResponse { ioUser = lcoUsers[0], ivstrToken = ioState.ioIdentityProvider.ivstrToken });
+            ioState.ivblnReady = true;
             NavigationManager.NavigateTo("Docs/0");
         }
         catch (Exception lioE)
         {
-            ioState.ivblnLogin = false;
-            Snackbar.Add(lioE.Message, Severity.Error);
-            mivnumFail++;
+            ioState.ivblnReady = true;
+            mioDialogModel.ivstrClass = string.Empty;
+            mioDialogModel.ieDialogType = eDialogType.Text;
+            mioDialogModel.ivstrBody = $"{Resources.lioE_OIDC}: {lioE.Message}";
+            mioDialogModel.ieDialogButtoms = eDialogButtoms.Ok;
+            DialogParameters lioDialogParameters = new DialogParameters<NatDialog> { { x => x.vioDialogModel, mioDialogModel } };
+            DialogOptions lioDialogOptions = new DialogOptions
+            {
+                MaxWidth = MaxWidth.Small
+            };
+            IDialogReference lioDialogResponse = await DialogService.ShowAsync<NatDialog>(Resources.lioL_Error, lioDialogParameters, lioDialogOptions);
+            DialogResult lioDialogResult = await lioDialogResponse.Result;
+            if (!lioDialogResult.Canceled)
+                NavigationManager.NavigateTo("login");
+            return;
         }
     }
-    public void CheckCaptcha()
-    {
-        if (lioModel.ivstrCaptcha == lioModel.ivstrCaptchaResponse)
-        {
-            mivnumFail = 0;
-            livstrRes = string.Empty;
-        }
-        else
-        {
-            lioModel.ivstrCaptchaResponse = string.Empty;
-            livstrRes = Resources.lioE_CaptchaNo;
-            mivnumFail++;
-        }
-        StateHasChanged();
-    }
-    #endregion
 }

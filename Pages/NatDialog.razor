@@ -66,7 +66,7 @@
                                 {
                                     <span style="color:#424242">@ioState.Getparam("STATUS", lioTracking.ioDcModel.ivnroStatus.ToString())</span>
                                 }
-                                @if (new short[] { 20, 35, 40, 65 }.Contains(lioTracking.ioDcModel?.ivnroStatus ?? 0))
+                                @if (new short[] { 20, 35, 40,56, 65 }.Contains(lioTracking.ioDcModel?.ivnroStatus ?? 0))
                                 {
                                     <span style="color:#F44336">@ioState.Getparam("STATUS", lioTracking.ioDcModel.ivnroStatus.ToString())</span>
                                 }
@@ -182,7 +182,7 @@
                                 </div>
                                 <div class="nat-borow-container">
                                     <MudTextField Typo=Typo.body1 @bind-Value="@mivstrUser" Class="nat-text" Label="@Resources.lioL_UserId" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Person" />
-                                    <MudTextField Typo=Typo.body1 @bind-Value="@mivstrPass" InputType="InputType.Password" class="nat-text" Label="@Resources.lioL_Pass" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Key" />
+                                    <MudTextField Typo=Typo.body1 @bind-Value="@mivstrPass" InputType=@mioInputType class="nat-text" Label="@Resources.lioL_Pass" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Key" OnAdornmentClick="TogglePasswordVisibility" />
                                 </div>
                                 <div class="nat-borow-container">
                                     <MudTextField Typo=Typo.body1 @bind-Value="@mivstrEntityID" Class="nat-text" Label="@Resources.lioL_EntityID" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Info" />
@@ -234,6 +234,29 @@
                         </div>
                         <p>@mivstrFileNameTemplate</p>
                     }
+                }
+                break;
+            case eDialogType.CuitCuit:
+                @if (vioDialogModel?.ioCuitCuit!= null)
+                {
+                    @if (vioDialogModel.ioCuitCuit.ioDcModel.ivlngCuitReceptor > 0)
+                    {
+                        <div>
+                            <MudTextField Disabled=true Typo=Typo.body1 @bind-Value="@vioDialogModel.ioCuitCuit.ioDcModel.ivlngCuitReceptor" Class="nat-text" Label="@Resources.lioL_Cuit1" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Factory" />
+                        </div>
+                    }
+                    else
+                    {
+                        <div>
+                            <MudTextField Typo=Typo.body1 @bind-Value="@vioDialogModel.ioCuitCuit.ioDcModel.ivlngCuitReceptor" Class="nat-text" Label="@Resources.lioL_Cuit1" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Factory" />
+                        </div>
+                    }
+                    <div>
+                        <MudTextField Typo=Typo.body1 @bind-Value="@vioDialogModel.ioCuitCuit.ioDcModel.ivstrRS" Class="nat-text" Label="@Resources.lioL_Rs" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Article" />
+                    </div>
+                    <div>
+                        <MudTextField Typo=Typo.body1 @bind-Value="@vioDialogModel.ioCuitCuit.ioDcModel.ivstrEmail" Class="nat-text" Label="@Resources.lioL_LDs" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Article" />
+                    </div>
                 }
                 break;
             case eDialogType.List:
@@ -291,18 +314,18 @@
                 break;
             case eDialogType.Me:
                 <div class="nat-text2N">@Resources.lioL_UserId</div>
-                <div class="nat-text2">@ioState.ioLogin?.ioUser.ioDcModel.ivstrUserId</div>
+                <div class="nat-text2">@ioState.ioUser.ioDcModel.ivstrUserId</div>
                 <div class="nat-text2N">@Resources.lioL_Email</div>
-                <div class="nat-text2">@ioState.ioLogin?.ioUser.ioDcModel.ivstrUserEmail</div>
+                <div class="nat-text2">@ioState.ioUser.ioDcModel.ivstrUserEmail</div>
                 <div class="nat-text2N">@Resources.lioL_UserName</div>
-                <div class="nat-text2">@ioState.ioLogin?.ioUser.ioDcModel.ivstrUserName</div>
+                <div class="nat-text2">@ioState.ioUser.ioDcModel.ivstrUserName</div>
                 <div class="nat-text2N">@Resources.lioL_DefaultCuit</div>
-                <div class="nat-text2">@ioState.ioLogin.ivlngCurrentCuit</div>
-                @if (ioState.ioLogin.ioUser.coCuitsModels.Count > 1)
+                <div class="nat-text2">@ioState.ioUser.ivlngCurrentCuit</div>
+                @if (ioState.ioUser.coCuitsModels.Count > 1)
                 {
                     <div class="nat-text2N">@Resources.lioL_CurrentCuit</div>
-                    <MudSelect Typo=Typo.body2 @bind-Value="@ioState.ioLogin.ivlngCurrentCuit" Variant="Variant.Outlined" Class="nat-text3" Margin="Margin.Dense">
-                        @foreach (UserCuitModel lio in ioState.ioLogin.ioUser.coCuitsModels)
+                    <MudSelect Typo=Typo.body2 @bind-Value="@ioState.ioUser.ivlngCurrentCuit" Variant="Variant.Outlined" Class="nat-text3" Margin="Margin.Dense">
+                        @foreach (UserCuitModel lio in ioState.ioUser.coCuitsModels)
                         {
                             <MudSelectItem Class="nat-text" Value=lio.ivlngCuit>@lio.ivlngCuit - @lio.ivstrRS</MudSelectItem>
                         }
@@ -330,22 +353,7 @@
                     <MudButton Class="nat-buttontrans" StartIcon="@Icons.Material.Filled.Key" FullWidth=true OnClick="Pass">@Resources.lioL_PassChg</MudButton>
                 }
                 break;
-            case eDialogType.Oidc:
-                @if (ioState.ioStatics.coIdentityProviders != null)
-                {
-                    <MudRadioGroup @bind-Value="vioDialogModel.ivstrBody">
-                        @foreach (IdentityProviderModel lioIdentityProviderModel in ioState.ioStatics.coIdentityProviders)
-                        {
-                            <MudRadio Color="Color.Primary" Value="@(lioIdentityProviderModel.ivnumIdentityProvider.ToString())">@lioIdentityProviderModel.ivstrIdentityProvider</MudRadio>
-                        }
-                    </MudRadioGroup>
-                }
-                else
-                {
-                    <p>@Resources.lioE_NoOidcClients</p>
-                }
-                break;
-
+        
         }
         @if (!string.IsNullOrEmpty(mivstrError))
         {
@@ -420,6 +428,7 @@
     private bool mivblnShowUploadMapper { get; set; }
     private bool mivblnShowUploadTemplate { get; set; }
     private IList<IBrowserFile> mcoUploadedFiles = new List<IBrowserFile>();
+    private InputType mioInputType = InputType.Password;
     #endregion
     #region Meths
     protected override void OnInitialized()
@@ -576,14 +585,14 @@
                 Snackbar.Add(Resources.lioE_PassDif, Severity.Error);
                 return;
             }
-            ioState.ioLogin.ioUser.ivstrPass = mivstrPass;
-            ioState.ioLogin.ioUser.ieTask = eTask.Pass;
-            string livstr = await Service.PostToStr(
+            ioState.ioUser.ivstrPass = mivstrPass;
+            ioState.ioUser.ieTask = eTask.Pass;
+            string livstr = await ioState.PostToStr(
                 EAuthType.Token,
-                ioState.ioLogin.ivstrToken,
+                ioState.ioIdentityProvider.ivstrToken,
                 Configuration,
                 "UserTask",
-                ioState.ioLogin.ioUser
+                ioState.ioUser
             );
             livblnPass = false;
         }
@@ -603,6 +612,8 @@
     }
     public void ShowData(DocumentTracking vioTracking)
     {
+        foreach (DocumentTracking lioTracking in vioDialogModel.coDocumentTracking.Where(x=>x.ioDcModel.ivnumtrack!=vioTracking.ioDcModel.ivnumtrack))
+            lioTracking.ivblnShowData = false;
         vioTracking.ivblnShowData = !vioTracking.ivblnShowData;
         mcoTrackDetail = new List<Tuple<string, string, int>>();
         if (vioTracking.ivblnShowData) //arma detalle de tracking
@@ -683,7 +694,9 @@
     }
     public async void Download()
     {
-        await iIJS.InvokeVoidAsync("downloadStrFile", $"Mapeador_{vioDialogModel.ioCuit.ioDcModel.ivlngCuit}.txt", JsonConvert.SerializeObject(vioDialogModel.ioCuit.ioCnfg.coServiceMappers));
+        await iIJS.InvokeVoidAsync("downloadStrFile", $"Mapeador_{vioDialogModel.ioCuit.ioDcModel.ivlngCuit}.txt",
+            JsonConvert.SerializeObject(vioDialogModel.ioCuit.ioCnfg.coServiceMappers,
+                new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }));
     }
     public void Upload()
     {
@@ -692,13 +705,21 @@
     }
     public async void DownloadTemplates()
     {
-        await iIJS.InvokeVoidAsync("downloadStrFile", $"TemplateVersion_{vioDialogModel.ioCuit.ioDcModel.ivlngCuit}.txt", JsonConvert.SerializeObject(vioDialogModel.ioCuit.ioCnfg.coTemplateVersions));
+        await iIJS.InvokeVoidAsync("downloadStrFile", $"TemplateVersion_{vioDialogModel.ioCuit.ioDcModel.ivlngCuit}.txt", 
+            JsonConvert.SerializeObject(vioDialogModel.ioCuit.ioCnfg.coTemplateVersions));
 
     }
     public void UploadTemplates()
     {
         mivblnShowUploadTemplate = !mivblnShowUploadTemplate;
         mivstrError = string.Empty;
+    }
+    private void TogglePasswordVisibility()
+    {
+        if (mioInputType == InputType.Password)
+            mioInputType = InputType.Text;
+        else
+            mioInputType = InputType.Password;
     }
     #endregion
 }

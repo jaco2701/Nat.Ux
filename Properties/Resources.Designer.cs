@@ -61,6 +61,15 @@ namespace Nat.Ux.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Recuperando Usuario NAT.
+        /// </summary>
+        internal static string GetNatUser {
+            get {
+                return ResourceManager.GetString("GetNatUser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Verificacion incorrecta.
         /// </summary>
         internal static string lioE_CaptchaNo {
@@ -138,6 +147,24 @@ namespace Nat.Ux.Properties {
         internal static string lioE_NoTracking {
             get {
                 return ResourceManager.GetString("lioE_NoTracking", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error en validación de identidad externa.
+        /// </summary>
+        internal static string lioE_OIDC {
+            get {
+                return ResourceManager.GetString("lioE_OIDC", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Usuario no encntrado.
+        /// </summary>
+        internal static string lioE_OIDCUserNo {
+            get {
+                return ResourceManager.GetString("lioE_OIDCUserNo", resourceCulture);
             }
         }
         
@@ -232,6 +259,15 @@ namespace Nat.Ux.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Desea Borrar el Log?.
+        /// </summary>
+        internal static string lioL_ClrLog {
+            get {
+                return ResourceManager.GetString("lioL_ClrLog", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Configuración.
         /// </summary>
         internal static string lioL_Cnfg {
@@ -282,6 +318,15 @@ namespace Nat.Ux.Properties {
         internal static string lioL_Cuit1 {
             get {
                 return ResourceManager.GetString("lioL_Cuit1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Receptores.
+        /// </summary>
+        internal static string lioL_Cuitr {
+            get {
+                return ResourceManager.GetString("lioL_Cuitr", resourceCulture);
             }
         }
         
@@ -372,6 +417,15 @@ namespace Nat.Ux.Properties {
         internal static string lioL_DeleteBody {
             get {
                 return ResourceManager.GetString("lioL_DeleteBody", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Desea eliminar los receptores seleccionados.
+        /// </summary>
+        internal static string lioL_DeleteCuitR {
+            get {
+                return ResourceManager.GetString("lioL_DeleteCuitR", resourceCulture);
             }
         }
         
@@ -574,6 +628,24 @@ namespace Nat.Ux.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Recuperando Parametros.
+        /// </summary>
+        internal static string lioL_GetCallBackQuery {
+            get {
+                return ResourceManager.GetString("lioL_GetCallBackQuery", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Gestionando Token.
+        /// </summary>
+        internal static string lioL_GetToken {
+            get {
+                return ResourceManager.GetString("lioL_GetToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Homologación.
         /// </summary>
         internal static string lioL_Homo {
@@ -597,6 +669,15 @@ namespace Nat.Ux.Properties {
         internal static string lioL_IdCliente {
             get {
                 return ResourceManager.GetString("lioL_IdCliente", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Proveedor de Identidad.
+        /// </summary>
+        internal static string lioL_IdentityProvider {
+            get {
+                return ResourceManager.GetString("lioL_IdentityProvider", resourceCulture);
             }
         }
         
@@ -858,6 +939,15 @@ namespace Nat.Ux.Properties {
         internal static string lioL_Print {
             get {
                 return ResourceManager.GetString("lioL_Print", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Iniciando Autientificacion desde Proveedor de Identidad.
+        /// </summary>
+        internal static string lioL_ProcessingLogin {
+            get {
+                return ResourceManager.GetString("lioL_ProcessingLogin", resourceCulture);
             }
         }
         

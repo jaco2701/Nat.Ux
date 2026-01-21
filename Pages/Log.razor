@@ -15,7 +15,7 @@
 @inject IJSRuntime iIJS;
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
-<PageTitle>@Resources.lioL_Documents</PageTitle>
+<PageTitle>@Resources.lioL_Log</PageTitle>
 <div class="nat-page">
     <div class="nat-cmdbar-container">
         <div class="nat-col15">
@@ -27,11 +27,12 @@
             </MudSelect>
         </div>
         <MudSpacer />
-            <MudIconButton Icon="@Icons.Material.Filled.CopyAll" Class="nat-icon-verde" title=@Resources.lioL_Copy @onclick="Copy" Edge="Edge.End"></MudIconButton>
-            <MudIconButton Icon="@Icons.Material.Filled.Search" title=@Resources.lioL_Find Class="nat-icon-verde" @onclick="Find" Edge="Edge.End"></MudIconButton>
+        <MudIconButton Icon="@Icons.Material.Filled.Delete" Class="nat-icon-verde" title=@Resources.lioL_Copy @onclick="Clear" Edge="Edge.End"></MudIconButton>
+        <MudIconButton Icon="@Icons.Material.Filled.CopyAll" Class="nat-icon-verde" title=@Resources.lioL_Copy @onclick="Copy" Edge="Edge.End"></MudIconButton>
+        <MudIconButton Icon="@Icons.Material.Filled.Autorenew" title=@Resources.lioL_Find Class="nat-icon-verde" @onclick="Find1" Edge="Edge.End"></MudIconButton>
     </div>
     <div class="nat-log-container">
-            <spam>@mivstrLog</spam>
+        <spam>@mivstrLog</spam>
     </div>
 </div>
 
@@ -39,6 +40,7 @@
     private string? mivstrLog { get; set; }
     private DateTime mivdtm { get; set; }
     private List<DateTime>? mcvdtms { get; set; }
+    private DialogModel? mioDialogModel { get; set; }
     protected override void OnInitialized()
     {
         if (!ioState.ivblnLogin)
@@ -49,17 +51,21 @@
         mcvdtms.Add(DateTime.Today.AddDays(-2));
         mcvdtms.Add(DateTime.Today.AddDays(-3));
         mivdtm = mcvdtms[0];
+        mioDialogModel = new DialogModel();
     }
     protected override async Task OnInitializedAsync()
     {
         await Find();
     }
     #region Tareas Header
-    public async Task Find()
+    public async Task Find1() { await Find(false); }
+
+    public async Task Find(bool vivblnClear = false)
     {
         try
         {
-            string livstr = await Service.PostToStr(EAuthType.Token, ioState.ioLogin.ivstrToken, Configuration, "Log", $"{mivdtm.ToString("yyyyMMdd")}.log");
+            string livstr = vivblnClear ? "CLEAR" : string.Empty;
+            livstr = await ioState.PostToStr(EAuthType.Token, ioState.ioIdentityProvider.ivstrToken, Configuration, "Log", $"{livstr}{mivdtm.ToString("yyyyMMdd")}.log");
             mivstrLog = string.Empty;
             if (!string.IsNullOrEmpty(livstr))
                 mivstrLog = Encoding.UTF8.GetString(Convert.FromBase64String(livstr));
@@ -69,6 +75,23 @@
             Snackbar.Add(lioE.Message, Severity.Error);
             StateHasChanged();
         }
+    }
+    public async Task Clear()
+    {
+        mioDialogModel.ivstrClass = string.Empty;
+        mioDialogModel.ieDialogType = eDialogType.Text;
+        mioDialogModel.ivstrBody = Resources.lioL_ClrLog;
+        mioDialogModel.ieDialogButtoms = eDialogButtoms.OkCancel;
+        DialogParameters lioDialogParameters = new DialogParameters<NatDialog> { { x => x.vioDialogModel, mioDialogModel } };
+        DialogOptions lioDialogOptions = new DialogOptions
+        {
+            MaxWidth = MaxWidth.Small
+        };
+
+        IDialogReference lioDialogResponse = await DialogService.ShowAsync<NatDialog>(Resources.lioL_Adv, lioDialogParameters, lioDialogOptions);
+        DialogResult lioDialogResult = await lioDialogResponse.Result;
+        if (!lioDialogResult.Canceled)
+            await Find(true);
     }
     public async Task Copy()
     {

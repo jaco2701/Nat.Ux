@@ -1,0 +1,239 @@
+﻿@page "/cuitsr"
+@using Applet.Nat.Ux
+@using Applet.Nat.Ux.Models
+@using MudBlazor
+@using Nat.Ux.Properties
+@using Newtonsoft.Json
+@using System.IO.Compression
+@using System.Text
+@using Microsoft.JSInterop;
+@using System.Reflection
+
+@inject NavigationManager NavigationManager
+@inject IConfiguration Configuration
+@inject State ioState
+@inject IJSRuntime iIJS;
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+
+<PageTitle>@Resources.lioL_Documents</PageTitle>
+@if (mcoCuitCuits == null || ioState.ioStatics == null)
+{
+    <p><em>@Resources.lioL_Wait</em></p>
+}
+else
+{
+    <div class="nat-page">
+        <div class="nat-cmdbar-container">
+            @if (mcoSelectedOs.Count() > 0)
+            {
+                <MudIconButton Icon="@Icons.Material.Outlined.Delete" Class="nat-icon-rojo" title=@Resources.lioL_Delete @onclick="Delete" Edge="Edge.Start"></MudIconButton>
+                @if (mcoSelectedOs.Count == 1)
+                {
+                    <MudIconButton Icon="@Icons.Material.Filled.Edit" Class="nat-icon-verde" title=@Resources.lioL_Tracking @onclick="Detail" Edge="Edge.Start"></MudIconButton>
+                }
+            }
+            <MudSpacer />
+            <div class="nat-col15">
+                <MudTextField Typo=Typo.body2 @bind-Value=mivlngCuit Label=@Resources.lioL_Cuit1 Class="nat-text3" Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.Start"></MudTextField>
+            </div>
+            <div class="nat-col20">
+                <MudTextField Typo=Typo.body2 @bind-Value=mivstrRs Label=@Resources.lioL_Rs Class="nat-text3" Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.Start"></MudTextField>
+            </div>
+            <div class="nat-cuitrcmd-container">
+                <MudIconButton Icon="@Icons.Material.Filled.Search" title=@Resources.lioL_Find Class="nat-icon-fondoverde" @onclick="Find" Edge="Edge.End"></MudIconButton>
+                <MudIconButton Icon="@Icons.Material.Filled.FilterAltOff" Class="nat-icon-rojoborde" title=@Resources.lioL_Clr @onclick="Clr" Edge="Edge.End"></MudIconButton>
+                <MudIconButton Icon="@Icons.Material.Filled.Add" Class="nat-icon-verde" title=@Resources.lioL_Add @onclick="Add" Edge="Edge.End"></MudIconButton>
+            </div>
+        </div>
+
+        <div>
+            <MudTable T="CuitCuit" HeaderClass="nat-header-table"  MultiSelection="true"FixedHeader="true" FixedFooter="true" Height="80vh" Items="@mcoCuitCuits.OrderByDescending(x => x.ioDcModel?.ivstrRS)" SelectionChangeable=true SortLabel="Sort By" Dense="true" @bind-SelectedItems="mcoSelectedOs">
+                <HeaderContent>
+                    <MudTh><MudTableSortLabel Class="nat-textN" SortBy="new Func<CuitCuit, object>(x => x.ioDcModel?.ivlngCuit)">@Resources.lioL_Cuit1</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel Class="nat-textN" SortBy="new Func<CuitCuit, object>(x => x.ioDcModel?.ivstrRS)">@Resources.lioL_Rs</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel Class="nat-textN" SortBy="new Func<CuitCuit, object>(x => x.ioDcModel?.ivstrEmail)">@Resources.lioL_LDs</MudTableSortLabel></MudTh>
+
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd Class="nat-text nat-td" DataLabel="@Resources.lioL_Cuit1">@context.ioDcModel?.ivlngCuitReceptor</MudTd>
+                    <MudTd Class="nat-text nat-td" DataLabel="@Resources.lioL_Rs">@context.ioDcModel?.ivstrRS</MudTd>
+                    <MudTd Class="nat-text nat-td" DataLabel="@Resources.lioL_LDs">@context.ioDcModel?.ivstrEmail</MudTd>
+                </RowTemplate>
+            </MudTable>
+        </div>
+    </div>
+}
+@code {
+    private long mivlngCuit { get; set; }
+    private string[] costrColHeaders { get; set; }
+    private string? mivstrRs { get; set; }
+    private HashSet<CuitCuit> mcoSelectedOs { get; set; }
+    private CuitCuit[]? mcoCuitCuits { get; set; }
+    private Filter? mioFilter { get; set; }
+    private DialogModel? mioDialogModel { get; set; }
+    public static bool mivblnSession;
+    private bool mivblnSelectAll { get; set; }
+    private MudTable<CuitCuit> mudTable;
+
+    protected override void OnInitialized()
+    {
+        if (!ioState.ivblnLogin)
+            NavigationManager.NavigateTo("login");
+        ioState.ivstrName = Resources.lioL_Cnfg;
+        mioDialogModel = new DialogModel();
+        mcoSelectedOs = new HashSet<CuitCuit>();
+
+        Clr();
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        await Find();
+    }
+
+    #region Tareas Header
+    public async Task Find()
+    {
+        try
+        {
+            mioFilter = new Filter { coFilterItems = new List<FilterItem>() };
+            mioFilter.coFilterItems.Clear();
+            mioFilter.coFilterItems.Add(
+            new FilterItem
+            {
+                ivstrOper = "EQ",
+                ivstrPropName = "ivlngCuit",
+                ivstrPropValue = ioState.ioUser.ivlngCurrentCuit.ToString()
+            }
+            );
+            if (mivlngCuit != 0)
+                mioFilter.coFilterItems.Add(
+                new FilterItem
+                {
+                    ivstrOper = "EQ",
+                    ivstrPropName = "ivlngCuitReceptor",
+                    ivstrPropValue = ioState.ioUser.ivlngCurrentCuit.ToString()
+                }
+                );
+            if (!string.IsNullOrEmpty(mivstrRs))
+                mioFilter.coFilterItems.Add(
+                new FilterItem
+                {
+                    ivstrOper = "LIKE",
+                    ivstrPropName = "ivstrRs",
+                    ivstrPropValue = mivstrRs
+                }
+                );
+            mcoCuitCuits = await ioState.Post<CuitCuit[]>(
+                EAuthType.Token,
+                ioState.ioIdentityProvider.ivstrToken,
+                Configuration,
+                "CuitCuitsGet",
+                mioFilter
+            );
+            mcoCuitCuits = mcoCuitCuits.OrderByDescending(x => x.ioDcModel.ivstrRS).ToArray();
+        }
+        catch (Exception lioE)
+        {
+            Snackbar.Add(lioE.Message, Severity.Error);
+            StateHasChanged();
+        }
+    }
+
+    public void Clr()
+    {
+        mivlngCuit = 0;
+        mivstrRs = string.Empty;
+    }
+
+    #endregion
+    #region Tareas Rows
+
+    public async Task Add()
+    {
+        try
+        {
+            await Do(new CuitCuit
+            {
+                ieTask = eTask.Save,
+                ioDcModel = new CuitCuitModel
+                {
+                    ivlngCuit = ioState.ioUser.ivlngCurrentCuit,
+                    ivlngCuitReceptor = 0,
+                    ivstrRS = string.Empty,
+                }
+            }, false);
+        }
+        catch (Exception lioE)
+        {
+            Snackbar.Add(lioE.Message, Severity.Error);
+            StateHasChanged();
+        }
+    }
+    public async Task Delete()
+    {
+        if (mcoSelectedOs == null || mcoSelectedOs.Count == 0)
+            return;
+        await Do(null, true);
+    }
+    public async Task Detail()
+    {
+        if (mcoSelectedOs == null || mcoSelectedOs.Count == 0)
+            return;
+        await Do(mcoSelectedOs.First(), false);
+    }
+    public async Task Do(CuitCuit vioCuitCuit, bool vivblnDelete)
+    {
+        DialogParameters lioDialogParameters;
+        DialogOptions lioDialogOptions;
+        IDialogReference lioDialogResponse;
+        if (vivblnDelete)
+        {
+            mioDialogModel.ivstrClass = string.Empty;
+            mioDialogModel.ieDialogType = eDialogType.Text;
+            mioDialogModel.ivstrBody = Resources.lioL_DeleteCuitR;
+            mioDialogModel.ieDialogButtoms = eDialogButtoms.OkCancel;
+            lioDialogParameters = new DialogParameters<NatDialog> { { x => x.vioDialogModel, mioDialogModel } };
+            lioDialogOptions = new DialogOptions
+            {
+                MaxWidth = MaxWidth.Small
+            };
+            lioDialogResponse = await DialogService.ShowAsync<NatDialog>(Resources.lioL_Delete, lioDialogParameters, lioDialogOptions);
+        }
+        else
+        {
+            mioDialogModel.ivstrClass = string.Empty;
+            mioDialogModel.ieDialogType = eDialogType.CuitCuit;
+            mioDialogModel.ioCuitCuit = vioCuitCuit;
+            lioDialogOptions = new DialogOptions
+            {
+                MaxWidth = MaxWidth.ExtraLarge
+            };
+            mioDialogModel.ieDialogButtoms = eDialogButtoms.OkCancel;
+            lioDialogParameters = new DialogParameters<NatDialog> { { x => x.vioDialogModel, mioDialogModel } };
+            lioDialogResponse = await DialogService.ShowAsync<NatDialog>(Resources.lioL_Cnfg, lioDialogParameters, lioDialogOptions);
+
+        }
+        DialogResult lioDialogResult = await lioDialogResponse.Result;
+        if (!lioDialogResult.Canceled)
+        {
+            CuitCuit[] lcoCuitCuits;
+            if (vivblnDelete)
+                lcoCuitCuits = mcoSelectedOs.ToArray();
+            else
+                lcoCuitCuits = [mioDialogModel.ioCuitCuit];
+            foreach (CuitCuit lioCuitCuit in lcoCuitCuits)
+                lioCuitCuit.ieTask = vivblnDelete ? eTask.Delete : eTask.Save;
+            await ioState.PostToStr(
+                EAuthType.Token,
+                ioState.ioIdentityProvider.ivstrToken,
+                Configuration,
+                "CuitCuitTask",
+                lcoCuitCuits
+            );
+            await Find();
+        }
+    }
+    #endregion
+
+}

@@ -15,7 +15,7 @@
 @inject IJSRuntime iIJS;
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
-<PageTitle>@Resources.lioL_Documents</PageTitle>
+<PageTitle>@Resources.lioL_Users</PageTitle>
 @if (mcoUsers == null || ioState.ioStatics == null)
 {
     <p><em>@Resources.lioL_Wait</em></p>
@@ -92,7 +92,7 @@ else
                     ivstrPropValue = mivstrUser
                 }
                 );
-                mcoUsers = await Service.Post<User[]>(EAuthType.Token, ioState.ioLogin.ivstrToken, Configuration, "UsersGet", mioFilter);
+                mcoUsers = await ioState.Post<User[]>(EAuthType.Token, ioState.ioIdentityProvider.ivstrToken, Configuration, "UsersGet", mioFilter);
             }
             else
                 mcoUsers = [];
@@ -154,14 +154,14 @@ else
                     lioUser.ioDcModel.ivnrologonFails = 0;
                 lioUser.SetStrCuit();
                 lioUser.ieTask = eTask.Save;
-                string livstr = await Service.PostToStr(EAuthType.Token, ioState.ioLogin.ivstrToken, Configuration, "UserTask", lioUser);
+                string livstr = await ioState.PostToStr(EAuthType.Token, ioState.ioIdentityProvider.ivstrToken, Configuration, "UserTask", lioUser);
                 int livnum;
                 if (!string.IsNullOrEmpty(lioUser.ivstrPass))
                 {
                     if (int.TryParse(livstr, out livnum))
                         lioUser.ioDcModel.ivnumUser = livnum;
                     lioUser.ieTask = eTask.Pass;
-                    await Service.PostToStr(EAuthType.Token, ioState.ioLogin.ivstrToken, Configuration, "UserTask", lioUser);
+                    await ioState.PostToStr(EAuthType.Token, ioState.ioIdentityProvider.ivstrToken, Configuration, "UserTask", lioUser);
                     Snackbar.Add(Resources.lioL_OperOK, Severity.Success);
                 }
             }

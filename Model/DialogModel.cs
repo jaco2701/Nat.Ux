@@ -11,6 +11,7 @@ namespace Applet.Nat.Ux.Models
         public List<DocumentUploadRequest>? coDocumentsUpload { get; set; }
         public User? ioUser { get; set; }
         public Cuit? ioCuit { get; set; }
+        public CuitCuit? ioCuitCuit { get; set; }
         public List? ioList { get; set; }
         public bool ivblnOK { get; set; }
         public string? ivstrFullBody { get; set; }

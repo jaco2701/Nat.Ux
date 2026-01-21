@@ -12,6 +12,7 @@ namespace Applet.Nat.Ux.Models
         public string? ivstrPass { get; set; }
         public List<UserCuitModel> coCuitsModels { get; set; }
         public string? ivstrCuits { get; set; }
+        public long ivlngCurrentCuit { get; set; }
         public void GetStrCuit()
         {
             ivstrCuits = string.Empty;
