@@ -1,4 +1,0 @@
-C:\Users\jaco2701\Documents\Visual Studio Projects\Nat\Nat.Ux\obj\Release\net8.0-windows\browser-wasm\PubTmp\Out\package-lock.json
-C:\Users\jaco2701\Documents\Visual Studio Projects\Nat\Nat.Ux\obj\Release\net8.0-windows\browser-wasm\PubTmp\Out\public\manifest.json
-C:\Users\jaco2701\Documents\Visual Studio Projects\Nat\Nat.Ux\obj\Release\net8.0-windows\browser-wasm\PubTmp\Out\emcc-props.json
-C:\Users\jaco2701\Documents\Visual Studio Projects\Nat\Nat.Ux\obj\Release\net8.0-windows\browser-wasm\PubTmp\Out\web.config
