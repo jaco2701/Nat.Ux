@@ -126,8 +126,7 @@ else
                 );
             mcoCuitCuits = await ioState.Post<CuitCuit[]>(
                 EAuthType.Token,
-                ioState.ioIdentityProvider.ivstrToken,
-                Configuration,
+                null,
                 "CuitCuitsGet",
                 mioFilter
             );
@@ -226,8 +225,7 @@ else
                 lioCuitCuit.ieTask = vivblnDelete ? eTask.Delete : eTask.Save;
             await ioState.PostToStr(
                 EAuthType.Token,
-                ioState.ioIdentityProvider.ivstrToken,
-                Configuration,
+                null,
                 "CuitCuitTask",
                 lcoCuitCuits
             );

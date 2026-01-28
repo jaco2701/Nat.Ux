@@ -65,7 +65,7 @@
         try
         {
             string livstr = vivblnClear ? "CLEAR" : string.Empty;
-            livstr = await ioState.PostToStr(EAuthType.Token, ioState.ioIdentityProvider.ivstrToken, Configuration, "Log", $"{livstr}{mivdtm.ToString("yyyyMMdd")}.log");
+            livstr = await ioState.PostToStr(EAuthType.Token,null, "Log", $"{livstr}{mivdtm.ToString("yyyyMMdd")}.log");
             mivstrLog = string.Empty;
             if (!string.IsNullOrEmpty(livstr))
                 mivstrLog = Encoding.UTF8.GetString(Convert.FromBase64String(livstr));

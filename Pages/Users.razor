@@ -92,7 +92,7 @@ else
                     ivstrPropValue = mivstrUser
                 }
                 );
-                mcoUsers = await ioState.Post<User[]>(EAuthType.Token, ioState.ioIdentityProvider.ivstrToken, Configuration, "UsersGet", mioFilter);
+                mcoUsers = await ioState.Post<User[]>(EAuthType.Token,null, "UsersGet", mioFilter);
             }
             else
                 mcoUsers = [];
@@ -154,14 +154,14 @@ else
                     lioUser.ioDcModel.ivnrologonFails = 0;
                 lioUser.SetStrCuit();
                 lioUser.ieTask = eTask.Save;
-                string livstr = await ioState.PostToStr(EAuthType.Token, ioState.ioIdentityProvider.ivstrToken, Configuration, "UserTask", lioUser);
+                string livstr = await ioState.PostToStr(EAuthType.Token,null, "UserTask", lioUser);
                 int livnum;
                 if (!string.IsNullOrEmpty(lioUser.ivstrPass))
                 {
                     if (int.TryParse(livstr, out livnum))
                         lioUser.ioDcModel.ivnumUser = livnum;
                     lioUser.ieTask = eTask.Pass;
-                    await ioState.PostToStr(EAuthType.Token, ioState.ioIdentityProvider.ivstrToken, Configuration, "UserTask", lioUser);
+                    await ioState.PostToStr(EAuthType.Token,null, "UserTask", lioUser);
                     Snackbar.Add(Resources.lioL_OperOK, Severity.Success);
                 }
             }

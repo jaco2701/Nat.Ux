@@ -120,15 +120,7 @@
         },
 
     };
-    protected override async Task OnInitializedAsync()
-    {
-        if (ioState.ioStatics.coLists.Count() == 0)
-        {
-            await ioState.getStatics(Configuration);
-            StateHasChanged();
-        }
-    }
-
+    
     void ButtonClicked()
     {
         livblnOpen = !livblnOpen;
@@ -179,7 +171,7 @@
     }
     void Exit()
     {
-        ioState.reset();
+        ioState.Logout();
     }
 
 }

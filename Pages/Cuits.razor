@@ -102,7 +102,7 @@ else
                     ivstrPropValue = mivstrRs
                 }
                 );
-            mcoCuits = await ioState.Post<Cuit[]>(EAuthType.Token, ioState.ioIdentityProvider.ivstrToken, Configuration, "CuitsGet", mioFilter);
+            mcoCuits = await ioState.Post<Cuit[]>(EAuthType.Token, null, "CuitsGet", mioFilter);
             mcoCuits = mcoCuits.OrderByDescending(x => x.ioDcModel.ivstrCuitRS).ToArray();
         }
         catch (Exception lioE)
@@ -175,7 +175,7 @@ else
             Cuit lioCuit = mioDialogModel.ioCuit;
             lioCuit.ioDcModel.ivstrCnfg = Format.Compress(Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(lioCuit.ioCnfg))));
             lioCuit.ieTask = eTask.Save;
-            await ioState.PostToStr(EAuthType.Token, ioState.ioIdentityProvider.ivstrToken, Configuration, "CuitTask", lioCuit);
+            await ioState.PostToStr(EAuthType.Token,null, "CuitTask", lioCuit);
         }
     }
     #endregion

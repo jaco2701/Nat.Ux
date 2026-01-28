@@ -16,7 +16,7 @@
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
 <PageTitle>@Resources.lioL_Statics</PageTitle>
-@if (!ioState.ivblnReady)
+@if (!mivblnReady)
 {
     <p><em>@Resources.lioL_Wait</em></p>
 }
@@ -72,10 +72,11 @@ else
     public static bool mivblnSession;
     private bool mivblnSelectAll { get; set; }
     private MudTable<List> mudTable;
+    private bool mivblnReady { get; set; }
 
     protected override void OnInitialized()
     {
-        ioState.ivblnReady = false;
+        mivblnReady = false;
         if (!ioState.ivblnLogin)
             NavigationManager.NavigateTo("login");
         ioState.ivstrName = Resources.lioL_Statics;
@@ -84,13 +85,13 @@ else
     }
     protected override async Task OnInitializedAsync()
     {
-        ioState.ivblnReady = false;
+        mivblnReady = false;
         mivcodType = "META"; //busca metalistas
         await Find();
         mcoMetalists = JsonConvert.DeserializeObject<List[]>(JsonConvert.SerializeObject(mcoLists));
         mcoLists = [];
         mivcodType = string.Empty;
-        ioState.ivblnReady = true;
+        mivblnReady = true;
     }
     #region Tareas Header
     public async Task Find()
@@ -109,7 +110,7 @@ else
                     ivstrPropValue = mivcodType ?? string.Empty
                 }
                 );
-                mcoLists = await ioState.Post<List[]>(EAuthType.Token, ioState.ioIdentityProvider.ivstrToken, Configuration, "ListGet", mioFilter);
+                mcoLists = await ioState.Post<List[]>(EAuthType.Token,null, "ListGet", mioFilter);
             }
             else
                 mcoLists = [];
@@ -192,7 +193,7 @@ else
     }
     public async Task Post(List vioList)
     {
-        await ioState.PostToStr(EAuthType.Token, ioState.ioIdentityProvider.ivstrToken, Configuration, "ListTask", vioList);
+        await ioState.PostToStr(EAuthType.Token,null, "ListTask", vioList);
         await Find();
     }
     #endregion

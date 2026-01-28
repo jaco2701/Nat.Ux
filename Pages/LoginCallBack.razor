@@ -12,79 +12,37 @@
 @inject IDialogService DialogService
 
 <PageTitle>@Resources.lioL_login</PageTitle>
-
 <div class="nat-page">
-    @foreach (string livstrLoginMessage in mcvstrLoginMessage)
-    {
-        <p>@livstrLoginMessage</p>
-    }
-)
+    <div class="nat-login-content">
+        <img src="./nat.png" class="nat-logo" />
+        <div class="nat-loginusrpass-container">
+            <span class="nat-text1N">@Resources.lioL_login</span>
+            <div class="nat-usrpass-container">
+                @mivstrLoginMessage
+            </div>
+        </div>
+
+    </div>
 </div>
 
+
 @code {
-    private DialogModel? mioDialogModel { get; set; }
-    private List<string> mcvstrLoginMessage { get; set; } 
-    protected override void OnInitialized()
-    {
-        mcvstrLoginMessage = new List<string>();
-        mcvstrLoginMessage.Add($"{Resources.lioL_ProcessingLogin}...");
-        mioDialogModel = new DialogModel();
-    }
+    private string mivstrLoginMessage { get; set; } = string.Empty;
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            mcvstrLoginMessage.Add($"{Resources.lioL_GetCallBackQuery}...");
+            await ioState.getStatics(Configuration, 0);
+            _ = ioState.getStatics(Configuration, 1);
             Uri lioUri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
-            Dictionary<string, Microsoft.Extensions.Primitives.StringValues> lcoQParams = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(lioUri.Query);
-            if (lcoQParams.TryGetValue("error", out var lioError))
-                throw new Exception($"{Resources.lioE_OIDC}: {lcoQParams["error"]}");
-            if (!lcoQParams.TryGetValue("code", out var lioCode) || !lcoQParams.TryGetValue("state", out var lioState))
-                throw new Exception($"{Resources.lioE_OIDC}: code or state invalid");
-            if (lioState != ioState.ioIdentityProvider.ivstrConnSts)
-                throw new Exception($"{Resources.lioE_OIDC}: state invalid [{lioState} <> {ioState.ioIdentityProvider.ivstrConnSts}]");
-            mcvstrLoginMessage.Add($"{Resources.lioL_GetToken}...");
-            await ioState.ioIdentityProvider?.GetToken(lioCode);
-            JwtSecurityTokenHandler lioJwtSecurityTokenHandler = new JwtSecurityTokenHandler();
-            JwtSecurityToken jsonToken = lioJwtSecurityTokenHandler.ReadToken(ioState.ioIdentityProvider.ivstrToken) as JwtSecurityToken;
-            string vivstrUserId = jsonToken?.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
-            Filter lioFilter = new Filter
-            {
-                coFilterItems =
-                [
-                    new FilterItem
-                    {
-                        ivstrOper = "=",
-                        ivstrPropName = "ivstrUserEmail",
-                        ivstrPropValue = vivstrUserId
-                    }
-                ]
-            };
-            mcvstrLoginMessage.Add($"{Resources.GetNatUser}...");
-            User[] lcoUsers = await ioState.Post<User[]>(EAuthType.Token, ioState.ioIdentityProvider.ivstrToken, Configuration, "UsersGet", null);
-            if (lcoUsers == null || lcoUsers.Length != 1)
-                throw new Exception($"{Resources.lioE_OIDCUserNo}[livstruserId]");
-            ioState.Login(new LoginResponse { ioUser = lcoUsers[0], ivstrToken = ioState.ioIdentityProvider.ivstrToken });
-            ioState.ivblnReady = true;
+            await ioState.ProcessCallBack(lioUri);
             NavigationManager.NavigateTo("Docs/0");
         }
         catch (Exception lioE)
         {
-            ioState.ivblnReady = true;
-            mioDialogModel.ivstrClass = string.Empty;
-            mioDialogModel.ieDialogType = eDialogType.Text;
-            mioDialogModel.ivstrBody = $"{Resources.lioE_OIDC}: {lioE.Message}";
-            mioDialogModel.ieDialogButtoms = eDialogButtoms.Ok;
-            DialogParameters lioDialogParameters = new DialogParameters<NatDialog> { { x => x.vioDialogModel, mioDialogModel } };
-            DialogOptions lioDialogOptions = new DialogOptions
-            {
-                MaxWidth = MaxWidth.Small
-            };
-            IDialogReference lioDialogResponse = await DialogService.ShowAsync<NatDialog>(Resources.lioL_Error, lioDialogParameters, lioDialogOptions);
-            DialogResult lioDialogResult = await lioDialogResponse.Result;
-            if (!lioDialogResult.Canceled)
-                NavigationManager.NavigateTo("login");
-            return;
+            mivstrLoginMessage=lioE.Message;
+
         }
     }
+
 }

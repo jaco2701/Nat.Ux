@@ -589,8 +589,7 @@
             ioState.ioUser.ieTask = eTask.Pass;
             string livstr = await ioState.PostToStr(
                 EAuthType.Token,
-                ioState.ioIdentityProvider.ivstrToken,
-                Configuration,
+                null,
                 "UserTask",
                 ioState.ioUser
             );

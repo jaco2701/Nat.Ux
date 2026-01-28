@@ -11,7 +11,8 @@ namespace Applet.Nat.Ux.Models
     public enum EAuthType
     {
         UserAndPass,
-        Token
+        Token,
+        OIDC,
     }
     public enum eTask : short
     {

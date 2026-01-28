@@ -20,7 +20,7 @@
 
 <PageTitle>@Resources.lioL_Documents</PageTitle>
 <div class="nat-page">
-    @if (!ioState.ivblnReady || !ioState.ivblnLogin)
+    @if (!mivblnReady || !ioState.ivblnLogin)
     {
         <p><em>@Resources.lioL_Wait</em></p>
     }
@@ -102,7 +102,7 @@
             <MudIconButton Icon="@Icons.Material.Filled.FileDownload" title=@Resources.lioL_Export Class="nat-icon-verde" @onclick="Export" Edge="Edge.End"></MudIconButton>
         </div>
         <div>
-            <MudTable FixedHeader="true" RowClass="nat-tr" FixedFooter="true"  HorizontalScrollbar="false" MultiSelection="true" Items="@mcoDocuments.OrderByDescending(x => x.ioDcModel?.ivlngDoc)" SelectionChangeable=true SortLabel="Sort By" Dense="true" @bind-SelectedItems="mcoSelectedDocuments">
+            <MudTable FixedHeader="true" RowClass="nat-tr" FixedFooter="true" HorizontalScrollbar="false" MultiSelection="true" Items="@mcoDocuments.OrderByDescending(x => x.ioDcModel?.ivlngDoc)" SelectionChangeable=true SortLabel="Sort By" Dense="true" @bind-SelectedItems="mcoSelectedDocuments">
 
                 <HeaderContent>
                     @if (ioState.ioUser.ioDcModel.ivblnAdmin)
@@ -120,7 +120,7 @@
                     <MudTh Style="max-width: 8vw; text-align:center;"><MudTableSortLabel Class="nat-textN nat-th " SortBy="new Func<Document, object>(x => x.ioDcModel?.ivnroStatus)">@Resources.lioL_Status</MudTableSortLabel></MudTh>
                     <MudTh Style="max-width: 8vw; text-align:center;"><MudTableSortLabel Class="nat-textN nat-th" SortBy="new Func<Document, object>(x => x.ioDcModel?.ivstrIdCliente)">@Resources.lioL_IdCliente</MudTableSortLabel></MudTh>
                 </HeaderContent>
-                <RowTemplate >
+                <RowTemplate>
                     @if (ioState.ioUser.ioDcModel.ivblnAdmin)
                     {
                         <MudTd DataLabel="Nr">@context.ioDcModel?.ivlngCuitEmisor</MudTd>
@@ -186,25 +186,27 @@
     private Filter? mioFilter { get; set; }
     private DialogModel? mioDialogModel { get; set; }
     private bool mivblnSelectAll { get; set; }
+    private bool mivblnReady { get; set; }
+
     protected override async Task OnParametersSetAsync()
     {
-        ioState.ivblnReady = false;
+        mivblnReady = false;
         if (!ioState.ivblnLogin)
             NavigationManager.NavigateTo("login");
         else if (!string.IsNullOrEmpty(livstrpar))
             await Find();
-        ioState.ivblnReady = true;
+        mivblnReady = true;
     }
     protected override void OnInitialized()
     {
-        ioState.ivblnReady = false;
+        mivblnReady = false;
         if (!ioState.ivblnLogin)
             NavigationManager.NavigateTo("login");
         ioState.ivstrName = Resources.lioL_Docs;
         mioDialogModel = new DialogModel();
         mcoSelectedDocuments = new HashSet<Document>();
         Clr();
-        ioState.ivblnReady = true;
+        mivblnReady = true;
     }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -215,7 +217,7 @@
     }
     #region Tareas Header
     public async Task Find()
-     {
+    {
         try
         {
             mioFilter = new Filter { coFilterItems = new List<FilterItem>() };
@@ -318,8 +320,8 @@
                         ivstrPropValue = mivstrIdCliente
                     }
                 );
-            ioState.ivblnReady = false;
-            DocumentModel[] lcoOs = await ioState.Post<DocumentModel[]>(EAuthType.Token, ioState.ioIdentityProvider.ivstrToken, Configuration, "DocsGet", mioFilter);
+            mivblnReady = false;
+            DocumentModel[] lcoOs = await ioState.Post<DocumentModel[]>(EAuthType.Token, null, "DocsGet", mioFilter);
             mcoDocuments = new List<Document>();
             foreach (DocumentModel lioDocumentModel in lcoOs.OrderByDescending(x => x.ivdtmEmision))
             {
@@ -331,7 +333,7 @@
                 });
             }
             mcoSelectedDocuments.Clear();
-            ioState.ivblnReady = true;
+            mivblnReady = true;
         }
         catch (Exception lioE)
         {
@@ -364,12 +366,20 @@
                 if (string.IsNullOrEmpty(lioDocumentUpload.ivstrName))
                     continue;
                 lioDocumentUpload.ivlngCuit = ioState.ioUser.ivlngCurrentCuit;
-                DocumentUploadResponse[] lcoDocumentUploadResponses = await ioState.Post<DocumentUploadResponse[]>(EAuthType.Token, ioState.ioIdentityProvider.ivstrToken, Configuration, "DocSave", lioDocumentUpload);
-                foreach (DocumentUploadResponse lioDocumentUploadResponse in lcoDocumentUploadResponses)
+                try
                 {
-                    livstrMsg += $"{lioDocumentUploadResponse.ivlngCuitEmisor}_{lioDocumentUploadResponse.ivnroTipoDoc}_{lioDocumentUploadResponse.ivnumPvta}_{lioDocumentUploadResponse.ivlngCbte}: {lioDocumentUploadResponse.ivstrDescStatus}";
-                    livstrMsg += Environment.NewLine;
+                    DocumentUploadResponse[] lcoDocumentUploadResponses = await ioState.Post<DocumentUploadResponse[]>(EAuthType.Token,null, "DocSave", lioDocumentUpload);
+                    foreach (DocumentUploadResponse lioDocumentUploadResponse in lcoDocumentUploadResponses)
+                    {
+                        livstrMsg += $"{lioDocumentUploadResponse.ivlngCuitEmisor}_{lioDocumentUploadResponse.ivnroTipoDoc}_{lioDocumentUploadResponse.ivnumPvta}_{lioDocumentUploadResponse.ivlngCbte}: {lioDocumentUploadResponse.ivstrDescStatus}";
+                        livstrMsg += Environment.NewLine;
+                    }
                 }
+                catch (Exception ex)
+                {
+                    livstrMsg += ex.Message;
+                }
+
             }
             if (!string.IsNullOrEmpty(livstrMsg))
                 Snackbar.Add(livstrMsg, Severity.Info);
@@ -395,7 +405,7 @@
         await iIJS.InvokeVoidAsync(
             "downloadBase64File",
             $"Export_{DateTime.Now.ToString("yyyyMMddhhmmss")}.xlsx",
-            await ioState.PostToStr(EAuthType.Token, ioState.ioIdentityProvider.ivstrToken, Configuration, "Export", mioFilter));
+            await ioState.PostToStr(EAuthType.Token,null, "Export", mioFilter));
     }
     #endregion
     #region Tareas Rows
@@ -404,7 +414,7 @@
         try
         {
             long[] livlngDoc = mcoSelectedDocuments.Select(x => x.ioDcModel.ivlngDoc).ToArray();
-            DocumentTaskResponse[] lcoDocumentTaskResponses = await ioState.Post<DocumentTaskResponse[]>(EAuthType.Token, ioState.ioIdentityProvider.ivstrToken, Configuration, "DocTask", new DocumentTask { ieTask = vieTask, cvlngDocs = livlngDoc });
+            DocumentTaskResponse[] lcoDocumentTaskResponses = await ioState.Post<DocumentTaskResponse[]>(EAuthType.Token,null, "DocTask", new DocumentTask { ieTask = vieTask, cvlngDocs = livlngDoc });
             StringBuilder lioSb = new StringBuilder();
             switch (vieTask)
             {
@@ -478,7 +488,7 @@
     private async void Original()
     {
         foreach (Document lioDocument in mcoSelectedDocuments)
-            await iIJS.InvokeVoidAsync("downloadBase64File", $"{lioDocument.ivstrKey}{lioDocument.ioDcModel.ivstrInType}", Format.UnCompress(lioDocument.ioDcModel.ivstrInData,ioState.GetEncoding()));
+            await iIJS.InvokeVoidAsync("downloadBase64File", $"{lioDocument.ivstrKey}{lioDocument.ioDcModel.ivstrInType}", Format.UnCompress(lioDocument.ioDcModel.ivstrInData, ioState.GetEncoding()));
     }
     public async Task Delete()
     {

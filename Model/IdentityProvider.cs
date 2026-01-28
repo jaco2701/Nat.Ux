@@ -19,7 +19,7 @@ namespace Applet.Nat.Ux.Models
     public class IdentityProvider
     {
         public IdentityProviderModel ioDcModel { get; set; }
-        public string? ivstrConnSts { get; set; }
+        public string? ivstrState { get; set; }
         public string? ivstrToken { get; set; }
         public string? ivstrRefreshToken { get; set; }
         public string? ivstrActualRedirectUrl { get; set; }
@@ -38,6 +38,7 @@ namespace Applet.Nat.Ux.Models
             {
                 using HttpResponseMessage lioResponse = await lioHttpClient.PostAsync(ioDcModel.ivstrIdentityProviderUrlToken, new FormUrlEncodedContent(lcoParams));
                 {
+                    lioResponse.EnsureSuccessStatusCode();
                     TokenResponse lioTokenResponse = JsonConvert.DeserializeObject<TokenResponse>(await lioResponse.Content.ReadAsStringAsync());
                     ivstrToken = lioTokenResponse.AccessToken;
                     ivstrRefreshToken = lioTokenResponse.RefreshToken;
@@ -73,5 +74,16 @@ namespace Applet.Nat.Ux.Models
                 }
             }
         }
+    }
+    public class OidcRequest
+    {
+        public string ivstrState { get; set; }
+    }
+    public class OidcStateModel
+    {
+        public string ivstrState { get; set; }
+        public int ivnumIdentityProvider { get; set; }
+        public string ivstrIdentityProviderId { get; set; }
+        public DateTime ivdtmState { get; set; }
     }
 }
