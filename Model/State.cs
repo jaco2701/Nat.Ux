@@ -1,9 +1,8 @@
+using Applet.Nat.Ux.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
 using Nat.Ux.Properties;
 using Newtonsoft.Json;
-using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
@@ -15,35 +14,19 @@ namespace Applet.Nat.Ux.Models
         #region CONSTRUCTOR
         public State()
         {
-            ioStatics = new Statics
-            {
-                coIdentityProviders = [],
-                coLists = new List<ListModel>()
-            };
+            coLists = new List<ListModel>();
             ioUser = null;
         }
         #endregion
         #region PRIVATE PROPS
-        private bool livblnStatic0 = false;
-        private bool livblnStatic1 = false;
+        private bool mivblnStatic0 = false;
+        private bool mivblnStatic1 = false;
         private IConfiguration mioConfiguration;
-        private IdentityProvider _mioIdentityProvider;
-        private IdentityProvider mioIdentityProvider
-        {
-            get
-            {
-                if (_mioIdentityProvider == null || _mioIdentityProvider.ioDcModel == null)
-                    _mioIdentityProvider = new IdentityProvider { ioDcModel = ioStatics.coIdentityProviders.FirstOrDefault(x => x.ivnumIdentityProvider == ivnumIdentityProvider) };
-                return _mioIdentityProvider;
-            }
-            set
-            {
-                _mioIdentityProvider = value;
-            }
-        }
+        private string mivstrRefreshToken = string.Empty;
+        private Dictionary<string, string> mcoIdentityParameter;
         #endregion
         #region PUBLIC PROPS
-        public Statics ioStatics { get; set; }
+        public List<ListModel> coLists { get; set; }
         public bool ivblnLogin { get { return ioUser != null; } }
         public User? ioUser { get; set; }
         public int ivnumInactiveMinutes { get; set; }
@@ -52,12 +35,13 @@ namespace Applet.Nat.Ux.Models
         {
             get
             {
-                if (ioStatics == null || ioStatics.coLists == null)
+                if (coLists == null)
                     return 1000;
-                return int.Parse(ioStatics.coLists.First(x => x.ivcodType == "EXPIRE" && x.ivcodId == "Captcha").ivstrDesc);
+                return int.Parse(GetListParam("EXPIRE", "Captcha"));
             }
         }
         public string? ivstrName { get; set; }
+        public string ivstrToken = string.Empty;
         #endregion
         #region PUBLIC METHS
         public void SetConfiguration(IConfiguration vioConfiguration)
@@ -67,7 +51,7 @@ namespace Applet.Nat.Ux.Models
         public void Login(LoginResponse vioLoginResponse)
         {
             ioUser = vioLoginResponse.ioUser;
-            mioIdentityProvider.ivstrToken = vioLoginResponse.ivstrToken;
+            ivstrToken = vioLoginResponse.ivstrToken ?? string.Empty;
             if (ioUser.coCuitsModels == null || ioUser.coCuitsModels.Count == 0)
                 ioUser.ivlngCurrentCuit = 0;
             else
@@ -81,13 +65,44 @@ namespace Applet.Nat.Ux.Models
                     }
             }
         }
-        public void Logout()
+        public string GetListParam(string vivCodType, string vivCodId)
         {
-            ioUser = null;
+            return coLists.FirstOrDefault(x => x.ivcodType.ToUpper() == vivCodType.ToUpper() && x.ivcodId.ToUpper() == vivCodId.ToUpper()).ivstrDesc;
         }
-        public string Getparam(string vivCodType, string vivCodId)
+        public List<ListModel> GetListParams(string vivCodType)
         {
-            return ioStatics.coLists.FirstOrDefault(x => x.ivcodType == vivCodType.ToUpper() && x.ivcodId == vivCodId).ivstrDesc;
+            return coLists.Where(x => x.ivcodType == vivCodType.ToUpper()).ToList();
+        }
+        public async Task LoadStatics()
+        {
+            if (coLists == null)
+            coLists = new List<ListModel>();
+            if (!coLists.Any(x => x.ivcodType == "ENV"))
+            {
+                List<ListModel> lcoLists = await Fetch<List<ListModel>>(EAuthType.UserAndPass, "0:0", $"Statics0", null);
+                foreach (ListModel lioListItem in lcoLists)
+                    if (!coLists.Any(x => x.ivcodType == lioListItem.ivcodType && x.ivcodId == lioListItem.ivcodId))
+                        coLists.Add(lioListItem);
+            }
+            if (!coLists.Any(x => x.ivcodType == "TCOMP"))
+            {
+                _ = Fetch<List<ListModel>>(EAuthType.UserAndPass, "0:0", $"Statics1", null).ContinueWith(vioResponse =>
+                {
+                    List<ListModel> lcoLists = vioResponse.Result;
+                    foreach (ListModel lioListItem in lcoLists)
+                        if (!coLists.Any(x => x.ivcodType == lioListItem.ivcodType && x.ivcodId == lioListItem.ivcodId))
+                            coLists.Add(lioListItem);
+                    if (!coLists.Any(x => x.ivcodType == "TCOMP" && x.ivcodId == "0"))
+                        coLists.Add(new ListModel { ivcodId = "0", ivcodType = "TCOMP", ivstrDesc = "Todos" });
+                    if (!coLists.Any(x => x.ivcodType == "STATUS" && x.ivcodId == "0"))
+                        coLists.Add(new ListModel { ivcodId = "0", ivcodType = "STATUS", ivstrDesc = "Todos" });
+                    if (!int.TryParse(coLists.First(x => x.ivcodType == "EXPIRE" && x.ivcodId == "Session").ivstrDesc ?? string.Empty, null, out int livniumInactiveMinutes))
+                        livniumInactiveMinutes = 600;
+                    ivnumInactiveMinutes = livniumInactiveMinutes * 60000;
+                });
+            }
+
+           
         }
         public Encoding GetEncoding()
         {
@@ -146,99 +161,48 @@ namespace Applet.Nat.Ux.Models
                 if (ivnumIdentityProvider <= 0)
                     throw new Exception(Resources.lioE_NoApi);
                 livblnRetry = true;
-                await mioIdentityProvider.RefreshToken();
+                await RefreshToken();
             }
         }
-        public async Task<string> GetOidcRedirect()
+        public async Task GetToken(string vivstrCode, string vivstrState)
         {
-            if (mioIdentityProvider == null || mioIdentityProvider.ioDcModel == null || mioIdentityProvider.ioDcModel.ivnumIdentityProvider == 0)
-                throw new Exception(Resources.lioE_NoOidcClients);
-            string livstr = Guid.NewGuid().ToString();
-            LoginResponse lioLoginResponse = await Fetch<LoginResponse>(
-                 EAuthType.OIDC,
-                 $"{mioIdentityProvider.ioDcModel.ivnumIdentityProvider}:{mioIdentityProvider.ioDcModel.ivstrIdentityProviderId}:{livstr}",
-                 "login",
-                 null
+            mcoIdentityParameter = await Post<Dictionary<string, string>>(
+                EAuthType.UserAndPass,
+                $"0:0",
+                "OidcState",
+                new OidcRequest
+                {
+                    ivnroType = (short)eOidcRequestType.GetExchangeParams,
+                    ivstrState = vivstrState,
+                }
             );
-            string livstrEnv = ioStatics.coLists.FirstOrDefault(x => x.ivcodType == "FORMAT" && x.ivcodId == "ENV").ivstrDesc == "P" ? string.Empty : "qa";
-            mioIdentityProvider.ivstrActualRedirectUrl = $"https://nat{livstrEnv}.signature-services.com.ar/web/authentication/login-callback";
-            return mioIdentityProvider.ioDcModel.ivstrIdentityProviderUrlLogin
-                    .Replace("{CI}", mioIdentityProvider.ioDcModel.ivstrIdentityProviderId)
-                    .Replace("{RU}", Uri.EscapeDataString(mioIdentityProvider.ivstrActualRedirectUrl))
-                    .Replace("{ST}", livstr
-                    );
-        }
-        public async Task ProcessCallBack(Uri vioUri)
-        {
-            Dictionary<string, Microsoft.Extensions.Primitives.StringValues> lcoQParams = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(vioUri.Query);
-            if (lcoQParams.TryGetValue("error", out var lioError))
-                throw new Exception($"{Resources.lioE_OIDC}: {lioError}");
-            if (!lcoQParams.TryGetValue("code", out var lioCode) || !lcoQParams.TryGetValue("state", out var lioState))
-                throw new Exception($"{Resources.lioE_OIDC}: code or state invalid");
-            OidcStateModel lioOidcStateModel = await Fetch<OidcStateModel>
-            (
-                EAuthType.OIDC,
-                $"{lioState}",
-                 "OidcState",
-                 null
-            );
-            ivnumIdentityProvider = lioOidcStateModel.ivnumIdentityProvider;
-            mioIdentityProvider.ivstrState = lioOidcStateModel.ivstrState;
-            string livstrEnv = ioStatics.coLists.FirstOrDefault(x => x.ivcodType == "FORMAT" && x.ivcodId == "ENV").ivstrDesc == "P" ? string.Empty : "qa";
-            mioIdentityProvider.ivstrActualRedirectUrl = $"https://nat{livstrEnv}.signature-services.com.ar/web/authentication/login-callback";
-            await mioIdentityProvider?.GetToken(lioCode);
-            JwtSecurityTokenHandler lioJwtSecurityTokenHandler = new JwtSecurityTokenHandler();
-            JwtSecurityToken jsonToken = lioJwtSecurityTokenHandler.ReadToken(mioIdentityProvider.ivstrToken) as JwtSecurityToken;
-            string vivstrUserId = jsonToken?.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
-            Filter lioFilter = new Filter
+            using (HttpClient lioHttpClient = new HttpClient())
             {
-                coFilterItems =
-                [
-                    new FilterItem
-                    {
-                        ivstrOper = "=",
-                        ivstrPropName = "ivstrUserEmail",
-                        ivstrPropValue = vivstrUserId
-                    }
-                ]
-            };
-            User[] lcoUsers = await Post<User[]>(EAuthType.Token, null, "UsersGet", null);
-            if (lcoUsers == null || lcoUsers.Length != 1)
-                throw new Exception($"{Resources.lioE_OIDCUserNo}[livstruserId]");
-            Login(new LoginResponse { ioUser = lcoUsers[0], ivstrToken = mioIdentityProvider.ivstrToken });
-        }
-        public async Task getStatics(IConfiguration vioConfiguration, short vivnroLevel)
-        {
-            if (vivnroLevel == 0)
-            {
-                if (livblnStatic0)
-                    return;
-                livblnStatic0 = true;
+                Dictionary<string, string> lcoExchangeParameter = new Dictionary<string, string>
+                {
+                    { "grant_type", "authorization_code" },
+                    { "code", vivstrCode },
+                    { "redirect_uri", mcoIdentityParameter["redirect_uri"] },
+                    { "client_id", mcoIdentityParameter["client_id"] },
+                    { "code_verifier", mcoIdentityParameter["code_verifier"] }
+                };
+                lcoExchangeParameter["code"] = vivstrCode;
+                var lioResponse = await lioHttpClient.PostAsync(mcoIdentityParameter["UrlToken"], new FormUrlEncodedContent(lcoExchangeParameter));
+                if (!lioResponse.IsSuccessStatusCode)
+                {
+                    var errorContent = await lioResponse.Content.ReadAsStringAsync();
+                    throw new Exception($"Token exchange failed: {errorContent}");
+                }
+                TokenResponse lioTokenResponse = JsonConvert.DeserializeObject<TokenResponse>(await lioResponse.Content.ReadAsStringAsync());
+                ivstrToken = lioTokenResponse.access_token;
+                mivstrRefreshToken = lioTokenResponse.refresh_token;
+                ivnumIdentityProvider = int.Parse(mcoIdentityParameter["IdentityProviders"]);
             }
-            if (vivnroLevel == 1)
-            {
-                if (livblnStatic1)
-                    return;
-                livblnStatic1 = true;
-            }
-            Statics lioStatics = await Fetch<Statics>(EAuthType.UserAndPass, "0:0", $"Statics{vivnroLevel}", null);
-            if (ioStatics == null)
-                ioStatics = new Statics { coIdentityProviders = [], coLists = new List<ListModel>() };
-            if (lioStatics.coIdentityProviders != null)
-            {
-                ioStatics.coIdentityProviders = lioStatics.coIdentityProviders;
-            }
-            foreach (ListModel lioListModel in lioStatics.coLists)
-                if (!this.ioStatics.coLists.Any(x => x.ivcodType == lioListModel.ivcodType && x.ivcodId == lioListModel.ivcodId))
-                    this.ioStatics.coLists.Add(lioListModel);
-            ioStatics.coLists.Add(new ListModel { ivcodId = "0", ivcodType = "TCOMP", ivstrDesc = "Todos" });
-            ioStatics.coLists.Add(new ListModel { ivcodId = "0", ivcodType = "STATUS", ivstrDesc = "Todos" });
-            if (!int.TryParse(ioStatics.coLists.First(x => x.ivcodType == "EXPIRE" && x.ivcodId == "Session").ivstrDesc ?? string.Empty, null, out int livniumInactiveMinutes))
-                livniumInactiveMinutes = 600;
-            ivnumInactiveMinutes = livniumInactiveMinutes * 60000;
         }
         #endregion
         #region PRIVATE METHS
+
+
         private AuthenticationHeaderValue GetAuthHeader(EAuthType viEAuthType, string vivstrAuthType, string vivstrCredencials)
         {
             switch (viEAuthType)
@@ -253,9 +217,7 @@ namespace Applet.Nat.Ux.Models
                             )
                         );
                 case EAuthType.Token:
-                    return new AuthenticationHeaderValue("NatToken", mioIdentityProvider.ivstrToken);
-                case EAuthType.OIDC:
-                    return new AuthenticationHeaderValue("NatOIDC", vivstrCredencials);
+                    return new AuthenticationHeaderValue("NatToken", ivstrToken);
                 default:
                     return new AuthenticationHeaderValue("none");
             }
@@ -293,6 +255,34 @@ namespace Applet.Nat.Ux.Models
             {
                 // Log the exception (not implemented here)
                 throw new Exception(Resources.lioE_NoApi, ex);
+            }
+        }
+
+        private async Task RefreshToken()
+        {
+            if (string.IsNullOrEmpty(mivstrRefreshToken))
+            {
+                throw new InvalidOperationException("Refresh token is not available.");
+            }
+            using (HttpClient lioHttpClient = new HttpClient())
+            {
+                Dictionary<string, string> lcoExchangeParameter = new Dictionary<string, string>
+                {
+                    { "grant_type", "refresh_token" },
+                    { "refresh_token", mivstrRefreshToken },
+                    { "redirect_uri", mcoIdentityParameter["redirect_uri"] },
+                    { "client_id", mcoIdentityParameter["client_id"] },
+                    { "code_verifier", mcoIdentityParameter["code_verifier"] }
+                };
+                var lioResponse = await lioHttpClient.PostAsync(mcoIdentityParameter["UrlToken"], new FormUrlEncodedContent(lcoExchangeParameter));
+                if (!lioResponse.IsSuccessStatusCode)
+                {
+                    var errorContent = await lioResponse.Content.ReadAsStringAsync();
+                    throw new Exception($"Token exchange failed: {errorContent}");
+                }
+                TokenResponse lioTokenResponse = JsonConvert.DeserializeObject<TokenResponse>(await lioResponse.Content.ReadAsStringAsync());
+                ivstrToken = lioTokenResponse.access_token;
+                ivnumIdentityProvider = int.Parse(mcoIdentityParameter["IdentityProviders"]);
             }
         }
         #endregion

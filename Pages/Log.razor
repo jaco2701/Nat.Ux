@@ -22,7 +22,7 @@
             <MudSelect Typo=Typo.body2 Class="nat-text3" @bind-Value="mivdtm" Variant="Variant.Outlined" Margin="Margin.Dense" Label=@Resources.lioL_DateLog>
                 @foreach (DateTime livdtm in mcvdtms)
                 {
-                    <MudSelectItem Class="nat-text" Value=livdtm>@livdtm.ToString(@ioState.Getparam("format", "UxDtm"))</MudSelectItem>
+                    <MudSelectItem Class="nat-text" Value=livdtm>@livdtm.ToString(@ioState.GetListParam("format", "UxDtm"))</MudSelectItem>
                 }
             </MudSelect>
         </div>

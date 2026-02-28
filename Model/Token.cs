@@ -11,15 +11,17 @@ namespace Applet.Nat.Ux.Models
     public class LoginResponse
     {
         public User ioUser { get; set; }
-        public string ivstrToken { get; set; }
+        public string? ivstrToken { get; set; }
+        public string? ivstrRefreshToken { get; set; }
 
     }
 
     public class TokenResponse
     {
-        public string AccessToken { get; set; }
-        public string RefreshToken { get; set; }
-        public string IdToken { get; set; }
-        public int ExpiresIn { get; set; }
+        public string access_token { get; set; }
+        public string refresh_token { get; set; }
+        public string id_token { get; set; }
+        public int expires_in { get; set; }
     }
+
 }

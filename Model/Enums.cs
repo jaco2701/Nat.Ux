@@ -11,8 +11,7 @@ namespace Applet.Nat.Ux.Models
     public enum EAuthType
     {
         UserAndPass,
-        Token,
-        OIDC,
+        Token
     }
     public enum eTask : short
     {
@@ -54,5 +53,11 @@ namespace Applet.Nat.Ux.Models
         Yes = 3,
         No = 4,
     }
-}
+    public enum eOidcRequestType : short
+    {
+        GetAuthUrl = 0,
+        GetExchangeParams = 1,
+        GetUser = 2,
+    }
+} 
 

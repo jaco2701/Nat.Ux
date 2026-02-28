@@ -33,6 +33,19 @@ html, body {
     width: 20%;
     height: 60%;
 }
+.nat-logincallback-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0px;
+    gap: 30px;
+    position: fixed;
+    bottom: 35%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    height: 60%;
+}
 .nat-loginusrpass-container {
     display: flex;
     flex-direction: column;

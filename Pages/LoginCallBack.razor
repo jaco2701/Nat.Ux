@@ -1,10 +1,9 @@
 ﻿@page "/authentication/login-callback"
 @using Applet.Nat.Ux
 @using Applet.Nat.Ux.Models
-@using Microsoft.IdentityModel.Tokens
+@using Microsoft.Extensions.Primitives
 @using Newtonsoft.Json
 @using Nat.Ux.Properties
-@using System.IdentityModel.Tokens.Jwt
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar
 @inject IConfiguration Configuration
@@ -13,7 +12,7 @@
 
 <PageTitle>@Resources.lioL_login</PageTitle>
 <div class="nat-page">
-    <div class="nat-login-content">
+    <div class="nat-logincallback-content">
         <img src="./nat.png" class="nat-logo" />
         <div class="nat-loginusrpass-container">
             <span class="nat-text1N">@Resources.lioL_login</span>
@@ -27,21 +26,39 @@
 
 
 @code {
-    private string mivstrLoginMessage { get; set; } = string.Empty;
+    private string mivstrLoginMessage { get; set; }
+    protected override void OnInitialized()
+    {
+        mivstrLoginMessage = "Validando Credenciales...";
+    }
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            await ioState.getStatics(Configuration, 0);
-            _ = ioState.getStatics(Configuration, 1);
+            await ioState.LoadStatics();
             Uri lioUri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
-            await ioState.ProcessCallBack(lioUri);
+            Dictionary<string, Microsoft.Extensions.Primitives.StringValues> lcoQParams = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(lioUri.Query);
+            if (lcoQParams.TryGetValue("error", out var lioError))
+                throw new Exception($"{Resources.lioE_OIDC}: {lioError}");
+            if (!lcoQParams.TryGetValue("code", out StringValues lioCode) || !lcoQParams.TryGetValue("state", out StringValues lioState))
+                throw new Exception($"{Resources.lioE_OIDC}: code or state invalid");
+            await ioState.GetToken(lioCode.ToString(), lioState.ToString());
+            LoginResponse lioLoginResponse = await ioState.Post<LoginResponse>(
+                    EAuthType.UserAndPass,
+                    $"0:0",
+                    "OidcState",
+                    new OidcRequest
+                    {
+                        ivnroType = (short)eOidcRequestType.GetUser,
+                        ivstrToken = ioState.ivstrToken,
+                    }
+                );
+            ioState.Login(lioLoginResponse);
             NavigationManager.NavigateTo("Docs/0");
         }
         catch (Exception lioE)
         {
-            mivstrLoginMessage=lioE.Message;
-
+            mivstrLoginMessage = lioE.Message + " " + lioE.InnerException?.Message;
         }
     }
 

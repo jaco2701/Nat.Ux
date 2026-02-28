@@ -3,7 +3,7 @@
 @using Nat.Ux.Properties
 @inject NavigationManager NavigationManager
 @using Microsoft.AspNetCore.WebUtilities
-@inject State AppState
+@inject State ioState
 @inject IConfiguration Configuration
 
 <Router AppAssembly="@typeof(App).Assembly">
@@ -21,7 +21,7 @@
 @code {
     protected override async Task OnInitializedAsync()
     {
-        AppState.SetConfiguration(Configuration);
+        ioState.SetConfiguration(Configuration);
         var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
         StringValues ivstrSessionTimeOut = string.Empty;
         if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("TimeOut", out ivstrSessionTimeOut))

@@ -24,7 +24,7 @@
                    BackgroundClass="nat-text3N" />
 <MudSnackbarProvider />
 
-@if (ioState.ioStatics?.coLists != null)
+@if (ioState.coLists != null)
 {
     <div class="nat-header-container">
         @if (ioState.ivblnLogin)
@@ -40,7 +40,7 @@
             }
         }
         <MudSpacer />
-        @if (ioState.ioStatics.coLists.FirstOrDefault(x => x.ivcodType == "FORMAT" && x.ivcodId == "ENV")?.ivstrDesc == "P")
+        @if (ioState.coLists.FirstOrDefault(x => x.ivcodType == "FORMAT" && x.ivcodId == "ENV")?.ivstrDesc == "P")
         {
             <MudChip T="string" Icon="@Icons.Material.Filled.Error" Text=@Resources.lioL_Prod class="nat-prod "></MudChip>
         }
@@ -80,14 +80,14 @@
         @Body
     </main>
 }
-@if (!ioState.ivblnLogin)
+@* @if (!ioState.ivblnLogin)
 {
     <main>
         <article>
             @Body
         </article>
     </main>
-}
+} *@
 
 @code
 {
@@ -120,7 +120,6 @@
         },
 
     };
-    
     void ButtonClicked()
     {
         livblnOpen = !livblnOpen;
@@ -153,12 +152,12 @@
             case 2:
                 {
                     string livstr = string.Empty;
-                    if (ioState.ioStatics.coLists.FirstOrDefault(x => x.ivcodType == "CTZ" && x.ivcodId == "DOLV1") != null)
-                        livstr += $"{@Resources.lioL_Ctz} Mercado Local: {ioState.ioStatics.coLists.FirstOrDefault(x => x.ivcodType == "CTZ" && x.ivcodId == "DOLV1").ivstrDesc}";
-                    if (ioState.ioStatics.coLists.FirstOrDefault(x => x.ivcodType == "CTZ" && x.ivcodId == "DOLEXP") != null)
-                        livstr += Environment.NewLine + $"{@Resources.lioL_Ctz} Exportacion: {@ioState.ioStatics.coLists.FirstOrDefault(x => x.ivcodType == "CTZ" && x.ivcodId == "DOLEXP").ivstrDesc}";
-                    if (ioState.ioStatics.coLists.FirstOrDefault(x => x.ivcodType == "CTZ" && x.ivcodId == "DOLMTX") != null)
-                        livstr += Environment.NewLine + $"{@Resources.lioL_Ctz} Matrix: {@ioState.ioStatics.coLists.FirstOrDefault(x => x.ivcodType == "CTZ" && x.ivcodId == "DOLMTX").ivstrDesc}";
+                    if (ioState.coLists.FirstOrDefault(x => x.ivcodType == "CTZ" && x.ivcodId == "DOLV1") != null)
+                        livstr += $"{@Resources.lioL_Ctz} Mercado Local: {ioState.coLists.FirstOrDefault(x => x.ivcodType == "CTZ" && x.ivcodId == "DOLV1").ivstrDesc}";
+                    if (ioState.coLists.FirstOrDefault(x => x.ivcodType == "CTZ" && x.ivcodId == "DOLEXP") != null)
+                        livstr += Environment.NewLine + $"{@Resources.lioL_Ctz} Exportacion: {@ioState.coLists.FirstOrDefault(x => x.ivcodType == "CTZ" && x.ivcodId == "DOLEXP").ivstrDesc}";
+                    if (ioState.coLists.FirstOrDefault(x => x.ivcodType == "CTZ" && x.ivcodId == "DOLMTX") != null)
+                        livstr += Environment.NewLine + $"{@Resources.lioL_Ctz} Matrix: {@ioState.coLists.FirstOrDefault(x => x.ivcodType == "CTZ" && x.ivcodId == "DOLMTX").ivstrDesc}";
                     mioDialogModel.ieDialogType = eDialogType.Text;
                     mioDialogModel.ivstrBody = livstr;
                     mioDialogModel.ieDialogButtoms = eDialogButtoms.X;
@@ -171,7 +170,8 @@
     }
     void Exit()
     {
-        ioState.Logout();
+        ioState.ioUser = null;
+        NavigationManager.NavigateTo("login");
     }
 
 }

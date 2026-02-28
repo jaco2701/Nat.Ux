@@ -35,7 +35,7 @@
             }
             <div class="nat-col15">
                 <MudSelect Typo=Typo.body2 Class="nat-text3" @bind-Value="mivnroTipo" Variant="Variant.Outlined" Margin="Margin.Dense" Label=@Resources.lioL_Type>
-                    @foreach (ListModel lioListModel in ioState.ioStatics.coLists.Where(x => x.ivcodType == "TCOMP").OrderBy(x => int.Parse(x.ivcodId)))
+                    @foreach (ListModel lioListModel in ioState.GetListParams("TCOMP").OrderBy(x => int.Parse(x.ivcodId)))
                     {
                         <MudSelectItem Class="nat-text" Value=@short.Parse(lioListModel.ivcodId)>@lioListModel.ivstrDesc</MudSelectItem>
                     }
@@ -53,17 +53,17 @@
                 <MudTextField Typo=Typo.body2 @bind-Value=mivlngCbteH Variant="Variant.Outlined" Class="nat-text3" Adornment="Adornment.Start" Margin="Margin.Dense" Label=@Resources.lioL_NbrH></MudTextField>
             </div>
             <div class="nat-col12">
-                <MudDatePicker style="font-size:16px" Class="nat-text3" @bind-Date="@mivdtmD" Variant="Variant.Outlined" Adornment="Adornment.End" Margin="Margin.Dense" DateFormat=@ioState.Getparam("format", "UxDtm") Label=@Resources.lioL_DateD></MudDatePicker>
+                <MudDatePicker style="font-size:16px" Class="nat-text3" @bind-Date="@mivdtmD" Variant="Variant.Outlined" Adornment="Adornment.End" Margin="Margin.Dense" DateFormat=@ioState.GetListParam("format", "UxDtm") Label=@Resources.lioL_DateD></MudDatePicker>
             </div>
             <div class="nat-col12">
-                <MudDatePicker style="font-size:16px" Class="nat-text3" @bind-Date="@mivdtmH" Variant="Variant.Outlined" Adornment="Adornment.End" Margin="Margin.Dense" DateFormat=@ioState.Getparam("format", "UxDtm") Label=@Resources.lioL_DateH></MudDatePicker>
+                <MudDatePicker style="font-size:16px" Class="nat-text3" @bind-Date="@mivdtmH" Variant="Variant.Outlined" Adornment="Adornment.End" Margin="Margin.Dense" DateFormat=@ioState.GetListParam("format", "UxDtm") Label=@Resources.lioL_DateH></MudDatePicker>
             </div>
             <div class="nat-col10">
                 <MudTextField Typo=Typo.body2 @bind-Value=mivlngCuitReceptor Variant="Variant.Outlined" Class="nat-text3" Adornment="Adornment.Start" Margin="Margin.Dense" Label=@Resources.lioL_Cuit></MudTextField>
             </div>
             <div class="nat-col10">
                 <MudSelect Typo=Typo.body2 @bind-Value="mivnroStatus" Variant="Variant.Outlined" Class="nat-text3" Margin="Margin.Dense" Label=@Resources.lioL_Sts>
-                    @foreach (ListModel lioListModel in ioState.ioStatics.coLists.Where(x => x.ivcodType == "STATUS").OrderBy(x => x.ivstrDesc))
+                    @foreach (ListModel lioListModel in ioState.GetListParams("STATUS").OrderBy(x => x.ivstrDesc))
                     {
                         <MudSelectItem Class="nat-text" Value=@short.Parse(@lioListModel.ivcodId)>@lioListModel.ivstrDesc</MudSelectItem>
                     }
@@ -125,33 +125,33 @@
                     {
                         <MudTd DataLabel="Nr">@context.ioDcModel?.ivlngCuitEmisor</MudTd>
                     }
-                    <MudTd Style="max-width: 5vw;" Class="nat-text nat-td" DataLabel="@Resources.lioL_Type1" title="@ioState.ioStatics.coLists.FirstOrDefault(x => x.ivcodType == "TCOMP" && x.ivcodId == context.ioDcModel.ivnroTipo.ToString())?.ivstrDesc">@context.ioDcModel.ivnroTipo.ToString().PadLeft(3, '0')</MudTd>
+                    <MudTd Style="max-width: 5vw;" Class="nat-text nat-td" DataLabel="@Resources.lioL_Type1" title="@ioState.coLists.FirstOrDefault(x => x.ivcodType == "TCOMP" && x.ivcodId == context.ioDcModel.ivnroTipo.ToString())?.ivstrDesc">@context.ioDcModel.ivnroTipo.ToString().PadLeft(3, '0')</MudTd>
                     <MudTd Style="max-width: 8vw;" Class="nat-text nat-td" DataLabel="@Resources.lioL_PV">@context.ioDcModel?.ivnumPvta.ToString().PadLeft(5, '0')</MudTd>
                     <MudTd Style="max-width: 8vw;" Class="nat-text nat-td nat-right" DataLabel="@Resources.lioL_Nbr">@context.ioDcModel?.ivlngCbte</MudTd>
-                    <MudTd Style="max-width: 8vw;" Class="nat-text nat-td" DataLabel="@Resources.lioL_Date">@context.ioDcModel?.ivdtmEmision?.ToString(ioState.Getparam("Format", "UxDtm"))</MudTd>
+                    <MudTd Style="max-width: 8vw;" Class="nat-text nat-td" DataLabel="@Resources.lioL_Date">@context.ioDcModel?.ivdtmEmision?.ToString(ioState.GetListParam("Format", "UxDtm"))</MudTd>
                     <MudTd Style="max-width: 10vw;" Class="nat-text nat-td nat-right" DataLabel="@Resources.lioL_User" title="@context.ioDcModel?.ivlngDoc">@context.ioDcModel?.ivlngCuitReceptor</MudTd>
                     <MudTd Style="max-width: 30vw;" Class="nat-text nat-td" DataLabel="@Resources.lioL_Rs">@context.ioDcModel?.ivstrRazonSocial</MudTd>
                     <MudTd Style="max-width: 10vw;" Class="nat-text nat-td nat-right" DataLabel="@Resources.lioL_Importe">@context.ioDcModel?.ivdblImporte.ToString("N2", System.Globalization.CultureInfo.GetCultureInfo("es-AR"))</MudTd>
                     <MudTd Style="max-width: 5vw; text-align:center" Class="nat-text nat-td " DataLabel="@Resources.lioL_Moneda">@context.ioDcModel?.ivstrMoneda</MudTd>
                     @if (context.ioDcModel?.ivnroStatus == 10)
                     {
-                        <MudTd Style="max-width: 8vw; color:#424242; text-align:center" Class="nat-text nat-td" DataLabel="@Resources.lioL_Status">@ioState.Getparam("STATUS", context.ioDcModel?.ivnroStatus.ToString() ?? "0")</MudTd>
+                        <MudTd Style="max-width: 8vw; color:#424242; text-align:center" Class="nat-text nat-td" DataLabel="@Resources.lioL_Status">@ioState.GetListParam("STATUS", context.ioDcModel?.ivnroStatus.ToString() ?? "0")</MudTd>
                     }
                     @if (new short[] { 20, 35, 40, 65 }.Contains(context.ioDcModel?.ivnroStatus ?? 0))
                     {
-                        <MudTd Style="max-width: 8vw; color:#F44336; text-align:center" Class="nat-text nat-td " DataLabel="@Resources.lioL_Status">@ioState.Getparam("STATUS", context.ioDcModel?.ivnroStatus.ToString() ?? "0")</MudTd>
+                        <MudTd Style="max-width: 8vw; color:#F44336; text-align:center" Class="nat-text nat-td " DataLabel="@Resources.lioL_Status">@ioState.GetListParam("STATUS", context.ioDcModel?.ivnroStatus.ToString() ?? "0")</MudTd>
                     }
                     @if (new short[] { 30, 50, 70, 100 }.Contains(context.ioDcModel?.ivnroStatus ?? 0))
                     {
-                        <MudTd Style="max-width: 8vw; color:#00973F; text-align:center" Class="nat-text nat-td   " DataLabel="@Resources.lioL_Status">@ioState.Getparam("STATUS", context.ioDcModel?.ivnroStatus.ToString() ?? "0")</MudTd>
+                        <MudTd Style="max-width: 8vw; color:#00973F; text-align:center" Class="nat-text nat-td   " DataLabel="@Resources.lioL_Status">@ioState.GetListParam("STATUS", context.ioDcModel?.ivnroStatus.ToString() ?? "0")</MudTd>
                     }
                     @if (new short[] { 55, 60 }.Contains(context.ioDcModel?.ivnroStatus ?? 0))
                     {
-                        <MudTd Style="max-width: 8vw; color:#008DAF; text-align:center" Class="nat-text nat-td" DataLabel="@Resources.lioL_Status">@ioState.Getparam("STATUS", context.ioDcModel?.ivnroStatus.ToString() ?? "0")</MudTd>
+                        <MudTd Style="max-width: 8vw; color:#008DAF; text-align:center" Class="nat-text nat-td" DataLabel="@Resources.lioL_Status">@ioState.GetListParam("STATUS", context.ioDcModel?.ivnroStatus.ToString() ?? "0")</MudTd>
                     }
                     @if (context.ioDcModel?.ivnroStatus == 80)
                     {
-                        <MudTd Style="max-width: 8vw; color:#FF9800; text-align:center" Class="nat-text nat-td " DataLabel="@Resources.lioL_Status">@ioState.Getparam("STATUS", context.ioDcModel?.ivnroStatus.ToString() ?? "0")</MudTd>
+                        <MudTd Style="max-width: 8vw; color:#FF9800; text-align:center" Class="nat-text nat-td " DataLabel="@Resources.lioL_Status">@ioState.GetListParam("STATUS", context.ioDcModel?.ivnroStatus.ToString() ?? "0")</MudTd>
                     }
                     <MudTd Style="max-width: 8vw;" Class="nat-text nat-td nat-right" DataLabel="@Resources.lioL_IdCliente">@context.ioDcModel?.ivstrIdCliente</MudTd>
                 </RowTemplate>
@@ -246,7 +246,7 @@
                   {
                       ivstrOper = "GE",
                       ivstrPropName = "ivdtmEmision",
-                      ivstrPropValue = mivdtmD?.ToString(ioState.Getparam("Format", "ApiDtm"))
+                      ivstrPropValue = mivdtmD?.ToString(ioState.GetListParam("Format", "ApiDtm"))
                   }
                   );
             mioFilter.coFilterItems.Add(
@@ -254,7 +254,7 @@
                  {
                      ivstrOper = "LE",
                      ivstrPropName = "ivdtmEmision",
-                     ivstrPropValue = mivdtmH?.ToString(ioState.Getparam("Format", "ApiDtm"))
+                     ivstrPropValue = mivdtmH?.ToString(ioState.GetListParam("Format", "ApiDtm"))
                  }
             );
             if (mivlngCbteD != null && mivlngCbteD != 0)
@@ -368,7 +368,7 @@
                 lioDocumentUpload.ivlngCuit = ioState.ioUser.ivlngCurrentCuit;
                 try
                 {
-                    DocumentUploadResponse[] lcoDocumentUploadResponses = await ioState.Post<DocumentUploadResponse[]>(EAuthType.Token,null, "DocSave", lioDocumentUpload);
+                    DocumentUploadResponse[] lcoDocumentUploadResponses = await ioState.Post<DocumentUploadResponse[]>(EAuthType.Token, null, "DocSave", lioDocumentUpload);
                     foreach (DocumentUploadResponse lioDocumentUploadResponse in lcoDocumentUploadResponses)
                     {
                         livstrMsg += $"{lioDocumentUploadResponse.ivlngCuitEmisor}_{lioDocumentUploadResponse.ivnroTipoDoc}_{lioDocumentUploadResponse.ivnumPvta}_{lioDocumentUploadResponse.ivlngCbte}: {lioDocumentUploadResponse.ivstrDescStatus}";
@@ -405,7 +405,7 @@
         await iIJS.InvokeVoidAsync(
             "downloadBase64File",
             $"Export_{DateTime.Now.ToString("yyyyMMddhhmmss")}.xlsx",
-            await ioState.PostToStr(EAuthType.Token,null, "Export", mioFilter));
+            await ioState.PostToStr(EAuthType.Token, null, "Export", mioFilter));
     }
     #endregion
     #region Tareas Rows
@@ -414,7 +414,7 @@
         try
         {
             long[] livlngDoc = mcoSelectedDocuments.Select(x => x.ioDcModel.ivlngDoc).ToArray();
-            DocumentTaskResponse[] lcoDocumentTaskResponses = await ioState.Post<DocumentTaskResponse[]>(EAuthType.Token,null, "DocTask", new DocumentTask { ieTask = vieTask, cvlngDocs = livlngDoc });
+            DocumentTaskResponse[] lcoDocumentTaskResponses = await ioState.Post<DocumentTaskResponse[]>(EAuthType.Token, null, "DocTask", new DocumentTask { ieTask = vieTask, cvlngDocs = livlngDoc });
             StringBuilder lioSb = new StringBuilder();
             switch (vieTask)
             {
@@ -488,7 +488,7 @@
     private async void Original()
     {
         foreach (Document lioDocument in mcoSelectedDocuments)
-            await iIJS.InvokeVoidAsync("downloadBase64File", $"{lioDocument.ivstrKey}{lioDocument.ioDcModel.ivstrInType}", Format.UnCompress(lioDocument.ioDcModel.ivstrInData, ioState.GetEncoding()));
+            await iIJS.InvokeVoidAsync("downloadBase64File", $"{lioDocument.ioDcModel.ivnroTipo}_{lioDocument.ioDcModel.ivnumPvta}_{lioDocument.ioDcModel.ivlngCbte}_{lioDocument.ioDcModel.ivlngCuitReceptor}_{lioDocument.ioDcModel.ivlngDoc}{lioDocument.ioDcModel.ivstrInType}", Format.UnCompress(lioDocument.ioDcModel.ivstrInData, ioState.GetEncoding()));
     }
     public async Task Delete()
     {

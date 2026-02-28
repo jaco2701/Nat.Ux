@@ -56,7 +56,7 @@
                     <div class="nat-track-container">
                         <div class="nat-trackheader-container">
                             <div class="nat-col15">
-                                @lioTracking.ioDcModel.ivdtmTrack.ToString(ioState.Getparam("Format", "UxDtm"))
+                                @lioTracking.ioDcModel.ivdtmTrack.ToString(ioState.GetListParam("Format", "UxDtm"))
                                 <br />
                                 @lioTracking.ioDcModel.ivdtmTrack.ToString("HH:mm:ss")
                             </div>
@@ -64,23 +64,23 @@
                             <div class="nat-col35">
                                 @if (lioTracking.ioDcModel?.ivnroStatus == 10)
                                 {
-                                    <span style="color:#424242">@ioState.Getparam("STATUS", lioTracking.ioDcModel.ivnroStatus.ToString())</span>
+                                    <span style="color:#424242">@ioState.GetListParam("STATUS", lioTracking.ioDcModel.ivnroStatus.ToString())</span>
                                 }
-                                @if (new short[] { 20, 35, 40,56, 65 }.Contains(lioTracking.ioDcModel?.ivnroStatus ?? 0))
+                                @if (new short[] { 20, 35, 40, 56, 65 }.Contains(lioTracking.ioDcModel?.ivnroStatus ?? 0))
                                 {
-                                    <span style="color:#F44336">@ioState.Getparam("STATUS", lioTracking.ioDcModel.ivnroStatus.ToString())</span>
+                                    <span style="color:#F44336">@ioState.GetListParam("STATUS", lioTracking.ioDcModel.ivnroStatus.ToString())</span>
                                 }
                                 @if (new short[] { 30, 50, 70, 100 }.Contains(lioTracking.ioDcModel?.ivnroStatus ?? 0))
                                 {
-                                    <span style="color:#00973F">@ioState.Getparam("STATUS", lioTracking.ioDcModel.ivnroStatus.ToString())</span>
+                                    <span style="color:#00973F">@ioState.GetListParam("STATUS", lioTracking.ioDcModel.ivnroStatus.ToString())</span>
                                 }
                                 @if (new short[] { 55, 60 }.Contains(lioTracking.ioDcModel?.ivnroStatus ?? 0))
                                 {
-                                    <span style="color:#008DAF">@ioState.Getparam("STATUS", lioTracking.ioDcModel.ivnroStatus.ToString())</span>
+                                    <span style="color:#008DAF">@ioState.GetListParam("STATUS", lioTracking.ioDcModel.ivnroStatus.ToString())</span>
                                 }
                                 @if (lioTracking.ioDcModel?.ivnroStatus == 80)
                                 {
-                                    <span style="color:#FF9800">@ioState.Getparam("STATUS", lioTracking.ioDcModel.ivnroStatus.ToString())</span>
+                                    <span style="color:#FF9800">@ioState.GetListParam("STATUS", lioTracking.ioDcModel.ivnroStatus.ToString())</span>
                                 }
 
                             </div>
@@ -148,13 +148,13 @@
                     </div>
                     <div class="nat-borow-container">
                         <MudSelect Typo=Typo.body2 Class="nat-text3" @bind-Value="@mivstrEncoding" Variant="Variant.Outlined" Margin="Margin.Dense" Label=@Resources.lioL_Encoding Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.FontDownload">
-                            @foreach (ListModel lioListModel in ioState.ioStatics.coLists.Where(x => x.ivcodType == "ENCOD").OrderBy(x => int.Parse(x.ivcodId)))
+                            @foreach (ListModel lioListModel in ioState.GetListParams("ENCOD").OrderBy(x => int.Parse(x.ivcodId)))
                             {
                                 <MudSelectItem Class="nat-text" Value=@lioListModel.ivstrDesc>@lioListModel.ivstrDesc</MudSelectItem>
                             }
                         </MudSelect>
                         <MudSelect Typo=Typo.body2 Class="nat-text3" @bind-Value="@mivstrLoadMethod" Variant="Variant.Outlined" Margin="Margin.Dense" Label=@Resources.lioL_LoadMethod Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Input">
-                            @foreach (ListModel lioListModel in ioState.ioStatics.coLists.Where(x => x.ivcodType == "LOADMTH").OrderBy(x => int.Parse(x.ivcodId)))
+                            @foreach (ListModel lioListModel in ioState.GetListParams("LOADMTH").OrderBy(x => int.Parse(x.ivcodId)))
                             {
                                 <MudSelectItem Class="nat-text" Value=@lioListModel.ivcodId>@lioListModel.ivstrDesc</MudSelectItem>
                             }
@@ -237,7 +237,7 @@
                 }
                 break;
             case eDialogType.CuitCuit:
-                @if (vioDialogModel?.ioCuitCuit!= null)
+                @if (vioDialogModel?.ioCuitCuit != null)
                 {
                     @if (vioDialogModel.ioCuitCuit.ioDcModel.ivlngCuitReceptor > 0)
                     {
@@ -333,27 +333,29 @@
                 }
                 <div class="nat-space2">
                 </div>
-                @if (livblnPass)
+                @if (ioState.ivnumIdentityProvider==0)
                 {
-                    <div class="nat-usrpass-container">
-                        <div class="nat-w100">
-                            <MudTextField Typo=Typo.body1 @bind-Value="mivstrPass" InputType="InputType.Password" class="nat-text" Label="@Resources.lioL_Pass" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Key" />
+                    @if (livblnPass)
+                    {
+                        <div class="nat-usrpass-container">
+                            <div class="nat-w100">
+                                <MudTextField Typo=Typo.body1 @bind-Value="mivstrPass" InputType="InputType.Password" class="nat-text" Label="@Resources.lioL_Pass" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Key" />
+                            </div>
+                            <div class="nat-w100">
+                                <MudTextField Typo=Typo.body1 @bind-Value="mivstrPass2" InputType="InputType.Password" class="nat-text" Label="@Resources.lioL_Pass2" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Key" />
+                            </div>
+                            <div class="nat-cw100">
+                                <MudButton Class="nat-buttontrans" FullWidth=true OnClick="Pass">@Resources.lioL_Cancel</MudButton>
+                                <MudButton Class="nat-button" FullWidth=true OnClick="PassChg">@Resources.lioL_Ok</MudButton>
+                            </div>
                         </div>
-                        <div class="nat-w100">
-                            <MudTextField Typo=Typo.body1 @bind-Value="mivstrPass2" InputType="InputType.Password" class="nat-text" Label="@Resources.lioL_Pass2" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Key" />
-                        </div>
-                        <div class="nat-cw100">
-                            <MudButton Class="nat-buttontrans" FullWidth=true OnClick="Pass">@Resources.lioL_Cancel</MudButton>
-                            <MudButton Class="nat-button" FullWidth=true OnClick="PassChg">@Resources.lioL_Ok</MudButton>
-                        </div>
-                    </div>
-                }
-                else
-                {
-                    <MudButton Class="nat-buttontrans" StartIcon="@Icons.Material.Filled.Key" FullWidth=true OnClick="Pass">@Resources.lioL_PassChg</MudButton>
+                    }
+                    else
+                    {
+                        <MudButton Class="nat-buttontrans" StartIcon="@Icons.Material.Filled.Key" FullWidth=true OnClick="Pass">@Resources.lioL_PassChg</MudButton>
+                    }
                 }
                 break;
-        
         }
         @if (!string.IsNullOrEmpty(mivstrError))
         {
@@ -611,7 +613,7 @@
     }
     public void ShowData(DocumentTracking vioTracking)
     {
-        foreach (DocumentTracking lioTracking in vioDialogModel.coDocumentTracking.Where(x=>x.ioDcModel.ivnumtrack!=vioTracking.ioDcModel.ivnumtrack))
+        foreach (DocumentTracking lioTracking in vioDialogModel.coDocumentTracking.Where(x => x.ioDcModel.ivnumtrack != vioTracking.ioDcModel.ivnumtrack))
             lioTracking.ivblnShowData = false;
         vioTracking.ivblnShowData = !vioTracking.ivblnShowData;
         mcoTrackDetail = new List<Tuple<string, string, int>>();
@@ -704,7 +706,7 @@
     }
     public async void DownloadTemplates()
     {
-        await iIJS.InvokeVoidAsync("downloadStrFile", $"TemplateVersion_{vioDialogModel.ioCuit.ioDcModel.ivlngCuit}.txt", 
+        await iIJS.InvokeVoidAsync("downloadStrFile", $"TemplateVersion_{vioDialogModel.ioCuit.ioDcModel.ivlngCuit}.txt",
             JsonConvert.SerializeObject(vioDialogModel.ioCuit.ioCnfg.coTemplateVersions));
 
     }
