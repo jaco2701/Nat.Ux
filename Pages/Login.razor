@@ -1,0 +1,110 @@
+﻿@page "/login/{vivstrTimeOut?}"
+@using Applet.Nat.Ux.Models
+@using Applet.Nat.Ux
+@using MudBlazor
+@using Nat.Ux.Properties
+@using DNTCaptcha.Blazor
+
+@inject IConfiguration Configuration
+@inject NavigationManager NavigationManager
+@inject State ioState
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+
+<PageTitle>@Resources.lioL_login</PageTitle>
+<div class="nat-page">
+    @if (mcoIdentityProviders != null && mcoIdentityProviders.Count > 0)
+    {
+        <div class="nat-login-content">
+            <img src="./nat.png" class="nat-logo" />
+            <div class="nat-loginusrpass-container">
+                <span class="nat-text1N">@Resources.lioL_login</span>
+                <div class="nat-usrpass-container">
+                    @if (ioState.ivnumIdentityProvider == 0)
+                    {
+                        <div class="nat-w100 ">
+                            <MudTextField Typo=Typo.body1 @bind-Value="mivstrUser" Class="nat-text" Label="@Resources.lioL_User" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Person" />
+                        </div>
+                        <div class="nat-w100">
+                            <MudTextField Typo=Typo.body1 @bind-Value="mivstrPass" InputType="InputType.Password" Class="nat-text" Label="@Resources.lioL_Pass" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Key" />
+                        </div>
+                    }
+                    <div class="nat-w100 nat-select">
+                        <MudSelect Typo=Typo.body2 Class="nat-text3 " @bind-Value="ioState.ivnumIdentityProvider" Variant="Variant.Outlined" Margin="Margin.Dense" Label=@Resources.lioL_IdentityProvider>
+                            @foreach (var lioO in mcoIdentityProviders)
+                            {
+                                <MudSelectItem Class="nat-text" Value=int.Parse(lioO.ivcodId)>@lioO.ivstrDesc</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </div>
+                    <div class="nat-w100">
+                        <MudButton Class="nat-button" FullWidth=true StartIcon="@Icons.Material.Filled.Login" OnClick="doLogin">@Resources.lioL_In</MudButton>
+                    </div>
+                    <span class="nat-text">@ioState.coLists.FirstOrDefault(x => x.ivcodType == "FORMAT" && x.ivcodId == "disc")?.ivstrDesc</span>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+@code {
+    [Parameter]
+    public string? vivstrTimeOut { get; set; }
+    #region Propiedades
+    // public LoginModel lioModel { get; set; }
+    private int livnumCaptchaLetters = 5;
+    private int mivnumFail { get; set; }
+    private string mivstrUser { get; set; } = string.Empty;
+    private string mivstrPass { get; set; } = string.Empty;
+    private List<ListModel> mcoIdentityProviders { get; set; }
+    #endregion
+    #region Metodos
+    protected override void OnInitialized()
+    {
+        if (!string.IsNullOrEmpty(vivstrTimeOut))
+            Snackbar.Add(Resources.lioE_TokenExp, Severity.Error, vioOpt => { vioOpt.RequireInteraction = true; });
+        mivnumFail = 0;
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        await ioState.LoadStatics();
+        mcoIdentityProviders = ioState.GetListParams("IDPROV");
+    }
+
+    public async Task doLogin()
+    {
+        try
+        {
+            if (ioState.ivnumIdentityProvider == 0)  //NAT
+            {
+                if (mivnumFail > ioState.ivnumBeforeCaptcha)
+                    return;
+                LoginResponse lioLoginResponse = await ioState.Fetch<LoginResponse>(EAuthType.UserAndPass, $"{mivstrUser}:{mivstrPass}", "login", null);
+                ioState.Login(lioLoginResponse);
+                NavigationManager.NavigateTo("Docs/0");
+            }
+            else //OIDC
+            {
+                string livstrUrlRedirect = await ioState.PostToStr(
+                     EAuthType.UserAndPass,
+                     "0:0",
+                     "OidcState",
+                     new OidcRequest
+                     {
+                         ivnroType = (short)eOidcRequestType.GetAuthUrl,
+                         ivnumIdentityProvider = ioState.ivnumIdentityProvider
+                     }
+                );
+                NavigationManager.NavigateTo(livstrUrlRedirect);
+            }
+
+        }
+        catch (Exception lioE)
+        {
+            ioState.ioUser = null;
+            Snackbar.Add(lioE.Message, Severity.Error);
+            mivnumFail++;
+        }
+    }
+
+    #endregion
+}

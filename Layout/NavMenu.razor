@@ -1,0 +1,48 @@
+﻿@using Applet.Nat.Ux.Models
+@using Nat.Ux.Properties
+@inject State ioState
+
+<div class="top-row ps-3 navbar navbar-dark">
+        @if (ioState.ivblnLogin)
+        {
+            <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        }
+</div>
+@if (ioState.ivblnLogin)
+{
+    <div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
+        <nav class="flex-column">
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/docs">
+                    <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> @Resources.lioL_Documents
+                </NavLink>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/">
+                    <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> @Resources.lioL_Exit
+                </NavLink>
+            </div>
+        </nav>
+    </div>
+}
+@code {
+    private bool collapseNavMenu = true;
+
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+    protected override void OnInitialized()
+    {
+        ioState.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        ioState.OnChange -= StateHasChanged;
+    }
+}

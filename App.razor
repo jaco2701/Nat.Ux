@@ -1,0 +1,33 @@
+﻿@using Applet.Nat.Ux.Models
+@using Microsoft.Extensions.Primitives
+@using Nat.Ux.Properties
+@inject NavigationManager NavigationManager
+@using Microsoft.AspNetCore.WebUtilities
+@inject State ioState
+@inject IConfiguration Configuration
+
+<Router AppAssembly="@typeof(App).Assembly">
+    <Found Context="routeData">
+        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+    </Found>
+    <NotFound>
+        <PageTitle>Not found</PageTitle>
+        <LayoutView Layout="@typeof(MainLayout)">
+            <p role="alert">@Resources.lioE_RouteNo</p>
+        </LayoutView>
+    </NotFound>
+</Router>
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        ioState.SetConfiguration(Configuration);
+        var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+        StringValues ivstrSessionTimeOut = string.Empty;
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("TimeOut", out ivstrSessionTimeOut))
+            NavigationManager.NavigateTo($"login/{ivstrSessionTimeOut}");
+        else if (!uri.AbsolutePath.Contains("login-callback"))
+            NavigationManager.NavigateTo("login");
+
+    }
+}

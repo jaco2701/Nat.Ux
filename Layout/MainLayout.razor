@@ -1,0 +1,177 @@
+﻿@using Applet.Nat.Ux
+@using Applet.Nat.Ux.Models
+@using MudBlazor
+@using Nat.Ux.Properties
+@using Nat.Ux.Pages
+@using Newtonsoft.Json
+@using static System.Net.WebRequestMethods
+@inherits LayoutComponentBase
+@inject State ioState
+@inject NavigationManager NavigationManager
+@inject IConfiguration Configuration
+@inject HttpClient mioHttpClient
+@inject IDialogService DialogService
+@inject IJSRuntime iIJS;
+<MudThemeProvider Theme="mioTheme" />
+<MudPopoverProvider />
+<MudDialogProvider FullWidth="true"
+                   MaxWidth="MaxWidth.ExtraSmall"
+                   CloseButton="true"
+                   BackdropClick="false"
+                   NoHeader="false"
+                   Position="DialogPosition.Center"
+                   CloseOnEscapeKey="true"
+                   BackgroundClass="nat-text3N" />
+<MudSnackbarProvider />
+
+@if (ioState.coLists != null)
+{
+    <div class="nat-header-container">
+        @if (ioState.ivblnLogin)
+        {
+            <MudIconButton Icon="@Icons.Material.Filled.Menu" Edge="Edge.Start" OnClick="ButtonClicked" />
+            <img src="./nat.png" class="nat-logo-bar" />
+            <span class="nat-space"></span>
+            <MudText Align=Align.Left class="nat-text3N">@ioState.ivstrName </MudText>
+            <span class="nat-space"></span>
+            @if (ioState.ioUser.ivlngCurrentCuit != 0 && ioState.ioUser.coCuitsModels != null)
+            {
+                <MudText Align=Align.Left class="nat-text2">@ioState.ioUser.coCuitsModels.FirstOrDefault(x => x.ivlngCuit == ioState.ioUser.ivlngCurrentCuit).ivstrRS</MudText>
+            }
+        }
+        <MudSpacer />
+        @if (ioState.coLists.FirstOrDefault(x => x.ivcodType == "FORMAT" && x.ivcodId == "ENV")?.ivstrDesc == "P")
+        {
+            <MudChip T="string" Icon="@Icons.Material.Filled.Error" Text=@Resources.lioL_Prod class="nat-prod "></MudChip>
+        }
+        else
+        {
+            <MudChip T="string" Icon="@Icons.Material.Filled.Error" Text=@Resources.lioL_Homo class="nat-homo"></MudChip>
+        }
+        @if (ioState.ivblnLogin)
+        {
+            <MudIconButton Icon="@Icons.Material.Outlined.Settings" title=@Resources.lioL_Cnfg @onclick="(() => Show(2))" Edge="Edge.End"></MudIconButton>
+            <MudIconButton Icon="@Icons.Material.Outlined.AccountCircle" title=@Resources.lioL_MisDatos @onclick="(() => Show(1))" Edge="Edge.End"></MudIconButton>
+            <MudIconButton Icon="@Icons.Material.Filled.Logout" title=@Resources.lioL_Exit @onclick="Exit" Edge="Edge.End"></MudIconButton>
+        }
+    </div>
+    @if (ioState.ivblnLogin)
+    {
+        <MudDrawer @bind-Open="@livblnOpen" Anchor="Anchor.Start" Elevation="1" Variant="@DrawerVariant.Temporary" OverlayAutoClose="true">
+            <MudNavMenu Class="nat-menu-container">
+                <img src="./nat.png" class="nat-logo-menu" />
+                @if (ioState.ioUser.ioDcModel.ivblnAdmin)
+                {
+                    <MudNavLink Icon="@Icons.Material.Outlined.Factory" Href="cuits">@Resources.lioL_Bo</MudNavLink>
+                    <MudNavLink Icon="@Icons.Material.Outlined.ManageAccounts" Href="users">@Resources.lioL_Users</MudNavLink>
+                    <MudNavLink Icon="@Icons.Material.Outlined.Article" Href="docs/3">@Resources.lioL_Documents</MudNavLink>
+                    <MudNavLink Icon="@Icons.Material.Outlined.BlurOn" Href="statics">@Resources.lioL_Statics</MudNavLink>
+                    <MudNavLink Icon="@Icons.Material.Outlined.BugReport" Href="log">@Resources.lioL_Log</MudNavLink>
+                }
+                else
+                {
+                    <MudNavLink Icon="@Icons.Material.Outlined.Badge" Href="cuitsr">@Resources.lioL_Cuitr</MudNavLink>
+                    <MudNavLink Icon="@Icons.Material.Outlined.Article" Href="docs/5">@Resources.lioL_Documents</MudNavLink>
+                }
+            </MudNavMenu>
+        </MudDrawer>
+    }
+    <main>
+        @Body
+    </main>
+}
+@* @if (!ioState.ivblnLogin)
+{
+    <main>
+        <article>
+            @Body
+        </article>
+    </main>
+} *@
+
+@code
+{
+    bool livblnOpen = false;
+    private DialogModel mioDialogModel = new DialogModel();
+    MudTheme mioTheme = new MudTheme()
+    {
+        Typography = new Typography()
+        {
+            Body1 = new Body1Typography()
+            {
+                FontFamily = new[] { "Figtree", "Helvetica", "Arial", "sans-serif" },
+                FontSize = "14px",
+                FontWeight = "500",
+                LineHeight = "1.6",
+                LetterSpacing = ".0075em"
+            },
+            Body2 = new Body2Typography()
+            {
+                FontFamily = new[] { "Figtree", "Helvetica", "Arial", "sans-serif" },
+                FontSize = "16px",
+                FontWeight = "500",
+                LineHeight = "1.6",
+                LetterSpacing = ".0075em"
+            }
+        },
+        PaletteLight = new PaletteLight()
+        {
+            Primary = "#008DAF"
+        },
+
+    };
+    void ButtonClicked()
+    {
+        livblnOpen = !livblnOpen;
+    }
+    public async Task Show(short vivnroType)
+    {
+        switch (vivnroType)
+        {
+            case 1:
+                {
+                    mioDialogModel.ieDialogType = eDialogType.Me;
+                    mioDialogModel.ieDialogButtoms = eDialogButtoms.X;
+                    mioDialogModel.ivstrClass = "nat-dialog-full-right";
+                    DialogOptions lioDialogOptions = new DialogOptions
+                    {
+                        CloseButton = true,
+                        Position = DialogPosition.Custom,
+                    };
+                    DialogParameters lioDialogParameters = new DialogParameters<NatDialog> { { x => x.vioDialogModel, mioDialogModel } };
+                    long livlngCuit = ioState.ioUser.ivlngCurrentCuit;
+                    IDialogReference lioDialogResponse = await DialogService.ShowAsync<NatDialog>(Resources.lioL_MisDatos, lioDialogParameters, lioDialogOptions);
+                    DialogResult lioDialogResult = await lioDialogResponse.Result;
+                    if (livlngCuit != ioState.ioUser.ivlngCurrentCuit)
+                    {
+                        Guid guid = Guid.NewGuid();
+                        NavigationManager.NavigateTo($"docs/{guid.ToString("N").Substring(0, 4)}");
+                    }
+                }
+                break;
+            case 2:
+                {
+                    string livstr = string.Empty;
+                    if (ioState.coLists.FirstOrDefault(x => x.ivcodType == "CTZ" && x.ivcodId == "DOLV1") != null)
+                        livstr += $"{@Resources.lioL_Ctz} Mercado Local: {ioState.coLists.FirstOrDefault(x => x.ivcodType == "CTZ" && x.ivcodId == "DOLV1").ivstrDesc}";
+                    if (ioState.coLists.FirstOrDefault(x => x.ivcodType == "CTZ" && x.ivcodId == "DOLEXP") != null)
+                        livstr += Environment.NewLine + $"{@Resources.lioL_Ctz} Exportacion: {@ioState.coLists.FirstOrDefault(x => x.ivcodType == "CTZ" && x.ivcodId == "DOLEXP").ivstrDesc}";
+                    if (ioState.coLists.FirstOrDefault(x => x.ivcodType == "CTZ" && x.ivcodId == "DOLMTX") != null)
+                        livstr += Environment.NewLine + $"{@Resources.lioL_Ctz} Matrix: {@ioState.coLists.FirstOrDefault(x => x.ivcodType == "CTZ" && x.ivcodId == "DOLMTX").ivstrDesc}";
+                    mioDialogModel.ieDialogType = eDialogType.Text;
+                    mioDialogModel.ivstrBody = livstr;
+                    mioDialogModel.ieDialogButtoms = eDialogButtoms.X;
+                    mioDialogModel.ivstrClass = "nat-dialog-full-right";
+                    DialogParameters lioDialogParameters = new DialogParameters<NatDialog> { { x => x.vioDialogModel, mioDialogModel } };
+                    await DialogService.ShowAsync<NatDialog>(Resources.lioL_Cnfg, lioDialogParameters);
+                }
+                break;
+        }
+    }
+    void Exit()
+    {
+        ioState.ioUser = null;
+        NavigationManager.NavigateTo("login");
+    }
+
+}

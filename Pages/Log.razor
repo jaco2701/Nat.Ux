@@ -1,0 +1,103 @@
+﻿@page "/Log"
+@using Applet.Nat.Ux
+@using Applet.Nat.Ux.Models
+@using MudBlazor
+@using Nat.Ux.Properties
+@using Newtonsoft.Json
+@using System.IO.Compression
+@using System.Text
+@using Microsoft.JSInterop;
+@using System.Reflection
+
+@inject NavigationManager NavigationManager
+@inject IConfiguration Configuration
+@inject State ioState
+@inject IJSRuntime iIJS;
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+<PageTitle>@Resources.lioL_Log</PageTitle>
+<div class="nat-page">
+    <div class="nat-cmdbar-container">
+        <div class="nat-col15">
+            <MudSelect Typo=Typo.body2 Class="nat-text3" @bind-Value="mivdtm" Variant="Variant.Outlined" Margin="Margin.Dense" Label=@Resources.lioL_DateLog>
+                @foreach (DateTime livdtm in mcvdtms)
+                {
+                    <MudSelectItem Class="nat-text" Value=livdtm>@livdtm.ToString(@ioState.GetListParam("format", "UxDtm"))</MudSelectItem>
+                }
+            </MudSelect>
+        </div>
+        <MudSpacer />
+        <MudIconButton Icon="@Icons.Material.Filled.Delete" Class="nat-icon-verde" title=@Resources.lioL_Copy @onclick="Clear" Edge="Edge.End"></MudIconButton>
+        <MudIconButton Icon="@Icons.Material.Filled.CopyAll" Class="nat-icon-verde" title=@Resources.lioL_Copy @onclick="Copy" Edge="Edge.End"></MudIconButton>
+        <MudIconButton Icon="@Icons.Material.Filled.Autorenew" title=@Resources.lioL_Find Class="nat-icon-verde" @onclick="Find1" Edge="Edge.End"></MudIconButton>
+    </div>
+    <div class="nat-log-container">
+        <spam>@mivstrLog</spam>
+    </div>
+</div>
+
+@code {
+    private string? mivstrLog { get; set; }
+    private DateTime mivdtm { get; set; }
+    private List<DateTime>? mcvdtms { get; set; }
+    private DialogModel? mioDialogModel { get; set; }
+    protected override void OnInitialized()
+    {
+        if (!ioState.ivblnLogin)
+            NavigationManager.NavigateTo("login");
+        mcvdtms = new List<DateTime>();
+        mcvdtms.Add(DateTime.Today);
+        mcvdtms.Add(DateTime.Today.AddDays(-1));
+        mcvdtms.Add(DateTime.Today.AddDays(-2));
+        mcvdtms.Add(DateTime.Today.AddDays(-3));
+        mivdtm = mcvdtms[0];
+        mioDialogModel = new DialogModel();
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        await Find();
+    }
+    #region Tareas Header
+    public async Task Find1() { await Find(false); }
+
+    public async Task Find(bool vivblnClear = false)
+    {
+        try
+        {
+            string livstr = vivblnClear ? "CLEAR" : string.Empty;
+            livstr = await ioState.PostToStr(EAuthType.Token,null, "Log", $"{livstr}{mivdtm.ToString("yyyyMMdd")}.log");
+            mivstrLog = string.Empty;
+            if (!string.IsNullOrEmpty(livstr))
+                mivstrLog = Encoding.UTF8.GetString(Convert.FromBase64String(livstr));
+        }
+        catch (Exception lioE)
+        {
+            Snackbar.Add(lioE.Message, Severity.Error);
+            StateHasChanged();
+        }
+    }
+    public async Task Clear()
+    {
+        mioDialogModel.ivstrClass = string.Empty;
+        mioDialogModel.ieDialogType = eDialogType.Text;
+        mioDialogModel.ivstrBody = Resources.lioL_ClrLog;
+        mioDialogModel.ieDialogButtoms = eDialogButtoms.OkCancel;
+        DialogParameters lioDialogParameters = new DialogParameters<NatDialog> { { x => x.vioDialogModel, mioDialogModel } };
+        DialogOptions lioDialogOptions = new DialogOptions
+        {
+            MaxWidth = MaxWidth.Small
+        };
+
+        IDialogReference lioDialogResponse = await DialogService.ShowAsync<NatDialog>(Resources.lioL_Adv, lioDialogParameters, lioDialogOptions);
+        DialogResult lioDialogResult = await lioDialogResponse.Result;
+        if (!lioDialogResult.Canceled)
+            await Find(true);
+    }
+    public async Task Copy()
+    {
+        await iIJS.InvokeVoidAsync("navigator.clipboard.writeText", mivstrLog);
+    }
+    #endregion
+    #region Tareas Rows
+    #endregion
+}
