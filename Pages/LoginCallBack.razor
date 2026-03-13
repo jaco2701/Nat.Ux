@@ -35,7 +35,7 @@
     {
         try
         {
-            await ioState.LoadStatics();
+            await ioState.LoadStatics(true);
             Uri lioUri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
             Dictionary<string, Microsoft.Extensions.Primitives.StringValues> lcoQParams = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(lioUri.Query);
             if (lcoQParams.TryGetValue("error", out var lioError))

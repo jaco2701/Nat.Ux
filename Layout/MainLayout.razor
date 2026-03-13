@@ -24,7 +24,7 @@
                    BackgroundClass="nat-text3N" />
 <MudSnackbarProvider />
 
-@if (ioState.coLists != null)
+@if (ioState.coLists != null || ioState.coLists.Count > 0)
 {
     <div class="nat-header-container">
         @if (ioState.ivblnLogin)
@@ -120,6 +120,10 @@
         },
 
     };
+    protected override async Task OnInitializedAsync()
+    {
+        await ioState.LoadStatics(false);
+    }
     void ButtonClicked()
     {
         livblnOpen = !livblnOpen;
