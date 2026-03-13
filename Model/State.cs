@@ -73,7 +73,7 @@ namespace Applet.Nat.Ux.Models
         {
             return coLists.Where(x => x.ivcodType == vivCodType.ToUpper()).ToList();
         }
-        public async Task LoadStatics()
+        public async Task LoadStatics(bool vivblnDeep)
         {
             if (coLists == null)
             coLists = new List<ListModel>();
@@ -84,7 +84,7 @@ namespace Applet.Nat.Ux.Models
                     if (!coLists.Any(x => x.ivcodType == lioListItem.ivcodType && x.ivcodId == lioListItem.ivcodId))
                         coLists.Add(lioListItem);
             }
-            if (!coLists.Any(x => x.ivcodType == "TCOMP"))
+            if (vivblnDeep && !coLists.Any(x => x.ivcodType == "TCOMP"))
             {
                 _ = Fetch<List<ListModel>>(EAuthType.UserAndPass, "0:0", $"Statics1", null).ContinueWith(vioResponse =>
                 {

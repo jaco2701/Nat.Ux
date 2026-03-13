@@ -482,7 +482,7 @@
         }
         catch (Exception lioE)
         {
-            Snackbar.Add(lioE.Message, Severity.Error);
+            Snackbar.Add($"{lioE.Message} {lioE.InnerException?.Message??string.Empty}", Severity.Error);
         }
     }
     private async void Original()
