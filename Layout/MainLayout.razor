@@ -156,12 +156,9 @@
             case 2:
                 {
                     string livstr = string.Empty;
-                    if (ioState.coLists.FirstOrDefault(x => x.ivcodType == "CTZ" && x.ivcodId == "DOLV1") != null)
-                        livstr += $"{@Resources.lioL_Ctz} Mercado Local: {ioState.coLists.FirstOrDefault(x => x.ivcodType == "CTZ" && x.ivcodId == "DOLV1").ivstrDesc}";
-                    if (ioState.coLists.FirstOrDefault(x => x.ivcodType == "CTZ" && x.ivcodId == "DOLEXP") != null)
-                        livstr += Environment.NewLine + $"{@Resources.lioL_Ctz} Exportacion: {@ioState.coLists.FirstOrDefault(x => x.ivcodType == "CTZ" && x.ivcodId == "DOLEXP").ivstrDesc}";
-                    if (ioState.coLists.FirstOrDefault(x => x.ivcodType == "CTZ" && x.ivcodId == "DOLMTX") != null)
-                        livstr += Environment.NewLine + $"{@Resources.lioL_Ctz} Matrix: {@ioState.coLists.FirstOrDefault(x => x.ivcodType == "CTZ" && x.ivcodId == "DOLMTX").ivstrDesc}";
+                    ListModel lioListModel = ioState.coLists.FirstOrDefault(x => x.ivcodType == "FORMAT" && x.ivcodId == "Cotizacion");
+                    if (lioListModel != null)
+                        livstr += $"{@Resources.lioL_Ctz} {lioListModel.ivstrDesc}";
                     mioDialogModel.ieDialogType = eDialogType.Text;
                     mioDialogModel.ivstrBody = livstr;
                     mioDialogModel.ieDialogButtoms = eDialogButtoms.X;
