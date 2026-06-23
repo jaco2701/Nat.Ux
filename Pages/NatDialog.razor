@@ -283,21 +283,17 @@
             case eDialogType.User:
                 @if (vioDialogModel?.ioUser != null)
                 {
-                    @if (vioDialogModel.ioUser.ioDcModel.ivnumUser > 0)
-                    {
-                        <div>
+                    <div class="nat-borow-container">
+                        @if (vioDialogModel.ioUser.ioDcModel.ivnumUser > 0)
+                        {
                             <MudTextField Disabled=true Typo=Typo.body1 @bind-Value="@vioDialogModel.ioUser.ioDcModel.ivstrUserId" Class="nat-text" Label="@Resources.lioL_UserId" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Person" />
-                        </div>
-                    }
-                    else
-                    {
-                        <div>
+                        }
+                        else
+                        {
                             <MudTextField Typo=Typo.body1 @bind-Value="@vioDialogModel.ioUser.ioDcModel.ivstrUserId" Class="nat-text" Label="@Resources.lioL_UserId" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Person" />
-                        </div>
-                    }
-                    <div>
+                        }
+                        <MudTextField Typo=Typo.body1 @bind-Value="@vioDialogModel.ioUser.ioDcModel.ivstrUserName" Class="nat-text" Label="@Resources.lioL_UserName" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.InsertDriveFile" />
                     </div>
-                    <MudTextField Typo=Typo.body1 @bind-Value="@vioDialogModel.ioUser.ioDcModel.ivstrUserName" Class="nat-text" Label="@Resources.lioL_UserName" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.InsertDriveFile" />
                     <div class="nat-borow-container">
                         <MudTextField Typo=Typo.body1 @bind-Value="@vioDialogModel.ioUser.ioDcModel.ivstrUserEmail" Class="nat-text" Label="@Resources.lioL_Email" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Email" />
                         <MudTextField Disabled="true" Typo=Typo.body1 @bind-Value="vioDialogModel.ioUser.ivstrPass" Class="nat-text" Label="@Resources.lioL_Pass" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Key" />
@@ -306,10 +302,46 @@
                         <MudTextField Disabled="true" Typo=Typo.body1 @bind-Value="vioDialogModel.ioUser.ioDcModel.ivnrologonFails" Class="nat-text" Label="@Resources.lioL_NroFails" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Key" />
                         <MudCheckBox Label=@Resources.lioL_Enable LabelPlacement="Placement.Start" @bind-Value="@vioDialogModel.ioUser.ioDcModel.ivblnEnable" />
                     </div>
-                    <div class="nat-borow-container">
-                        <MudTextField Typo=Typo.body1 @bind-Value="@vioDialogModel.ioUser.ivstrCuits" Class="nat-text" Label="@Resources.lioL_UsrCuit" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Factory" />
-                        <span>@Resources.lioL_Coma</span>
-                    </div>
+                    @if (ioState.ioUser.ieRol >= eRol.CuitAdmin)
+                    {
+                        <div class="nat-table">
+                            <div class="nat-2lists">
+                                <MudTable FixedHeader="true" T="UserCuitModel" RowClassFunc="GetRowClass" HorizontalScrollbar="false" Items="@mcoCuitsDisponibles" SelectionChangeable=true SortLabel="Sort By" Hover="true" Dense="true" OnRowClick="OnRowClicked">
+                                    <HeaderContent>
+                                        <MudTh Style="max-width: 15vw; text-align:center;">@Resources.lioL_Bo</MudTh>
+                                    </HeaderContent>
+                                    <RowTemplate>
+                                        <MudTd Style="max-width: 15vw;" Class="nat-text nat-td nat-right" DataLabel="@Resources.lioL_Nbr">@context.ivlngCuit</MudTd>
+                                    </RowTemplate>
+                                </MudTable>
+                            </div>
+                            <MudIconButton Icon="@Icons.Material.Rounded.ArrowBack" Class="nat-icon-verde" @onclick="SacarCuit"></MudIconButton>
+                            <MudIconButton Icon="@Icons.Material.Rounded.ArrowForward" Class="nat-icon-verde" @onclick="PonerCuit"></MudIconButton>
+                            <div class="nat-2lists">
+                                <MudTable FixedHeader="true" RowClassFunc="GetRowClass" T="UserCuitModel" HorizontalScrollbar="false" Items="@mcoCuitsSeleccionados" SelectionChangeable=true SortLabel="Sort By" Hover="true" Dense="true" OnRowClick="OnRowClicked">
+                                    <HeaderContent>
+                                        <MudTh Style="max-width: 15vw; text-align:center;">@Resources.lioL_UsrCuit</MudTh>
+                                        <MudTh Style="max-width: 15vw; text-align:center;">@Resources.lioL_DefaultCuit</MudTh>
+                                    </HeaderContent>
+                                    <RowTemplate>
+                                        <MudTd Style="max-width: 15vw;" Class="nat-text nat-td nat-right">@context.ivlngCuit</MudTd>
+                                        <MudTd Style="max-width: 15vw;" Class="nat-text nat-td nat-right">
+                                            <MudCheckBox T="bool" Value="@context.ivblnDefaut" ValueChanged="@((bool e) => CheckDefaultCuit(e, context))" />
+                                        </MudTd>
+                                    </RowTemplate>
+                                </MudTable>
+                            </div>
+                            @if (ioState.ioUser.ieRol == eRol.SysAdmin)
+                            {
+                                <MudSelect Typo=Typo.body2 Class="nat-text3" @bind-Value="@mivstrRol" Variant="Variant.Outlined" Margin="Margin.Dense" Label=@Resources.lioL_Rol Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.SupervisorAccount">
+                                    @foreach (ListModel lioListModel in ioState.GetListParams("ROL").OrderBy(x => int.Parse(x.ivcodId)))
+                                    {
+                                        <MudSelectItem Class="nat-text" Value=@lioListModel.ivcodId>@lioListModel.ivstrDesc</MudSelectItem>
+                                    }
+                                </MudSelect>
+                            }
+                        </div>
+                    }
                 }
                 break;
             case eDialogType.Me:
@@ -333,7 +365,7 @@
                 }
                 <div class="nat-space2">
                 </div>
-                @if (ioState.ivnumIdentityProvider==0)
+                @if (ioState.ivnumIdentityProvider == 0)
                 {
                     @if (livblnPass)
                     {
@@ -388,19 +420,7 @@
         }
     </DialogActions>
 </MudDialog>
-@if (mivblnShowText)
-{
-    <MudDialog>
-        <TitleContent>
-        </TitleContent>
-        <DialogContent>
-            <p>@mivstrText</p>
-        </DialogContent>
-        <DialogActions>
-            <MudButton class="nat-button" OnClick="OK">@Resources.lioL_Ok</MudButton>
-        </DialogActions>
-    </MudDialog>
-}
+
 @code {
     [CascadingParameter]
     private IMudDialogInstance vioMudDialog { get; set; }
@@ -419,6 +439,7 @@
     private string mivstrPass2 { get; set; }
     private string mivstrEntityID { get; set; }
     private string mivstrEmail { get; set; }
+    private string mivstrRol { get; set; }
     private short mivnroDays { get; set; }
     private short mivnroRows { get; set; }
     private string livstrRes { get; set; }
@@ -426,17 +447,18 @@
     private bool livblnshowFullError { get; set; }
     private bool livblnPass { get; set; }
     private string mivstrText { get; set; }
-    private bool mivblnShowText { get; set; }
     private bool mivblnShowUploadMapper { get; set; }
     private bool mivblnShowUploadTemplate { get; set; }
     private IList<IBrowserFile> mcoUploadedFiles = new List<IBrowserFile>();
     private InputType mioInputType = InputType.Password;
+    private UserCuitModel mioSelectedCuitModel = new UserCuitModel();
+    private List<UserCuitModel> mcoCuitsDisponibles = new List<UserCuitModel>();
+    private List<UserCuitModel> mcoCuitsSeleccionados = new List<UserCuitModel>();
     #endregion
-    #region Meths
+    #region Inicializadores
     protected override void OnInitialized()
     {
         mivstrError = string.Empty;
-        mivblnShowText = false;
         mivblnShowUploadMapper = false;
         mivblnShowUploadTemplate = false;
     }
@@ -461,7 +483,31 @@
             mivnroRows = short.Parse(vioDialogModel.ioCuit.ioCnfg.coParameters?.FirstOrDefault(x => x.ivstrId == "Rows")?.ivstrValue ?? "100");
             mivstrEmail = vioDialogModel.ioCuit.ioCnfg.coParameters?.FirstOrDefault(x => x.ivstrId == "Email")?.ivstrValue;
         }
+        if (vioDialogModel.ioUser != null)
+        {
+            mivstrRol = vioDialogModel.ioUser.ioDcModel?.ivnroRol.ToString() ?? "0";
+
+            try
+            {
+                if (ioState.ioUser.ieRol == eRol.SysAdmin)
+                {
+                    Cuit[] lcoCuit = await ioState.Post<Cuit[]>(EAuthType.Token, null, "CuitsGet", new Filter { coFilterItems = new List<FilterItem>() });
+                    foreach (Cuit lioCuit in lcoCuit)
+                        mcoCuitsDisponibles.Add(new UserCuitModel { ivblnDefaut = false, ivlngCuit = lioCuit.ioDcModel.ivlngCuit });
+                }
+                else
+                    mcoCuitsDisponibles = ioState.ioUser.coCuitsModels;
+                mcoCuitsSeleccionados = vioDialogModel.ioUser.coCuitsModels;
+            }
+            catch (Exception lioE)
+            {
+                Snackbar.Add(lioE.Message, Severity.Error);
+                StateHasChanged();
+            }
+        }
     }
+    #endregion
+    #region Salir
     private void Cancel() => vioMudDialog.Cancel();
     private void OK()
     {
@@ -505,17 +551,69 @@
                 lcoParams.Add(new CuitParameter { ivstrId = "Email", ivstrValue = mivstrEmail });
             vioDialogModel.ioCuit.ioCnfg.coParameters = lcoParams.ToArray();
         }
+        if (vioDialogModel.ioUser != null)
+        {
+            vioDialogModel.ioUser.ioDcModel.ivnroRol = short.Parse(mivstrRol);
+            if (mcoCuitsSeleccionados == null || mcoCuitsSeleccionados.Count == 0)
+            {
+                Snackbar.Add(Resources.lioL_CuitNoSelec, Severity.Error);
+                return;
+            }
+            vioDialogModel.ioUser.coCuitsModels = mcoCuitsSeleccionados;
+        }
+
         vioMudDialog.Close(DialogResult.Ok(DialogResult.Ok(true)));
     }
     private void ShowFullError()
     {
         livblnshowFullError = !livblnshowFullError;
     }
+    #endregion
+    #region Grilla Asigancion de Cuits a usuarios
+    public async Task OnRowClicked(TableRowClickEventArgs<UserCuitModel> vioArg)
+    {
+        if (vioArg == null || vioArg.Item == null)
+            return;
+        mioSelectedCuitModel = vioArg.Item;
+    }
+    private void SacarCuit()
+    {
+        if (mioSelectedCuitModel == null) return;
+        mcoCuitsDisponibles.Add(mioSelectedCuitModel);
+        mcoCuitsSeleccionados.Remove(mioSelectedCuitModel);
+        mioSelectedCuitModel = null;
+        StateHasChanged();
+    }
+    private void PonerCuit()
+    {
+        if (mioSelectedCuitModel == null) return;
+        mcoCuitsDisponibles.Remove(mioSelectedCuitModel);
+        mcoCuitsSeleccionados.Add(mioSelectedCuitModel);
+        mioSelectedCuitModel = null;
+        StateHasChanged();
+    }
+    private async Task CheckDefaultCuit(bool vioBlnIsChecked, UserCuitModel vioCuitModel)
+    {
+        if (!vioBlnIsChecked)
+            vioCuitModel = mcoCuitsSeleccionados[0];
+        foreach (UserCuitModel lioO in mcoCuitsSeleccionados)
+            lioO.ivblnDefaut = lioO.ivlngCuit == vioCuitModel.ivlngCuit;
+        StateHasChanged();
+    }
+    private string GetRowClass(UserCuitModel vioUserCuitModel, int rowIndex)
+    {
+        if (mioSelectedCuitModel == vioUserCuitModel)
+        {
+            return "nat-tr nat-row-selected";
+        }
+        return "nat-tr";
+    }  
+    #endregion
+    #region Carga de Documentos
     private async Task FilesReady(IBrowserFile vioUploadedFile)
     {
         try
         {
-
             if (vioUploadedFile == null)
                 throw new Exception(Resources.lioE_DocUserNo);
             if (vioDialogModel.coDocumentsUpload == null)
@@ -537,6 +635,27 @@
             await InvokeAsync(StateHasChanged);
         }
     }
+    private async Task<string> LoadDocument(IBrowserFile vioBrowserFile)
+    {
+        string livstr = string.Empty;
+        using (Stream lioMS = vioBrowserFile.OpenReadStream(1024 * 1024))
+        {
+            using (var lioRdr = new StreamReader(lioMS, ioState.GetEncoding()))
+            {
+                livstr = await lioRdr.ReadToEndAsync();
+            }
+        }
+        return livstr;
+    }
+    public void Upload()
+    {
+        mivstrError = string.Empty;
+        mivblnShowUploadMapper = !mivblnShowUploadMapper;
+    }
+
+
+    #endregion
+    #region Carga de Mapeador y Templates
     private async Task FileReadyMapper(IBrowserFile vioUploadedFile)
     {
         if (vioUploadedFile == null)
@@ -552,18 +671,24 @@
         mivstrFileNameTemplate = vioUploadedFile.Name;
 
     }
-    private async Task<string> LoadDocument(IBrowserFile vioBrowserFile)
+    public async void Download()
     {
-        string livstr = string.Empty;
-        using (Stream lioMS = vioBrowserFile.OpenReadStream(1024 * 1024))
-        {
-            using (var lioRdr = new StreamReader(lioMS, ioState.GetEncoding()))
-            {
-                livstr = await lioRdr.ReadToEndAsync();
-            }
-        }
-        return livstr;
+        await iIJS.InvokeVoidAsync("downloadStrFile", $"Mapeador_{vioDialogModel.ioCuit.ioDcModel.ivlngCuit}.txt",
+            JsonConvert.SerializeObject(vioDialogModel.ioCuit.ioCnfg.coServiceMappers,
+                new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }));
     }
+    public async void DownloadTemplates()
+    {
+        await iIJS.InvokeVoidAsync("downloadStrFile", $"TemplateVersion_{vioDialogModel.ioCuit.ioDcModel.ivlngCuit}.txt",
+            JsonConvert.SerializeObject(vioDialogModel.ioCuit.ioCnfg.coTemplateVersions));
+    }
+    public void UploadTemplates()
+    {
+        mivblnShowUploadTemplate = !mivblnShowUploadTemplate;
+        mivstrError = string.Empty;
+    }
+    #endregion
+    #region Contraseña
     private void Pass()
     {
         livstrRes = string.Empty;
@@ -611,6 +736,15 @@
             await InvokeAsync(StateHasChanged);
         }
     }
+    private void TogglePasswordVisibility()
+    {
+        if (mioInputType == InputType.Password)
+            mioInputType = InputType.Text;
+        else
+            mioInputType = InputType.Password;
+    }   
+    #endregion
+    #region Tracking
     public void ShowData(DocumentTracking vioTracking)
     {
         foreach (DocumentTracking lioTracking in vioDialogModel.coDocumentTracking.Where(x => x.ioDcModel.ivnumtrack != vioTracking.ioDcModel.ivnumtrack))
@@ -688,39 +822,6 @@
     public async Task Copy(DocumentTracking vioTracking)
     {
         await iIJS.InvokeVoidAsync("navigator.clipboard.writeText", vioTracking.ioDcModel.ivstrData);
-    }
-    public void EndDialogText()
-    {
-        mivblnShowText = false;
-    }
-    public async void Download()
-    {
-        await iIJS.InvokeVoidAsync("downloadStrFile", $"Mapeador_{vioDialogModel.ioCuit.ioDcModel.ivlngCuit}.txt",
-            JsonConvert.SerializeObject(vioDialogModel.ioCuit.ioCnfg.coServiceMappers,
-                new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }));
-    }
-    public void Upload()
-    {
-        mivstrError = string.Empty;
-        mivblnShowUploadMapper = !mivblnShowUploadMapper;
-    }
-    public async void DownloadTemplates()
-    {
-        await iIJS.InvokeVoidAsync("downloadStrFile", $"TemplateVersion_{vioDialogModel.ioCuit.ioDcModel.ivlngCuit}.txt",
-            JsonConvert.SerializeObject(vioDialogModel.ioCuit.ioCnfg.coTemplateVersions));
-
-    }
-    public void UploadTemplates()
-    {
-        mivblnShowUploadTemplate = !mivblnShowUploadTemplate;
-        mivstrError = string.Empty;
-    }
-    private void TogglePasswordVisibility()
-    {
-        if (mioInputType == InputType.Password)
-            mioInputType = InputType.Text;
-        else
-            mioInputType = InputType.Password;
     }
     #endregion
 }

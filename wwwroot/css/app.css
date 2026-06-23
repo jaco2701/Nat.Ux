@@ -247,6 +247,18 @@ html, body {
     align-items: end;
     gap: 10px;
 }
+.nat-table {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    vertical-align: top;
+}
+.nat-2lists {
+    display: flex;
+    gap: 10px;
+    height: 35vh;
+    overflow-y: scroll;
+}
 .nat-td {
     border-right-width: 0.5px;
     border-left-width: 0.5px;
@@ -425,6 +437,9 @@ html, body {
     border-bottom-style: solid !important;
     border-bottom: 0.5px !important;
     border-color: #E0E0E0 !important;
+}
+.nat-row-selected {
+    background-color: #E3F2FD !important;
 }
 .nat-dialog {
     background-color: #E9EEF6;

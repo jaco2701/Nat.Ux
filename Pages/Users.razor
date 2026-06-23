@@ -35,7 +35,9 @@ else
             </div>
         </div>
         <div>
-            <MudTable T="User" HeaderClass="nat-header-table" @ref="mudTable" Items="@mcoUsers.OrderByDescending(x => x.ioDcModel?.ivstrUserId)" SelectionChangeable=true Hover="true" SortLabel="Sort By" OnRowClick="Detail">
+            <MudTable FixedHeader="true" T="User" RowClass="nat-tr" @ref="mudTable" Items="@mcoUsers.OrderByDescending(x => x.ioDcModel?.ivstrUserId)" SelectionChangeable=true SortLabel="Sort By" Hover="true"  OnRowClick="Detail">
+
+            @* <MudTable T="User" HeaderClass="nat-header-table" @ref="mudTable" Items="@mcoUsers.OrderByDescending(x => x.ioDcModel?.ivstrUserId)" SelectionChangeable=true Hover="true" SortLabel="Sort By" OnRowClick="Detail"> *@
                 <HeaderContent>
                     <MudTh><MudTableSortLabel Class="nat-textN" SortBy="new Func<User, object>(x => x.ioDcModel?.ivstrUserId)">@Resources.lioL_UserId</MudTableSortLabel></MudTh>
                     <MudTh><MudTableSortLabel Class="nat-textN" SortBy="new Func<User, object>(x => x.ioDcModel?.ivstrUserName)">@Resources.lioL_UserName</MudTableSortLabel></MudTh>
@@ -135,7 +137,7 @@ else
     {
         try
         {
-            vioUser.GetStrCuit();
+            //vioUser.GetStrCuit();
             mioDialogModel.ieDialogType = eDialogType.User;
             mioDialogModel.ioUser = vioUser;
             mioDialogModel.ieDialogButtoms = eDialogButtoms.OkCancel;
@@ -152,7 +154,7 @@ else
                 User lioUser = mioDialogModel.ioUser;
                 if (lioUser.ioDcModel.ivblnEnable && !livblnEnable)
                     lioUser.ioDcModel.ivnrologonFails = 0;
-                lioUser.SetStrCuit();
+               // lioUser.SetStrCuit();
                 lioUser.ieTask = eTask.Save;
                 string livstr = await ioState.PostToStr(EAuthType.Token,null, "UserTask", lioUser);
                 int livnum;

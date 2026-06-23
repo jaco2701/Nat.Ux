@@ -60,18 +60,25 @@
         <MudDrawer @bind-Open="@livblnOpen" Anchor="Anchor.Start" Elevation="1" Variant="@DrawerVariant.Temporary" OverlayAutoClose="true">
             <MudNavMenu Class="nat-menu-container">
                 <img src="./nat.png" class="nat-logo-menu" />
-                @if (ioState.ioUser.ioDcModel.ivblnAdmin)
+
+                @switch (ioState.ioUser.ieRol)
                 {
-                    <MudNavLink Icon="@Icons.Material.Outlined.Factory" Href="cuits">@Resources.lioL_Bo</MudNavLink>
-                    <MudNavLink Icon="@Icons.Material.Outlined.ManageAccounts" Href="users">@Resources.lioL_Users</MudNavLink>
-                    <MudNavLink Icon="@Icons.Material.Outlined.Article" Href="docs/3">@Resources.lioL_Documents</MudNavLink>
-                    <MudNavLink Icon="@Icons.Material.Outlined.BlurOn" Href="statics">@Resources.lioL_Statics</MudNavLink>
-                    <MudNavLink Icon="@Icons.Material.Outlined.BugReport" Href="log">@Resources.lioL_Log</MudNavLink>
-                }
-                else
-                {
-                    <MudNavLink Icon="@Icons.Material.Outlined.Badge" Href="cuitsr">@Resources.lioL_Cuitr</MudNavLink>
-                    <MudNavLink Icon="@Icons.Material.Outlined.Article" Href="docs/5">@Resources.lioL_Documents</MudNavLink>
+                    case eRol.SysAdmin:
+                        <MudNavLink Icon="@Icons.Material.Outlined.Factory" Href="cuits">@Resources.lioL_Bo</MudNavLink>
+                        <MudNavLink Icon="@Icons.Material.Outlined.ManageAccounts" Href="users">@Resources.lioL_Users</MudNavLink>
+                        <MudNavLink Icon="@Icons.Material.Outlined.BlurOn" Href="statics">@Resources.lioL_Statics</MudNavLink>
+                        <MudNavLink Icon="@Icons.Material.Outlined.BugReport" Href="log">@Resources.lioL_Log</MudNavLink>
+                        break;
+                    case eRol.CuitAdmin:
+                        <MudNavLink Icon="@Icons.Material.Outlined.ManageAccounts" Href="users">@Resources.lioL_Users</MudNavLink>
+                        <MudNavLink Icon="@Icons.Material.Outlined.Badge" Href="cuitsr">@Resources.lioL_Cuitr</MudNavLink>
+                        <MudNavLink Icon="@Icons.Material.Outlined.FormatIndentIncrease" Href="docs/5">@Resources.lioL_Docs</MudNavLink>
+                        <MudNavLink Icon="@Icons.Material.Outlined.FormatIndentDecrease" Href="docr/0">@Resources.lioL_Docr</MudNavLink>
+                        break;
+                    case eRol.User:
+                        <MudNavLink Icon="@Icons.Material.Outlined.FormatIndentIncrease" Href="docs/5">@Resources.lioL_Docs</MudNavLink>
+                        <MudNavLink Icon="@Icons.Material.Outlined.FormatIndentDecrease" Href="docr/0">@Resources.lioL_Docr</MudNavLink>
+                        break;
                 }
             </MudNavMenu>
         </MudDrawer>
@@ -148,8 +155,12 @@
                     DialogResult lioDialogResult = await lioDialogResponse.Result;
                     if (livlngCuit != ioState.ioUser.ivlngCurrentCuit)
                     {
-                        Guid guid = Guid.NewGuid();
-                        NavigationManager.NavigateTo($"docs/{guid.ToString("N").Substring(0, 4)}");
+                        Guid lioGuid = Guid.NewGuid();
+                        if (NavigationManager.Uri.Contains("docr"))
+                            NavigationManager.NavigateTo($"docr/{lioGuid.ToString("N").Substring(0, 4)}");
+                        else
+                            NavigationManager.NavigateTo($"docs/{lioGuid.ToString("N").Substring(0, 4)}");
+
                     }
                 }
                 break;

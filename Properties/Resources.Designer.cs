@@ -19,7 +19,7 @@ namespace Nat.Ux.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "18.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -322,6 +322,15 @@ namespace Nat.Ux.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Debe Seleccionar al menos un C.U.I.T..
+        /// </summary>
+        internal static string lioL_CuitNoSelec {
+            get {
+                return ResourceManager.GetString("lioL_CuitNoSelec", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Receptores.
         /// </summary>
         internal static string lioL_Cuitr {
@@ -444,6 +453,15 @@ namespace Nat.Ux.Properties {
         internal static string lioL_Detail {
             get {
                 return ResourceManager.GetString("lioL_Detail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Documentos Recibidos.
+        /// </summary>
+        internal static string lioL_Docr {
+            get {
+                return ResourceManager.GetString("lioL_Docr", resourceCulture);
             }
         }
         
@@ -975,6 +993,15 @@ namespace Nat.Ux.Properties {
         internal static string lioL_Result {
             get {
                 return ResourceManager.GetString("lioL_Result", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Rol.
+        /// </summary>
+        internal static string lioL_Rol {
+            get {
+                return ResourceManager.GetString("lioL_Rol", resourceCulture);
             }
         }
         

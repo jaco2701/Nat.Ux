@@ -40,8 +40,24 @@ namespace Applet.Nat.Ux.Models
                 return int.Parse(GetListParam("EXPIRE", "Captcha"));
             }
         }
-        public string? ivstrName { get; set; }
+        private string? mivstrName;
+        public string? ivstrName 
+        { 
+            get { return mivstrName; }
+            set 
+            { 
+                if (mivstrName != value)
+                {
+                    mivstrName = value;
+                    OnNameChanged?.Invoke();
+                }
+            }
+        }
         public string ivstrToken = string.Empty;
+        #endregion
+
+        #region EVENTS
+        public event Action? OnNameChanged;
         #endregion
         #region PUBLIC METHS
         public void SetConfiguration(IConfiguration vioConfiguration)
@@ -96,6 +112,8 @@ namespace Applet.Nat.Ux.Models
                         coLists.Add(new ListModel { ivcodId = "0", ivcodType = "TCOMP", ivstrDesc = "Todos" });
                     if (!coLists.Any(x => x.ivcodType == "STATUS" && x.ivcodId == "0"))
                         coLists.Add(new ListModel { ivcodId = "0", ivcodType = "STATUS", ivstrDesc = "Todos" });
+                    if (!coLists.Any(x => x.ivcodType == "STATUSR" && x.ivcodId == "0"))
+                        coLists.Add(new ListModel { ivcodId = "0", ivcodType = "STATUSR", ivstrDesc = "Todos" });
                     if (!int.TryParse(coLists.First(x => x.ivcodType == "EXPIRE" && x.ivcodId == "Session").ivstrDesc ?? string.Empty, null, out int livniumInactiveMinutes))
                         livniumInactiveMinutes = 600;
                     ivnumInactiveMinutes = livniumInactiveMinutes * 60000;

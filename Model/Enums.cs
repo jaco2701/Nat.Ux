@@ -27,6 +27,12 @@ namespace Applet.Nat.Ux.Models
         Pass = 11,
         SendResponse=12
     }
+    public enum eRol : short
+    {
+        User = 0,
+        SysAdmin = 20,
+        CuitAdmin = 10,
+    }
     public enum eDialogType : short
     {
         Text = 1,

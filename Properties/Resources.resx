@@ -495,4 +495,13 @@
   <data name="GetNatUser" xml:space="preserve">
     <value>Recuperando Usuario NAT</value>
   </data>
+  <data name="lioL_Rol" xml:space="preserve">
+    <value>Rol</value>
+  </data>
+  <data name="lioL_CuitNoSelec" xml:space="preserve">
+    <value>Debe Seleccionar al menos un C.U.I.T.</value>
+  </data>
+  <data name="lioL_Docr" xml:space="preserve">
+    <value>Documentos Recibidos</value>
+  </data>
 </root>

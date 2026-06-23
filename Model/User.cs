@@ -13,6 +13,7 @@ namespace Applet.Nat.Ux.Models
         public List<UserCuitModel> coCuitsModels { get; set; }
         public string? ivstrCuits { get; set; }
         public long ivlngCurrentCuit { get; set; }
+        public eRol ieRol { get { return (eRol)(ioDcModel?.ivnroRol ?? 3); } }
         public void GetStrCuit()
         {
             ivstrCuits = string.Empty;
@@ -51,7 +52,7 @@ namespace Applet.Nat.Ux.Models
         public string? ivstrUserEmail { get; set; }
         public string? ivstrUserId { get; set; }
         public string? ivstrUserName { get; set; }
-        public bool ivblnAdmin { get; set; }
+        public short ivnroRol { get; set; }
         public bool ivblnEnable { get; set; }
         public short? ivnrologonFails { get; set; }
     }
