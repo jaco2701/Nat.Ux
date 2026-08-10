@@ -19,7 +19,9 @@
 <PageTitle>@Resources.lioL_Documents</PageTitle>
 @if (mcoCuitCuits == null || ioState.coLists == null)
 {
-    <p><em>@Resources.lioL_Wait</em></p>
+    <div class="nat-login-content">
+        <MudProgressCircular Size="Size.Large" Indeterminate="true" Color="Color.Primary" />
+    </div>
 }
 else
 {
@@ -41,9 +43,9 @@ else
                 <MudTextField Typo=Typo.body2 @bind-Value=mivstrRs Label=@Resources.lioL_Rs Class="nat-text3" Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.Start"></MudTextField>
             </div>
             <div class="nat-cuitrcmd-container">
+                <MudIconButton Icon="@Icons.Material.Filled.Add" title=@Resources.lioL_Add @onclick="Add" Edge="Edge.End"  Class="@(@ioState.ioUser.Can(15) ? "nat-icon-verde" : "d-none")"></MudIconButton>
                 <MudIconButton Icon="@Icons.Material.Filled.Search" title=@Resources.lioL_Find Class="nat-icon-fondoverde" @onclick="Find" Edge="Edge.End"></MudIconButton>
                 <MudIconButton Icon="@Icons.Material.Filled.FilterAltOff" Class="nat-icon-rojoborde" title=@Resources.lioL_Clr @onclick="Clr" Edge="Edge.End"></MudIconButton>
-                <MudIconButton Icon="@Icons.Material.Filled.Add" Class="nat-icon-verde" title=@Resources.lioL_Add @onclick="Add" Edge="Edge.End"></MudIconButton>
             </div>
         </div>
 
@@ -191,7 +193,7 @@ else
             mioDialogModel.ivstrClass = string.Empty;
             mioDialogModel.ieDialogType = eDialogType.Text;
             mioDialogModel.ivstrBody = Resources.lioL_DeleteCuitR;
-            mioDialogModel.ieDialogButtoms = eDialogButtoms.OkCancel;
+            mioDialogModel.ieDialogButtoms =  ioState.ioUser.Can(15) ? eDialogButtoms.OkCancel : eDialogButtoms.Cancel ;
             lioDialogParameters = new DialogParameters<NatDialog> { { x => x.vioDialogModel, mioDialogModel } };
             lioDialogOptions = new DialogOptions
             {

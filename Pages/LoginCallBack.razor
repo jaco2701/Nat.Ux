@@ -54,7 +54,10 @@
                     }
                 );
             ioState.Login(lioLoginResponse);
-            NavigationManager.NavigateTo("Docs/0");
+            if (ioState.ioUser.Can(6))
+                NavigationManager.NavigateTo("Docs/0");
+            else if (ioState.ioUser.Can(1))
+                NavigationManager.NavigateTo("Docr/0");
         }
         catch (Exception lioE)
         {

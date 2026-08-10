@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Components.Routing;
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -7,17 +8,20 @@ namespace Applet.Nat.Ux.Models
 {
     public class User
     {
+        #region PUBLICS PROPS
         public UserModel? ioDcModel { get; set; }
         public eTask ieTask { get; set; }
         public string? ivstrPass { get; set; }
         public List<UserCuitModel> coCuitsModels { get; set; }
         public string? ivstrCuits { get; set; }
         public long ivlngCurrentCuit { get; set; }
-        public eRol ieRol { get { return (eRol)(ioDcModel?.ivnroRol ?? 3); } }
+        public short[] cvnroActions { get; set; }
+        #endregion
+        #region PUBLICS METHS
         public void GetStrCuit()
         {
             ivstrCuits = string.Empty;
-            if (this.coCuitsModels == null) 
+            if (this.coCuitsModels == null)
                 return;
             List<string> lcvstr = new List<string>();
             foreach (UserCuitModel lioO in coCuitsModels)
@@ -29,12 +33,12 @@ namespace Applet.Nat.Ux.Models
         }
         public void SetStrCuit()
         {
-            coCuitsModels= new List<UserCuitModel>();
+            coCuitsModels = new List<UserCuitModel>();
             UserCuitModel lioUserCuitModel;
             string livstrCuit;
             foreach (string livstr in ivstrCuits.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
             {
-                livstrCuit=livstr.Trim();
+                livstrCuit = livstr.Trim();
                 lioUserCuitModel = new UserCuitModel { ivnumUser = ioDcModel.ivnumUser };
                 if (livstrCuit.StartsWith("[") && livstrCuit.EndsWith("]"))
                     lioUserCuitModel.ivblnDefaut = true;
@@ -45,6 +49,13 @@ namespace Applet.Nat.Ux.Models
                 }
             }
         }
+        public bool Can(short vivnroAction)
+        {
+            return cvnroActions?.Contains(vivnroAction)??false;
+        }
+        #endregion
+        #region PRIVATE METHS
+        #endregion
     }
     public class UserModel
     {
@@ -52,7 +63,7 @@ namespace Applet.Nat.Ux.Models
         public string? ivstrUserEmail { get; set; }
         public string? ivstrUserId { get; set; }
         public string? ivstrUserName { get; set; }
-        public short ivnroRol { get; set; }
+        public short ivnroRole { get; set; }
         public bool ivblnEnable { get; set; }
         public short? ivnrologonFails { get; set; }
     }

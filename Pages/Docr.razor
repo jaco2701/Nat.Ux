@@ -22,12 +22,14 @@
 <div class="nat-page">
     @if (!mivblnReady || !ioState.ivblnLogin)
     {
-        <p><em>@Resources.lioL_Wait</em></p>
+        <div class="nat-login-content">
+            <MudProgressCircular Size="Size.Large" Indeterminate="true" Color="Color.Primary" />
+        </div>
     }
     else
     {
         <div class="nat-filter-container">
-            @if (ioState.ioUser.ieRol == eRol.SysAdmin)
+            @if (ioState.ioUser.Can(17))
             {
                 <div class="nat-col10">
                     <MudTextField Typo=Typo.body2 @bind-Value=mivlngCuitReceptor Variant="Variant.Outlined" Class="nat-text3" Adornment="Adornment.Start" Margin="Margin.Dense" Label=@Resources.lioL_Emisor></MudTextField>
@@ -79,29 +81,27 @@
         <div class="nat-cmdbar-container">
             @if (mcoSelectedDocuments.Count() > 0)
             {
-                <MudIconButton Icon="@Icons.Material.Outlined.SimCardDownload" Class="nat-icon-verde" title=@Resources.lioL_Original @onclick="(() => Original())" Edge="Edge.Start"></MudIconButton>
+                <MudIconButton Icon="@Icons.Material.Outlined.SimCardDownload" Class="@(@ioState.ioUser.Can(4) ? "nat-icon-verde" : "d-none")" title=@Resources.lioL_Original @onclick="(() => Original())" Edge="Edge.Start"></MudIconButton>
                 @if (mcoSelectedDocuments.Count == 1)
                 {
-                    <MudIconButton Icon="@Icons.Material.Filled.Route" Class="nat-icon-verde" title=@Resources.lioL_Tracking @onclick="(() => Submit(eTask.Tracking))" Edge="Edge.Start"></MudIconButton>
+                    <MudIconButton Icon="@Icons.Material.Filled.Route" Class="@(@ioState.ioUser.Can(5) ? "nat-icon-verde" : "d-none")" title=@Resources.lioL_Tracking @onclick="(() => Submit(eTask.Tracking))" Edge="Edge.Start"></MudIconButton>
                     @if (mcoSelectedDocuments.First().ioDcModel.ivnroStatus < 50)
                     {
-                        <MudIconButton Icon="@Icons.Material.Outlined.Delete" Class="nat-icon-rojo" title=@Resources.lioL_Delete @onclick="Delete" Edge="Edge.Start"></MudIconButton>
+                        <MudIconButton Icon="@Icons.Material.Outlined.Delete" Class="@(@ioState.ioUser.Can(3) ? "nat-icon-rojo" : "d-none")" title=@Resources.lioL_Delete @onclick="Delete" Edge="Edge.Start"></MudIconButton>
                     }
                 }
             }
             <MudSpacer />
             <span Class="nat-text">@Resources.lioL_Result: <strong>@mcoDocuments.Count()</strong> @Resources.lioL_Documents </span>
             <MudSpacer />
-            @if (ioState.ioUser.ieRol > eRol.User)
-            {
-                <MudIconButton Icon="@Icons.Material.Filled.Add" Class="nat-icon-verde" title=@Resources.lioL_Add @onclick="Add" Edge="Edge.End"></MudIconButton>
-            }    <MudIconButton Icon="@Icons.Material.Filled.FileDownload" title=@Resources.lioL_Export Class="nat-icon-verde" @onclick="Export" Edge="Edge.End"></MudIconButton>
+            <MudIconButton Icon="@Icons.Material.Filled.Add" Class="@(@ioState.ioUser.Can(2) ? "nat-icon-verde" : "d-none")" title=@Resources.lioL_Add @onclick="Add" Edge="Edge.End"></MudIconButton>
+            <MudIconButton Icon="@Icons.Material.Filled.FileDownload" title=@Resources.lioL_Export Class="nat-icon-verde" @onclick="Export" Edge="Edge.End"></MudIconButton>
         </div>
         <div>
             <MudTable FixedHeader="true" RowClass="nat-tr" FixedFooter="true" HorizontalScrollbar="false" MultiSelection="true" Items="@mcoDocuments.OrderByDescending(x => x.ioDcModel?.ivlngDoc)" SelectionChangeable=true SortLabel="Sort By" Dense="true" @bind-SelectedItems="mcoSelectedDocuments">
 
                 <HeaderContent>
-                    @if (ioState.ioUser.ieRol == eRol.SysAdmin)
+                    @if (ioState.ioUser.Can(17))
                     {
                         <MudTh Style="max-width: 8vw; text-align:center;"><MudTableSortLabel Class="nat-textN nat-th" SortBy="new Func<Document, object>(x => x.ioDcModel?.ivlngCuitEmisor)">@Resources.lioL_Emisor</MudTableSortLabel></MudTh>
                     }
@@ -109,15 +109,15 @@
                     <MudTh Style="max-width: 8vw; text-align:center;"><MudTableSortLabel Class="nat-textN nat-th" SortBy="new Func<Document, object>(x => x.ioDcModel?.ivnumPvta)">@Resources.lioL_PV</MudTableSortLabel></MudTh>
                     <MudTh Style="max-width: 8vw; text-align:center;"><MudTableSortLabel Class="nat-textN nat-th" SortBy="new Func<Document, object>(x => x.ioDcModel?.ivlngCbte)">@Resources.lioL_Nbr</MudTableSortLabel></MudTh>
                     <MudTh Style="max-width: 8vw; text-align:center;"><MudTableSortLabel Class="nat-textN nat-th" SortBy="new Func<Document, object>(x => x.ioDcModel?.ivdtmEmision)">@Resources.lioL_Date</MudTableSortLabel></MudTh>
-                    <MudTh Style="max-width: 10vw; text-align:center;"><MudTableSortLabel Class="nat-textN nat-th" SortBy="new Func<Document, object>(x => x.ioDcModel?.ivlngCuitReceptor)">@Resources.lioL_Cuit </MudTableSortLabel></MudTh>
+                    <MudTh Style="max-width: 10vw; text-align:center;"><MudTableSortLabel Class="nat-textN nat-th" SortBy="new Func<Document, object>(x => x.ioDcModel?.ivlngCuitEmisor)">@Resources.lioL_Emisor </MudTableSortLabel></MudTh>
                     <MudTh Style="max-width: 30vw; text-align:center;"><MudTableSortLabel Class="nat-textN nat-th" SortBy="new Func<Document, object>(x => x.ioDcModel?.ivstrRazonSocial)">@Resources.lioL_Rs</MudTableSortLabel></MudTh>
                     <MudTh Style="max-width: 10vw; text-align:center;"><MudTableSortLabel Class="nat-textN nat-th" SortBy="new Func<Document, object>(x => x.ioDcModel?.ivdblImporte)">@Resources.lioL_Importe</MudTableSortLabel></MudTh>
                     <MudTh Style="max-width: 5vw; text-align:center;"><MudTableSortLabel Class="nat-textN nat-th" SortBy="new Func<Document, object>(x => x.ioDcModel?.ivstrMoneda)">@Resources.lioL_Moneda</MudTableSortLabel></MudTh>
                     <MudTh Style="max-width: 8vw; text-align:center;"><MudTableSortLabel Class="nat-textN nat-th " SortBy="new Func<Document, object>(x => x.ioDcModel?.ivnroStatus)">@Resources.lioL_Status</MudTableSortLabel></MudTh>
-                    <MudTh Style="max-width: 8vw; text-align:center;"><MudTableSortLabel Class="nat-textN nat-th" SortBy="new Func<Document, object>(x => x.ioDcModel?.ivstrIdCliente)">@Resources.lioL_IdCliente</MudTableSortLabel></MudTh>
+                    <MudTh Style="max-width: 8vw; text-align:center;"><MudTableSortLabel Class="nat-textN nat-th" SortBy="new Func<Document, object>(x => x.ioDcModel?.ivstrIdCliente)">@Resources.lioL_Origen</MudTableSortLabel></MudTh>
                 </HeaderContent>
                 <RowTemplate>
-                    @if (ioState.ioUser.ieRol == eRol.SysAdmin)
+                    @if (ioState.ioUser.Can(17))
                     {
                         <MudTd DataLabel="Nr">@context.ioDcModel?.ivlngCuitEmisor</MudTd>
                     }
@@ -125,7 +125,7 @@
                     <MudTd Style="max-width: 8vw;" Class="nat-text nat-td" DataLabel="@Resources.lioL_PV">@context.ioDcModel?.ivnumPvta.ToString().PadLeft(5, '0')</MudTd>
                     <MudTd Style="max-width: 8vw;" Class="nat-text nat-td nat-right" DataLabel="@Resources.lioL_Nbr">@context.ioDcModel?.ivlngCbte</MudTd>
                     <MudTd Style="max-width: 8vw;" Class="nat-text nat-td" DataLabel="@Resources.lioL_Date">@context.ioDcModel?.ivdtmEmision?.ToString(ioState.GetListParam("Format", "UxDtm"))</MudTd>
-                    <MudTd Style="max-width: 10vw;" Class="nat-text nat-td nat-right" DataLabel="@Resources.lioL_User" title="@context.ioDcModel?.ivlngDoc">@context.ioDcModel?.ivlngCuitReceptor</MudTd>
+                    <MudTd Style="max-width: 10vw;" Class="nat-text nat-td nat-right" DataLabel="@Resources.lioL_Emisor" title="@context.ioDcModel?.ivlngDoc">@context.ioDcModel?.ivlngCuitEmisor</MudTd>
                     <MudTd Style="max-width: 30vw;" Class="nat-text nat-td" DataLabel="@Resources.lioL_Rs">@context.ioDcModel?.ivstrRazonSocial</MudTd>
                     <MudTd Style="max-width: 10vw;" Class="nat-text nat-td nat-right" DataLabel="@Resources.lioL_Importe">@context.ioDcModel?.ivdblImporte.ToString("N2", System.Globalization.CultureInfo.GetCultureInfo("es-AR"))</MudTd>
                     <MudTd Style="max-width: 5vw; text-align:center" Class="nat-text nat-td " DataLabel="@Resources.lioL_Moneda">@context.ioDcModel?.ivstrMoneda</MudTd>
@@ -149,7 +149,7 @@
                     {
                         <MudTd Style="max-width: 8vw; color:#FF9800; text-align:center" Class="nat-text nat-td " DataLabel="@Resources.lioL_Status">@ioState.GetListParam("STATUS", context.ioDcModel?.ivnroStatus.ToString() ?? "0")</MudTd>
                     }
-                    <MudTd Style="max-width: 8vw;" Class="nat-text nat-td nat-right" DataLabel="@Resources.lioL_IdCliente">@context.ioDcModel?.ivstrIdCliente</MudTd>
+                    <MudTd Style="max-width: 8vw;text-align:center" Class="nat-text nat-td " DataLabel="@Resources.lioL_Origen">@Origen(context.ioDcModel?.ivstrIdCliente)</MudTd>
                 </RowTemplate>
                 <PagerContent>
                     <MudTablePager RowsPerPageString="Documentos por Pagina:" PageSizeOptions="new int[] { 10, 25, 50, 100 }" />
@@ -218,15 +218,7 @@
         {
             mioFilter = new Filter { coFilterItems = new List<FilterItem>() };
             mioFilter.coFilterItems.Clear();
-            mioFilter.coFilterItems.Add(
-            new FilterItem
-                {
-                    ivstrOper = "EQ",
-                    ivstrPropName = "ivstrSR",
-                    ivstrPropValue = "R"
-                }
-            );
-            if (ioState.ioUser.ieRol == eRol.SysAdmin && mivlngCuitEmisor != null && mivlngCuitEmisor != 0)
+            if (ioState.ioUser.Can(17) && mivlngCuitReceptor != null && mivlngCuitReceptor != 0)
                 mioFilter.coFilterItems.Add(
                     new FilterItem
                     {
@@ -241,7 +233,7 @@
                     {
                         ivstrOper = "EQ",
                         ivstrPropName = "ivlngCuitReceptor",
-                        ivstrPropValue = ioState.ioUser.ivlngCurrentCuit.ToString()
+                        ivstrPropValue = ioState?.ioUser?.ivlngCurrentCuit.ToString()
                     }
                     );
             mioFilter.coFilterItems.Add(
@@ -421,17 +413,6 @@
             StringBuilder lioSb = new StringBuilder();
             switch (vieTask)
             {
-                case eTask.Print:
-                    {
-                        foreach (DocumentTaskResponse lioDocumentTaskResponse in lcoDocumentTaskResponses)
-                        {
-                            if (lioDocumentTaskResponse.ioData == "-1")
-                                lioSb.AppendLine($"{lioDocumentTaskResponse.ivstrKey}: {Resources.lioE_NoPdf}");
-                            else
-                                await iIJS.InvokeVoidAsync("downloadBase64File", $"{lioDocumentTaskResponse.ivstrKey}.pdf", lioDocumentTaskResponse.ioData);
-                        }
-                        break;
-                    }
                 case eTask.Tracking:
                     {
                         foreach (DocumentTaskResponse lioDocumentTaskResponse in lcoDocumentTaskResponses)
@@ -452,46 +433,49 @@
                             Snackbar.Add(lioSb.ToString(), Severity.Error);
                         break;
                     }
-                case eTask.Share:
-                    {
-                        lioSb.Clear();
-                        foreach (DocumentTaskResponse lioDocumentTaskResponse in lcoDocumentTaskResponses)
-                        {
-                            if (lioDocumentTaskResponse.ioData == "-1")
-                                lioSb.AppendLine($"{lioDocumentTaskResponse.ivstrKey}: {Resources.lioE_NoShare}");
-                            else
-                                lioSb.AppendLine($"{lioDocumentTaskResponse.ivstrKey}: {lioDocumentTaskResponse.ioData}");
-                        }
-                        Snackbar.Add(lioSb.ToString(), Severity.Info);
-                        break;
-                    }
-                case eTask.PdfGen:
-                    {
-                        await Find();
-                        break;
-                    }
                 case eTask.Delete:
                     {
                         await Find();
                         break;
                     }
-                case eTask.SendResponse:
-                    {
-                        Snackbar.Add(Resources.lioL_OperOK, Severity.Success);
-                        break;
-                    }
+               
             }
 
         }
         catch (Exception lioE)
         {
-            Snackbar.Add($"{lioE.Message} {lioE.InnerException?.Message??string.Empty}", Severity.Error);
+            Snackbar.Add($"{lioE.Message} {lioE.InnerException?.Message ?? string.Empty}", Severity.Error);
         }
     }
+    private string Origen(string vivstrIdCliente)
+    {
+        string livstr = string.Empty;
+        if (string.IsNullOrEmpty(vivstrIdCliente) || !(new string[] { "NatOrigen0", "NatOrigen1", "NatOrigen2", "NatOrigen3", "NatOrigen4" }.Contains(vivstrIdCliente)))
+            livstr = "1";
+        else
+            livstr = vivstrIdCliente.Replace("NatOrigen", string.Empty);
+        return ioState.GetListParam("ORIGEN", livstr);
+    }
+
     private async void Original()
     {
         foreach (Document lioDocument in mcoSelectedDocuments)
-            await iIJS.InvokeVoidAsync("downloadBase64File", $"{lioDocument.ioDcModel.ivnroTipo}_{lioDocument.ioDcModel.ivnumPvta}_{lioDocument.ioDcModel.ivlngCbte}_{lioDocument.ioDcModel.ivlngCuitReceptor}_{lioDocument.ioDcModel.ivlngDoc}{lioDocument.ioDcModel.ivstrInType}", Format.UnCompress(lioDocument.ioDcModel.ivstrInData, ioState.GetEncoding()));
+        {
+            if (Origen(lioDocument.ioDcModel.ivstrIdCliente) == "NAT")
+            {
+                long[] livlngDoc = { lioDocument.ioDcModel.ivlngDoc };
+                DocumentTaskResponse[] lcoDocumentTaskResponses = await ioState.Post<DocumentTaskResponse[]>(EAuthType.Token, null, "DocTask", new DocumentTask { ieTask = eTask.Print, cvlngDocs = livlngDoc });
+                if (lcoDocumentTaskResponses[0].ioData == "-1")
+                    Snackbar.Add($"{lcoDocumentTaskResponses[0].ivstrKey}: {Resources.lioE_NoPdf}", Severity.Error);
+                else
+                    await iIJS.InvokeVoidAsync("downloadBase64File", $"{lcoDocumentTaskResponses[0].ivstrKey}.pdf", lcoDocumentTaskResponses[0].ioData);
+            }
+            else
+                if (new string[] { ".pdf", ".jpg", ".jpeg" }.Contains(lioDocument.ioDcModel.ivstrInType))
+                    await iIJS.InvokeVoidAsync("downloadBase64File", $"{lioDocument.ioDcModel.ivnroTipo}_{lioDocument.ioDcModel.ivnumPvta}_{lioDocument.ioDcModel.ivlngCbte}_{lioDocument.ioDcModel.ivlngCuitReceptor}_{lioDocument.ioDcModel.ivlngDoc}{lioDocument.ioDcModel.ivstrInType}", lioDocument.ioDcModel.ivstrInData);
+                else
+                    await iIJS.InvokeVoidAsync("downloadBase64File", $"{lioDocument.ioDcModel.ivnroTipo}_{lioDocument.ioDcModel.ivnumPvta}_{lioDocument.ioDcModel.ivlngCbte}_{lioDocument.ioDcModel.ivlngCuitReceptor}_{lioDocument.ioDcModel.ivlngDoc}{lioDocument.ioDcModel.ivstrInType}", Format.UnCompress(lioDocument.ioDcModel.ivstrInData, ioState.GetEncoding()));
+        }
     }
     public async Task Delete()
     {

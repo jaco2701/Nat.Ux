@@ -143,10 +143,10 @@
                     <div>
                         <MudTextField Typo=Typo.body1 @bind-Value="@vioDialogModel.ioCuit.ioDcModel.ivstrCuitRS" Class="nat-text" Label="@Resources.lioL_Rs" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Article" />
                     </div>
-                    <div>
-                        <MudTextField Typo=Typo.body1 @bind-Value="@mivstrEmail" Class="nat-text" Label="@Resources.lioL_LDs" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Article" />
-                    </div>
                     <div class="nat-borow-container">
+                        <MudField Label="@Resources.lioL_Delivery" Variant="Variant.Outlined" InnerPadding="false" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Mail">
+                            <MudCheckBox T="bool" @bind-Value="@mivblnDelivery" />
+                        </MudField>
                         <MudSelect Typo=Typo.body2 Class="nat-text3" @bind-Value="@mivstrEncoding" Variant="Variant.Outlined" Margin="Margin.Dense" Label=@Resources.lioL_Encoding Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.FontDownload">
                             @foreach (ListModel lioListModel in ioState.GetListParams("ENCOD").OrderBy(x => int.Parse(x.ivcodId)))
                             {
@@ -159,6 +159,9 @@
                                 <MudSelectItem Class="nat-text" Value=@lioListModel.ivcodId>@lioListModel.ivstrDesc</MudSelectItem>
                             }
                         </MudSelect>
+                    </div>
+                    <div>
+                        <MudTextField Typo=Typo.body1 @bind-Value="@mivstrEmail" Class="nat-text" Label="@Resources.lioL_LDs" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.AlternateEmail" />
                     </div>
                     @switch (mivstrLoadMethod)
                     {
@@ -302,51 +305,59 @@
                         <MudTextField Disabled="true" Typo=Typo.body1 @bind-Value="vioDialogModel.ioUser.ioDcModel.ivnrologonFails" Class="nat-text" Label="@Resources.lioL_NroFails" Variant="Variant.Outlined" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Key" />
                         <MudCheckBox Label=@Resources.lioL_Enable LabelPlacement="Placement.Start" @bind-Value="@vioDialogModel.ioUser.ioDcModel.ivblnEnable" />
                     </div>
-                    @if (ioState.ioUser.ieRol >= eRol.CuitAdmin)
-                    {
-                        <div class="nat-table">
-                            <div class="nat-2lists">
-                                <MudTable FixedHeader="true" T="UserCuitModel" RowClassFunc="GetRowClass" HorizontalScrollbar="false" Items="@mcoCuitsDisponibles" SelectionChangeable=true SortLabel="Sort By" Hover="true" Dense="true" OnRowClick="OnRowClicked">
-                                    <HeaderContent>
-                                        <MudTh Style="max-width: 15vw; text-align:center;">@Resources.lioL_Bo</MudTh>
-                                    </HeaderContent>
-                                    <RowTemplate>
-                                        <MudTd Style="max-width: 15vw;" Class="nat-text nat-td nat-right" DataLabel="@Resources.lioL_Nbr">@context.ivlngCuit</MudTd>
-                                    </RowTemplate>
-                                </MudTable>
-                            </div>
-                            <MudIconButton Icon="@Icons.Material.Rounded.ArrowBack" Class="nat-icon-verde" @onclick="SacarCuit"></MudIconButton>
-                            <MudIconButton Icon="@Icons.Material.Rounded.ArrowForward" Class="nat-icon-verde" @onclick="PonerCuit"></MudIconButton>
-                            <div class="nat-2lists">
-                                <MudTable FixedHeader="true" RowClassFunc="GetRowClass" T="UserCuitModel" HorizontalScrollbar="false" Items="@mcoCuitsSeleccionados" SelectionChangeable=true SortLabel="Sort By" Hover="true" Dense="true" OnRowClick="OnRowClicked">
-                                    <HeaderContent>
-                                        <MudTh Style="max-width: 15vw; text-align:center;">@Resources.lioL_UsrCuit</MudTh>
-                                        <MudTh Style="max-width: 15vw; text-align:center;">@Resources.lioL_DefaultCuit</MudTh>
-                                    </HeaderContent>
-                                    <RowTemplate>
-                                        <MudTd Style="max-width: 15vw;" Class="nat-text nat-td nat-right">@context.ivlngCuit</MudTd>
-                                        <MudTd Style="max-width: 15vw;" Class="nat-text nat-td nat-right">
-                                            <MudCheckBox T="bool" Value="@context.ivblnDefaut" ValueChanged="@((bool e) => CheckDefaultCuit(e, context))" />
-                                        </MudTd>
-                                    </RowTemplate>
-                                </MudTable>
-                            </div>
-                            @if (ioState.ioUser.ieRol == eRol.SysAdmin)
-                            {
-                                <MudSelect Typo=Typo.body2 Class="nat-text3" @bind-Value="@mivstrRol" Variant="Variant.Outlined" Margin="Margin.Dense" Label=@Resources.lioL_Rol Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.SupervisorAccount">
-                                    @foreach (ListModel lioListModel in ioState.GetListParams("ROL").OrderBy(x => int.Parse(x.ivcodId)))
-                                    {
-                                        <MudSelectItem Class="nat-text" Value=@lioListModel.ivcodId>@lioListModel.ivstrDesc</MudSelectItem>
-                                    }
-                                </MudSelect>
-                            }
+                    <div class="nat-table">
+                        <div class="nat-2lists">
+                            <MudTable FixedHeader="true" T="UserCuitModel" RowClassFunc="GetRowClass" HorizontalScrollbar="false" Items="@mcoCuitsDisponibles" SelectionChangeable=true SortLabel="Sort By" Hover="true" Dense="true" OnRowClick="OnRowClicked">
+                                <HeaderContent>
+                                    <MudTh Style="max-width: 15vw; text-align:center;">@Resources.lioL_Bo</MudTh>
+                                </HeaderContent>
+                                <RowTemplate>
+                                    <MudTd Style="max-width: 15vw;" Class="nat-text nat-td nat-right" DataLabel="@Resources.lioL_Nbr">@context.ivlngCuit</MudTd>
+                                </RowTemplate>
+                            </MudTable>
                         </div>
-                    }
+                        <MudIconButton Icon="@Icons.Material.Rounded.ArrowBack" Class="nat-icon-verde" @onclick="SacarCuit"></MudIconButton>
+                        <MudIconButton Icon="@Icons.Material.Rounded.ArrowForward" Class="nat-icon-verde" @onclick="PonerCuit"></MudIconButton>
+                        <div class="nat-2lists">
+                            <MudTable FixedHeader="true" RowClassFunc="GetRowClass" T="UserCuitModel" HorizontalScrollbar="false" Items="@mcoCuitsSeleccionados" SelectionChangeable=true SortLabel="Sort By" Hover="true" Dense="true" OnRowClick="OnRowClicked">
+                                <HeaderContent>
+                                    <MudTh Style="max-width: 15vw; text-align:center;">@Resources.lioL_UsrCuit</MudTh>
+                                    <MudTh Style="max-width: 15vw; text-align:center;">@Resources.lioL_DefaultCuit</MudTh>
+                                </HeaderContent>
+                                <RowTemplate>
+                                    <MudTd Style="max-width: 15vw;" Class="nat-text nat-td nat-right">@context.ivlngCuit</MudTd>
+                                    <MudTd Style="max-width: 15vw;" Class="nat-text nat-td nat-right">
+                                        <MudCheckBox T="bool" Value="@context.ivblnDefaut" ValueChanged="@((bool e) => CheckDefaultCuit(e, context))" />
+                                    </MudTd>
+                                </RowTemplate>
+                            </MudTable>
+                        </div>
+                        @if (ioState.ioUser.Can(17))
+                        {
+                            <MudSelect Typo=Typo.body2 Class="nat-text3" @bind-Value="@mivstrRol" Variant="Variant.Outlined" Margin="Margin.Dense" Label=@Resources.lioL_Rol Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.SupervisorAccount">
+                                @foreach (ListModel lioListModel in ioState.GetListParams("ROL").OrderBy(x => int.Parse(x.ivcodId)))
+                                {
+                                    <MudSelectItem Class="nat-text" Value=@lioListModel.ivcodId>@lioListModel.ivstrDesc</MudSelectItem>
+                                }
+                            </MudSelect>
+                        }
+                        else
+                        {
+                            <MudSelect Typo=Typo.body2 Class="nat-text3" @bind-Value="@mivstrRol" Variant="Variant.Outlined" Margin="Margin.Dense" Label=@Resources.lioL_Rol Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.SupervisorAccount">
+                                @foreach (ListModel lioListModel in ioState.GetListParams("ROLCOMBO").OrderBy(x => int.Parse(x.ivcodId)))
+                                {
+                                    <MudSelectItem Class="nat-text" Value=@lioListModel.ivcodId>@lioListModel.ivstrDesc</MudSelectItem>
+                                }
+                            </MudSelect>
+                        }
+                    </div>
                 }
                 break;
             case eDialogType.Me:
                 <div class="nat-text2N">@Resources.lioL_UserId</div>
                 <div class="nat-text2">@ioState.ioUser.ioDcModel.ivstrUserId</div>
+                <div class="nat-text2N">@Resources.lioL_Rol</div>
+                <div class="nat-text2">@ioState.GetListParam("ROL", ioState.ioUser.ioDcModel?.ivnroRole.ToString())</div>
                 <div class="nat-text2N">@Resources.lioL_Email</div>
                 <div class="nat-text2">@ioState.ioUser.ioDcModel.ivstrUserEmail</div>
                 <div class="nat-text2N">@Resources.lioL_UserName</div>
@@ -416,6 +427,11 @@
                     <MudButton class="nat-button" OnClick="Cancel">@Resources.lioL_No</MudButton>
                     break;
                 }
+            case eDialogButtoms.Cancel:
+                {
+                    <MudButton class="nat-button" OnClick="Cancel">@Resources.lioL_Cancel</MudButton>
+                    break;
+                }
 
         }
     </DialogActions>
@@ -427,19 +443,20 @@
     [Parameter]
     public DialogModel vioDialogModel { get; set; }
     #region Props
-    private string mivstrUser { get; set; }
-    private string mivstrInFolder { get; set; }
-    private string mivstrOutFolder { get; set; }
-    private string mivstrEncoding { get; set; }
-    private string mivstrLoadMethod { get; set; }
-    private string mivstrFileNameTemplate { get; set; }
-    private string mivstrFileNameMapper { get; set; }
-    private string mivstrError { get; set; }
-    private string mivstrPass { get; set; }
-    private string mivstrPass2 { get; set; }
-    private string mivstrEntityID { get; set; }
-    private string mivstrEmail { get; set; }
-    private string mivstrRol { get; set; }
+    private string? mivstrUser { get; set; }
+    private string? mivstrInFolder { get; set; }
+    private string? mivstrOutFolder { get; set; }
+    private string? mivstrEncoding { get; set; }
+    private string? mivstrLoadMethod { get; set; }
+    private string? mivstrFileNameTemplate { get; set; }
+    private string? mivstrFileNameMapper { get; set; }
+    private string? mivstrError { get; set; }
+    private string? mivstrPass { get; set; }
+    private string? mivstrPass2 { get; set; }
+    private string? mivstrEntityID { get; set; }
+    private string? mivstrEmail { get; set; }
+    private string? mivstrRol { get; set; }
+    private bool mivblnDelivery { get; set; }
     private short mivnroDays { get; set; }
     private short mivnroRows { get; set; }
     private string livstrRes { get; set; }
@@ -472,32 +489,37 @@
         livstrRes = string.Empty;
         if (vioDialogModel.ioCuit != null)
         {
-            mivstrEncoding = vioDialogModel.ioCuit.ioCnfg.coParameters?.FirstOrDefault(x => x.ivstrId == "Encoding")?.ivstrValue;
-            mivstrLoadMethod = vioDialogModel.ioCuit.ioCnfg.coParameters?.FirstOrDefault(x => x.ivstrId == "LoadMethod")?.ivstrValue;
-            mivstrUser = vioDialogModel.ioCuit.ioCnfg.coParameters?.FirstOrDefault(x => x.ivstrId == "User")?.ivstrValue;
-            mivstrPass = vioDialogModel.ioCuit.ioCnfg.coParameters?.FirstOrDefault(x => x.ivstrId == "Pass")?.ivstrValue;
-            mivstrInFolder = vioDialogModel.ioCuit.ioCnfg.coParameters?.FirstOrDefault(x => x.ivstrId == "InFolder")?.ivstrValue;
-            mivstrOutFolder = vioDialogModel.ioCuit.ioCnfg.coParameters?.FirstOrDefault(x => x.ivstrId == "OutFolder")?.ivstrValue;
-            mivstrEntityID = vioDialogModel.ioCuit.ioCnfg.coParameters?.FirstOrDefault(x => x.ivstrId == "EntityID")?.ivstrValue;
-            mivnroDays = short.Parse(vioDialogModel.ioCuit.ioCnfg.coParameters?.FirstOrDefault(x => x.ivstrId == "Days")?.ivstrValue ?? "2");
-            mivnroRows = short.Parse(vioDialogModel.ioCuit.ioCnfg.coParameters?.FirstOrDefault(x => x.ivstrId == "Rows")?.ivstrValue ?? "100");
-            mivstrEmail = vioDialogModel.ioCuit.ioCnfg.coParameters?.FirstOrDefault(x => x.ivstrId == "Email")?.ivstrValue;
+            mivstrEncoding = vioDialogModel.ioCuit.ioCnfg?.coParameters?.FirstOrDefault(x => x.ivstrId == "Encoding")?.ivstrValue ?? string.Empty;
+            mivstrLoadMethod = vioDialogModel.ioCuit.ioCnfg?.coParameters?.FirstOrDefault(x => x.ivstrId == "LoadMethod")?.ivstrValue ?? string.Empty;
+            mivstrUser = vioDialogModel.ioCuit.ioCnfg?.coParameters?.FirstOrDefault(x => x.ivstrId == "User")?.ivstrValue ?? string.Empty;
+            mivstrPass = vioDialogModel.ioCuit.ioCnfg?.coParameters?.FirstOrDefault(x => x.ivstrId == "Pass")?.ivstrValue ?? string.Empty;
+            mivstrInFolder = vioDialogModel.ioCuit.ioCnfg?.coParameters?.FirstOrDefault(x => x.ivstrId == "InFolder")?.ivstrValue ?? string.Empty; ;
+            mivstrOutFolder = vioDialogModel.ioCuit.ioCnfg?.coParameters?.FirstOrDefault(x => x.ivstrId == "OutFolder")?.ivstrValue ?? string.Empty; ;
+            mivstrEntityID = vioDialogModel.ioCuit.ioCnfg?.coParameters?.FirstOrDefault(x => x.ivstrId == "EntityID")?.ivstrValue ?? string.Empty;
+            mivnroDays = short.Parse(vioDialogModel.ioCuit.ioCnfg?.coParameters?.FirstOrDefault(x => x.ivstrId == "Days")?.ivstrValue ?? "2");
+            mivnroRows = short.Parse(vioDialogModel.ioCuit.ioCnfg?.coParameters?.FirstOrDefault(x => x.ivstrId == "Rows")?.ivstrValue ?? "100");
+            mivstrEmail = vioDialogModel.ioCuit.ioCnfg?.coParameters?.FirstOrDefault(x => x.ivstrId == "Email")?.ivstrValue ?? string.Empty;
+            mivblnDelivery = (vioDialogModel.ioCuit.ioCnfg?.coParameters?.FirstOrDefault(x => x.ivstrId == "Delivery")?.ivstrValue ?? "0") == "1";
         }
         if (vioDialogModel.ioUser != null)
         {
-            mivstrRol = vioDialogModel.ioUser.ioDcModel?.ivnroRol.ToString() ?? "0";
-
+            mivstrRol = vioDialogModel.ioUser.ioDcModel?.ivnroRole.ToString() ?? "0";
             try
             {
-                if (ioState.ioUser.ieRol == eRol.SysAdmin)
+                mcoCuitsSeleccionados = vioDialogModel.ioUser.coCuitsModels;
+                if (ioState.ioUser.Can(17))
                 {
                     Cuit[] lcoCuit = await ioState.Post<Cuit[]>(EAuthType.Token, null, "CuitsGet", new Filter { coFilterItems = new List<FilterItem>() });
                     foreach (Cuit lioCuit in lcoCuit)
-                        mcoCuitsDisponibles.Add(new UserCuitModel { ivblnDefaut = false, ivlngCuit = lioCuit.ioDcModel.ivlngCuit });
+                        if (!mcoCuitsSeleccionados.Any(x => x.ivlngCuit == lioCuit.ioDcModel.ivlngCuit))
+                            mcoCuitsDisponibles.Add(new UserCuitModel { ivblnDefaut = false, ivlngCuit = lioCuit.ioDcModel.ivlngCuit });
                 }
                 else
-                    mcoCuitsDisponibles = ioState.ioUser.coCuitsModels;
-                mcoCuitsSeleccionados = vioDialogModel.ioUser.coCuitsModels;
+                    foreach (UserCuitModel lioUserCuitModel in ioState.ioUser.coCuitsModels)
+                    {
+                        if (!mcoCuitsSeleccionados.Any(x => x.ivlngCuit == lioUserCuitModel.ivlngCuit))
+                            mcoCuitsDisponibles.Add(new UserCuitModel { ivblnDefaut = false, ivlngCuit = lioUserCuitModel.ivlngCuit });
+                    }
             }
             catch (Exception lioE)
             {
@@ -549,11 +571,13 @@
             }
             if (!string.IsNullOrEmpty(mivstrEmail))
                 lcoParams.Add(new CuitParameter { ivstrId = "Email", ivstrValue = mivstrEmail });
+            lcoParams.Add(new CuitParameter { ivstrId = "Delivery", ivstrValue = mivblnDelivery ? "1" : "0" });
+
             vioDialogModel.ioCuit.ioCnfg.coParameters = lcoParams.ToArray();
         }
         if (vioDialogModel.ioUser != null)
         {
-            vioDialogModel.ioUser.ioDcModel.ivnroRol = short.Parse(mivstrRol);
+            vioDialogModel.ioUser.ioDcModel.ivnroRole = short.Parse(mivstrRol);
             if (mcoCuitsSeleccionados == null || mcoCuitsSeleccionados.Count == 0)
             {
                 Snackbar.Add(Resources.lioL_CuitNoSelec, Severity.Error);
@@ -578,7 +602,7 @@
     }
     private void SacarCuit()
     {
-        if (mioSelectedCuitModel == null) return;
+        if (mioSelectedCuitModel == null || mioSelectedCuitModel.ivlngCuit == 0) return;
         mcoCuitsDisponibles.Add(mioSelectedCuitModel);
         mcoCuitsSeleccionados.Remove(mioSelectedCuitModel);
         mioSelectedCuitModel = null;
@@ -586,7 +610,7 @@
     }
     private void PonerCuit()
     {
-        if (mioSelectedCuitModel == null) return;
+        if (mioSelectedCuitModel == null || mioSelectedCuitModel.ivlngCuit == 0) return;
         mcoCuitsDisponibles.Remove(mioSelectedCuitModel);
         mcoCuitsSeleccionados.Add(mioSelectedCuitModel);
         mioSelectedCuitModel = null;
@@ -602,12 +626,16 @@
     }
     private string GetRowClass(UserCuitModel vioUserCuitModel, int rowIndex)
     {
-        if (mioSelectedCuitModel == vioUserCuitModel)
+        if (!ioState.ioUser.Can(17) && !ioState.ioUser.coCuitsModels.Any(x => x.ivlngCuit == vioUserCuitModel.ivlngCuit)) //verifica si el cuit de la grilla esta en la lista de cuits del usuario
+        {
+            return "nat-tr nat-row-disabled";
+        }
+        else if (mioSelectedCuitModel == vioUserCuitModel)
         {
             return "nat-tr nat-row-selected";
         }
         return "nat-tr";
-    }  
+    }
     #endregion
     #region Carga de Documentos
     private async Task FilesReady(IBrowserFile vioUploadedFile)
@@ -618,6 +646,18 @@
                 throw new Exception(Resources.lioE_DocUserNo);
             if (vioDialogModel.coDocumentsUpload == null)
                 vioDialogModel.coDocumentsUpload = new List<DocumentUploadRequest>();
+            if (vioUploadedFile.Name.EndsWith(".jpg") || vioUploadedFile.Name.EndsWith(".jpeg") || vioUploadedFile.Name.EndsWith(".pdf"))
+            {
+                byte[] lcoImg = await LoadImg(vioUploadedFile);
+                vioDialogModel.coDocumentsUpload.Add(
+                    new DocumentUploadRequest
+                    {
+                        ivstrName = vioUploadedFile.Name,
+                        ivstrData = Convert.ToBase64String(lcoImg)
+                    }
+                );
+                return;
+            }
             vioDialogModel.coDocumentsUpload.Add(
                  new DocumentUploadRequest
                  {
@@ -646,6 +686,13 @@
             }
         }
         return livstr;
+    }
+    private async Task<byte[]> LoadImg(IBrowserFile vioBrowserFile)
+    {
+        using Stream lioS = vioBrowserFile.OpenReadStream(1024 * 1024 * 5);
+        using MemoryStream lioMS = new MemoryStream();
+        await lioS.CopyToAsync(lioMS);
+        return lioMS.ToArray();
     }
     public void Upload()
     {
@@ -742,7 +789,7 @@
             mioInputType = InputType.Text;
         else
             mioInputType = InputType.Password;
-    }   
+    }
     #endregion
     #region Tracking
     public void ShowData(DocumentTracking vioTracking)

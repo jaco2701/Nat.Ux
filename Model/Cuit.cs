@@ -50,7 +50,7 @@ namespace Applet.Nat.Ux.Models
         public string? ivstrCoord { get; set; }
         public bool? ivblnRequired { get; set; }
         public string? ivstrDefault { get; set; }
-
+        public bool? ivblnColumnHeader { get; set; }
     }
     public class ServiceMapperItemXPath
     {

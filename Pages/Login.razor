@@ -30,7 +30,7 @@
                         </div>
                     }
                     <div class="nat-w100 nat-select">
-                        <MudSelect Typo=Typo.body2 Class="nat-text3 " @bind-Value="ioState.ivnumIdentityProvider" Variant="Variant.Outlined" Margin="Margin.Dense" Label=@Resources.lioL_IdentityProvider>
+                        <MudSelect Typo=Typo.body2 Class="nat-text3" @bind-Value="ioState.ivnumIdentityProvider" Variant="Variant.Outlined" Margin="Margin.Dense" Label=@Resources.lioL_IdentityProvider>
                             @foreach (var lioO in mcoIdentityProviders)
                             {
                                 <MudSelectItem Class="nat-text" Value=int.Parse(lioO.ivcodId)>@lioO.ivstrDesc</MudSelectItem>
@@ -80,7 +80,12 @@
                     return;
                 LoginResponse lioLoginResponse = await ioState.Fetch<LoginResponse>(EAuthType.UserAndPass, $"{mivstrUser}:{mivstrPass}", "login", null);
                 ioState.Login(lioLoginResponse);
-                NavigationManager.NavigateTo("Docs/0");
+                if (ioState.ioUser.Can(17))
+                    NavigationManager.NavigateTo("cuits");
+                else if (ioState.ioUser.Can(6))
+                    NavigationManager.NavigateTo("Docs/0");
+                else if (ioState.ioUser.Can(1))
+                    NavigationManager.NavigateTo("Docr/0");
             }
             else //OIDC
             {
