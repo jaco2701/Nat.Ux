@@ -1,0 +1,171 @@
+﻿@page "/Roles"
+@using Applet.Nat.Ux
+@using Applet.Nat.Ux.Models
+@using MudBlazor
+@using Nat.Ux.Properties
+@using Newtonsoft.Json
+@using System.IO.Compression
+@using System.Text
+@using Microsoft.JSInterop;
+@using System.Reflection
+
+@inject NavigationManager NavigationManager
+@inject IConfiguration Configuration
+@inject State ioState
+@inject IJSRuntime iIJS;
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+<PageTitle>@Resources.lioL_Statics</PageTitle>
+@if (!mivblnReady)
+{
+    <div class="nat-login-content">
+        <MudProgressCircular Size="Size.Large" Indeterminate="true" Color="Color.Primary" />
+    </div>
+}
+else
+{
+    <div class="nat-page">
+        <div class="nat-cmdbar-container">
+            <div class="nat-col50">
+                <MudSelect Typo=Typo.body2 Class="nat-text3" T="string" Value="mivstrRol" ValueChanged="Find" Variant="Variant.Outlined" Margin="Margin.Dense" Label=@Resources.lioL_Rol>
+                    @foreach (ListModel lioListModel in mcoRoles.OrderBy(x => x.ivstrDesc))
+                    {
+                        <MudSelectItem Class="nat-text" Value=lioListModel.ivcodId>@lioListModel.ivstrDesc</MudSelectItem>
+                    }
+                </MudSelect>
+            </div>
+            @if (!string.IsNullOrEmpty(mivstrRol))
+            {
+                <MudIconButton Icon="@Icons.Material.Outlined.Save" title=@Resources.lioL_Ok Class="@(@ioState.ioUser.Can(25) ? "nat-icon-verde" : "d-none")" @onclick="Post" Edge="Edge.End"></MudIconButton>
+            }
+        </div>
+        <div>
+            <MudTable T="RoleActionUx" FixedHeader="true" RowClass="nat-tr" Height="75vh" FixedFooter="true" HorizontalScrollbar="false" SelectedItems="@mcoSelectedRoleActionsUx" Items="@mcoRoleActionsUx.OrderBy(x => x.ivstrEntity).ThenBy(x => x.ivstrAction)" SelectionChangeable=true SortLabel="Sort By" Dense="true" MultiSelection="true" @ref="mudTable">
+                <HeaderContent>
+                    <MudTh Style="text-align:center;"><MudTableSortLabel Class="nat-textN nat-th" SortBy="new Func<RoleActionUx, object>(x => x.ivstrEntity)">@Resources.lioL_Action</MudTableSortLabel></MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd Style="max-width: 50vw;" Class="nat-text nat-td" DataLabel="@Resources.lioL_Desc">@context.ivstrEntity: @context.ivstrAction </MudTd>
+                </RowTemplate>
+            </MudTable>
+        </div>
+    </div>
+
+}
+@code {
+    private long mivlngCuit { get; set; }
+    private string? mivstrUser { get; set; }
+    private string? mivstrRol { get; set; }
+    private List<RoleActionUx>? mcoRoleActionsUx { get; set; }
+    private HashSet<RoleActionUx> mcoSelectedRoleActionsUx { get; set; }
+    private ListModel[]? mcoRoles { get; set; }
+    private Filter? mioFilter { get; set; }
+    private DialogModel? mioDialogModel { get; set; }
+    public static bool mivblnSession;
+    private bool mivblnSelectAll { get; set; }
+    private MudTable<RoleActionUx>? mudTable;
+    private bool mivblnReady { get; set; }
+
+    protected override void OnInitialized()
+    {
+        if (!ioState.ivblnLogin)
+            NavigationManager.NavigateTo("login");
+        ioState.ivstrName = Resources.lioL_Roles;
+        mioDialogModel = new DialogModel();
+        mcoRoles = ioState.coLists.Where(x => x.ivcodType == "ROL").ToArray();
+        mivstrRol = string.Empty;
+        mcoRoleActionsUx = [];
+        Clr();
+        mivblnReady = true;
+
+    }
+
+    #region Tareas Header
+    public async Task Find(string vivstrRol)
+    {
+        try
+        {
+            mivstrRol = vivstrRol;
+            mivblnReady = false;
+            mioFilter = new Filter { coFilterItems = new List<FilterItem>() };
+            mioFilter.coFilterItems.Clear();
+            RoleAction[] lcoActions;
+            if (!string.IsNullOrEmpty(mivstrRol))
+            {
+                mioFilter.coFilterItems.Add(
+                new FilterItem
+                {
+                    ivstrOper = "EQ",
+                    ivstrPropName = "ivnroRole",
+                    ivstrPropValue = mivstrRol
+                }
+                );
+                lcoActions = await ioState.Post<RoleAction[]>(EAuthType.Token, null, "RoleActionGet", mioFilter);
+            }
+            else
+                lcoActions = [];
+            mcoRoleActionsUx = new List<RoleActionUx>();
+            foreach (ListModel lioListModel in ioState.coLists.Where(x => x.ivcodType == "ACTION"))
+            {
+                mcoRoleActionsUx.Add(
+                    new RoleActionUx
+                    {
+                        ivnroAction = short.Parse(lioListModel.ivcodId),
+                        ivnroRole = short.Parse(mivstrRol ?? "0"),
+                        ivstrEntity = lioListModel.ivstrDesc?.Split('.')?[0] ?? string.Empty,
+                        ivstrAction = lioListModel.ivstrDesc?.Split('.')?[1] ?? string.Empty,
+                        ivblnSelected = lcoActions.Any(x => x.ioDcModel.ivnroAction == short.Parse(lioListModel.ivcodId) && x.ioDcModel.ivnroRole == short.Parse(mivstrRol ?? "0"))
+                    }
+                );
+            }
+            mcoSelectedRoleActionsUx = mcoRoleActionsUx.Where(x => x.ivblnSelected).ToHashSet();
+
+        }
+        catch (Exception lioE)
+        {
+            Snackbar.Add(lioE.Message, Severity.Error);
+            StateHasChanged();
+        }
+        finally
+        {
+            mivblnReady = true;
+        }
+    }
+    public void Clr()
+    {
+        mivstrUser = string.Empty;
+    }
+
+    #endregion
+    #region Tareas Rows
+    public async Task Post()
+    {
+        List<RoleAction> lcoOs = new List<RoleAction>();
+        foreach (RoleActionUx lioRoleActionUx in mcoSelectedRoleActionsUx)
+        {
+            lcoOs.Add(new RoleAction
+            {
+                ioDcModel = new RoleActionModel
+                {
+                    ivnroRole = lioRoleActionUx.ivnroRole,
+                    ivnroAction = lioRoleActionUx.ivnroAction
+                },
+                ieTask = eTask.Save
+            });
+        }
+        if (lcoOs.Count == 0) //si esta todo destildado borra todo
+        {
+            lcoOs.Add(new RoleAction
+            {
+                ioDcModel = new RoleActionModel
+                {
+                    ivnroRole = short.Parse(mivstrRol??"0"),
+                    ivnroAction = 0
+                },
+                ieTask = eTask.Delete
+            });
+        }
+        await ioState.PostToStr(EAuthType.Token, null, "RoleActionTask", lcoOs);
+    }
+    #endregion
+}

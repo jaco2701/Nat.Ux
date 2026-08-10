@@ -18,7 +18,9 @@
 <PageTitle>@Resources.lioL_Users</PageTitle>
 @if (mcoUsers == null || ioState.coLists == null)
 {
-    <p><em>@Resources.lioL_Wait</em></p>
+    <div class="nat-login-content">
+        <MudProgressCircular Size="Size.Large" Indeterminate="true" Color="Color.Primary" />
+    </div>
 }
 else
 {
@@ -35,7 +37,9 @@ else
             </div>
         </div>
         <div>
-            <MudTable T="User" HeaderClass="nat-header-table" @ref="mudTable" Items="@mcoUsers.OrderByDescending(x => x.ioDcModel?.ivstrUserId)" SelectionChangeable=true Hover="true" SortLabel="Sort By" OnRowClick="Detail">
+            <MudTable FixedHeader="true" T="User" RowClass="nat-tr" @ref="mudTable" Items="@mcoUsers.OrderByDescending(x => x.ioDcModel?.ivstrUserId)" SelectionChangeable=true SortLabel="Sort By" Hover="true" OnRowClick="Detail">
+
+                @* <MudTable T="User" HeaderClass="nat-header-table" @ref="mudTable" Items="@mcoUsers.OrderByDescending(x => x.ioDcModel?.ivstrUserId)" SelectionChangeable=true Hover="true" SortLabel="Sort By" OnRowClick="Detail"> *@
                 <HeaderContent>
                     <MudTh><MudTableSortLabel Class="nat-textN" SortBy="new Func<User, object>(x => x.ioDcModel?.ivstrUserId)">@Resources.lioL_UserId</MudTableSortLabel></MudTh>
                     <MudTh><MudTableSortLabel Class="nat-textN" SortBy="new Func<User, object>(x => x.ioDcModel?.ivstrUserName)">@Resources.lioL_UserName</MudTableSortLabel></MudTh>
@@ -92,7 +96,9 @@ else
                     ivstrPropValue = mivstrUser
                 }
                 );
-                mcoUsers = await ioState.Post<User[]>(EAuthType.Token,null, "UsersGet", mioFilter);
+                mcoUsers = await ioState.Post<User[]>(EAuthType.Token, null, "UsersGet", mioFilter);
+                if (!ioState.ioUser.Can(17))
+                    mcoUsers = mcoUsers.Where(x => x.coCuitsModels.Any(c => c.ivlngCuit == ioState.ioUser.ivlngCurrentCuit)).ToArray();
             }
             else
                 mcoUsers = [];
@@ -135,7 +141,7 @@ else
     {
         try
         {
-            vioUser.GetStrCuit();
+            //vioUser.GetStrCuit();
             mioDialogModel.ieDialogType = eDialogType.User;
             mioDialogModel.ioUser = vioUser;
             mioDialogModel.ieDialogButtoms = eDialogButtoms.OkCancel;
@@ -152,16 +158,17 @@ else
                 User lioUser = mioDialogModel.ioUser;
                 if (lioUser.ioDcModel.ivblnEnable && !livblnEnable)
                     lioUser.ioDcModel.ivnrologonFails = 0;
-                lioUser.SetStrCuit();
+                // lioUser.SetStrCuit();
+                lioUser.cvnroActions = null;
                 lioUser.ieTask = eTask.Save;
-                string livstr = await ioState.PostToStr(EAuthType.Token,null, "UserTask", lioUser);
+                string livstr = await ioState.PostToStr(EAuthType.Token, null, "UserTask", lioUser);
                 int livnum;
                 if (!string.IsNullOrEmpty(lioUser.ivstrPass))
                 {
                     if (int.TryParse(livstr, out livnum))
                         lioUser.ioDcModel.ivnumUser = livnum;
                     lioUser.ieTask = eTask.Pass;
-                    await ioState.PostToStr(EAuthType.Token,null, "UserTask", lioUser);
+                    await ioState.PostToStr(EAuthType.Token, null, "UserTask", lioUser);
                     Snackbar.Add(Resources.lioL_OperOK, Severity.Success);
                 }
             }

@@ -39,7 +39,11 @@
                 <MudText Align=Align.Left class="nat-text2">@ioState.ioUser.coCuitsModels.FirstOrDefault(x => x.ivlngCuit == ioState.ioUser.ivlngCurrentCuit).ivstrRS</MudText>
             }
         }
-        <MudSpacer />
+        <MudSpacer/>
+        @if (ioState.ivblnLogin)
+        {
+             <MudText Align=Align.Left class="nat-text2">@ioState.ioUser.ioDcModel.ivstrUserId</MudText>
+        }
         @if (ioState.coLists.FirstOrDefault(x => x.ivcodType == "FORMAT" && x.ivcodId == "ENV")?.ivstrDesc == "P")
         {
             <MudChip T="string" Icon="@Icons.Material.Filled.Error" Text=@Resources.lioL_Prod class="nat-prod "></MudChip>
@@ -50,8 +54,9 @@
         }
         @if (ioState.ivblnLogin)
         {
-            <MudIconButton Icon="@Icons.Material.Outlined.Settings" title=@Resources.lioL_Cnfg @onclick="(() => Show(2))" Edge="Edge.End"></MudIconButton>
+
             <MudIconButton Icon="@Icons.Material.Outlined.AccountCircle" title=@Resources.lioL_MisDatos @onclick="(() => Show(1))" Edge="Edge.End"></MudIconButton>
+            <MudIconButton Icon="@Icons.Material.Outlined.Settings" title=@Resources.lioL_Cnfg @onclick="(() => Show(2))" Edge="Edge.End"></MudIconButton>
             <MudIconButton Icon="@Icons.Material.Filled.Logout" title=@Resources.lioL_Exit @onclick="Exit" Edge="Edge.End"></MudIconButton>
         }
     </div>
@@ -60,19 +65,14 @@
         <MudDrawer @bind-Open="@livblnOpen" Anchor="Anchor.Start" Elevation="1" Variant="@DrawerVariant.Temporary" OverlayAutoClose="true">
             <MudNavMenu Class="nat-menu-container">
                 <img src="./nat.png" class="nat-logo-menu" />
-                @if (ioState.ioUser.ioDcModel.ivblnAdmin)
-                {
-                    <MudNavLink Icon="@Icons.Material.Outlined.Factory" Href="cuits">@Resources.lioL_Bo</MudNavLink>
-                    <MudNavLink Icon="@Icons.Material.Outlined.ManageAccounts" Href="users">@Resources.lioL_Users</MudNavLink>
-                    <MudNavLink Icon="@Icons.Material.Outlined.Article" Href="docs/3">@Resources.lioL_Documents</MudNavLink>
-                    <MudNavLink Icon="@Icons.Material.Outlined.BlurOn" Href="statics">@Resources.lioL_Statics</MudNavLink>
-                    <MudNavLink Icon="@Icons.Material.Outlined.BugReport" Href="log">@Resources.lioL_Log</MudNavLink>
-                }
-                else
-                {
-                    <MudNavLink Icon="@Icons.Material.Outlined.Badge" Href="cuitsr">@Resources.lioL_Cuitr</MudNavLink>
-                    <MudNavLink Icon="@Icons.Material.Outlined.Article" Href="docs/5">@Resources.lioL_Documents</MudNavLink>
-                }
+                <MudNavLink Icon="@Icons.Material.Outlined.FormatIndentIncrease" Href="docs/5" Class="@(@ioState.ioUser.Can(6) ? "d-block" : "d-none")">@Resources.lioL_Docs</MudNavLink>
+                <MudNavLink Icon="@Icons.Material.Outlined.FormatIndentDecrease" Href="docr/0" Class="@(@ioState.ioUser.Can(1) ? "d-block" : "d-none")">@Resources.lioL_Docr</MudNavLink>
+                <MudNavLink Icon="@Icons.Material.Outlined.Badge" Href="cuitsr" Class="@(@ioState.ioUser.Can(14) ? "d-block" : "d-none")">@Resources.lioL_Cuitr</MudNavLink>
+                <MudNavLink Icon="@Icons.Material.Outlined.ManageAccounts" Href="users" Class="@(@ioState.ioUser.Can(18) ? "d-block" : "d-none")">@Resources.lioL_Users</MudNavLink>
+                <MudNavLink Icon="@Icons.Material.Outlined.People" Href="roles" Class="@(@ioState.ioUser.Can(24) ? "d-block" : "d-none")">@Resources.lioL_Roles</MudNavLink>
+                <MudNavLink Icon="@Icons.Material.Outlined.Factory" Href="cuits" Class="@(@ioState.ioUser.Can(16) ? "d-block" : "d-none")">@Resources.lioL_Bo</MudNavLink>
+                <MudNavLink Icon="@Icons.Material.Outlined.BlurOn" Href="statics" Class="@(@ioState.ioUser.Can(20) ? "d-block" : "d-none")">@Resources.lioL_Statics</MudNavLink>
+                <MudNavLink Icon="@Icons.Material.Outlined.BugReport" Href="log" Class="@(@ioState.ioUser.Can(23) ? "d-block" : "d-none")">@Resources.lioL_Log</MudNavLink>
             </MudNavMenu>
         </MudDrawer>
     }
@@ -148,8 +148,12 @@
                     DialogResult lioDialogResult = await lioDialogResponse.Result;
                     if (livlngCuit != ioState.ioUser.ivlngCurrentCuit)
                     {
-                        Guid guid = Guid.NewGuid();
-                        NavigationManager.NavigateTo($"docs/{guid.ToString("N").Substring(0, 4)}");
+                        Guid lioGuid = Guid.NewGuid();
+                        if (NavigationManager.Uri.Contains("docr"))
+                            NavigationManager.NavigateTo($"docr/{lioGuid.ToString("N").Substring(0, 4)}");
+                        else
+                            NavigationManager.NavigateTo($"docs/{lioGuid.ToString("N").Substring(0, 4)}");
+
                     }
                 }
                 break;

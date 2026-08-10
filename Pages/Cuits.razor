@@ -19,7 +19,9 @@
 <PageTitle>@Resources.lioL_Cuit1</PageTitle>
 @if (mcoCuits == null || ioState.coLists == null)
 {
-    <p><em>@Resources.lioL_Wait</em></p>
+    <div class="nat-login-content">
+        <MudProgressCircular Size="Size.Large" Indeterminate="true" Color="Color.Primary" />
+    </div>
 }
 else
 {
@@ -33,7 +35,7 @@ else
             </div>
             <MudSpacer />
             <div class="nat-bocmd-container">
-                <MudIconButton Icon="@Icons.Material.Filled.Add" Class="nat-icon-verde" title=@Resources.lioL_Add @onclick="Add" Edge="Edge.End"></MudIconButton>
+                <MudIconButton Icon="@Icons.Material.Filled.Add" Class="@(@ioState.ioUser.Can(17) ? "nat-icon-verde" : "d-none")" title=@Resources.lioL_Add @onclick="Add" Edge="Edge.End"></MudIconButton>
                 <MudIconButton Icon="@Icons.Material.Filled.Search" title=@Resources.lioL_Find Class="nat-icon-fondoverde" @onclick="Find" Edge="Edge.End"></MudIconButton>
                 <MudIconButton Icon="@Icons.Material.Filled.FilterAltOff" Class="nat-icon-rojoborde" title=@Resources.lioL_Clr @onclick="Clr" Edge="Edge.End"></MudIconButton>
             </div>
@@ -68,7 +70,7 @@ else
     {
         if (!ioState.ivblnLogin)
             NavigationManager.NavigateTo("login");
-        ioState.ivstrName = Resources.lioL_Cnfg;
+        ioState.ivstrName = Resources.lioL_Cuit1;
         mioDialogModel = new DialogModel();
         Clr();
     }
@@ -166,7 +168,7 @@ else
         {
             MaxWidth = MaxWidth.ExtraLarge
         };
-        mioDialogModel.ieDialogButtoms = eDialogButtoms.OkCancel;
+        mioDialogModel.ieDialogButtoms = ioState.ioUser.Can(17) ? eDialogButtoms.OkCancel : eDialogButtoms.Cancel ;
         DialogParameters lioDialogParameters = new DialogParameters<NatDialog> { { x => x.vioDialogModel, mioDialogModel } };
         IDialogReference lioDialogResponse = await DialogService.ShowAsync<NatDialog>(Resources.lioL_Cnfg, lioDialogParameters, lioDialogOptions);
         DialogResult lioDialogResult = await lioDialogResponse.Result;

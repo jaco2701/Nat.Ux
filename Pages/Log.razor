@@ -27,7 +27,7 @@
             </MudSelect>
         </div>
         <MudSpacer />
-        <MudIconButton Icon="@Icons.Material.Filled.Delete" Class="nat-icon-verde" title=@Resources.lioL_Copy @onclick="Clear" Edge="Edge.End"></MudIconButton>
+        <MudIconButton Icon="@Icons.Material.Filled.Delete" Class="@(@ioState.ioUser.Can(22) ? "nat-icon-verde" : "d-none")" title=@Resources.lioL_Copy @onclick="Clear" Edge="Edge.End"></MudIconButton>
         <MudIconButton Icon="@Icons.Material.Filled.CopyAll" Class="nat-icon-verde" title=@Resources.lioL_Copy @onclick="Copy" Edge="Edge.End"></MudIconButton>
         <MudIconButton Icon="@Icons.Material.Filled.Autorenew" title=@Resources.lioL_Find Class="nat-icon-verde" @onclick="Find1" Edge="Edge.End"></MudIconButton>
     </div>

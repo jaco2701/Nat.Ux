@@ -45,6 +45,7 @@ namespace Applet.Nat.Ux.Models
         OkCancel = 2,
         YesNo = 3,
         X=4,
+        Cancel = 5,
     }
     public enum eDialogResponse : short
     {
