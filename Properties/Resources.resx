@@ -516,4 +516,19 @@
   <data name="lioL_Origen" xml:space="preserve">
     <value>Origen</value>
   </data>
+  <data name="lioL_DeleteR" xml:space="preserve">
+    <value>Eliminar Receptor</value>
+  </data>
+  <data name="lioL_AddR" xml:space="preserve">
+    <value>Agregar Receptor</value>
+  </data>
+  <data name="lioL_AddC" xml:space="preserve">
+    <value>Agregar C.U.I.T.</value>
+  </data>
+  <data name="lioL_AddU" xml:space="preserve">
+    <value>Agregar Usuario</value>
+  </data>
+  <data name="lioL_CuitRM" xml:space="preserve">
+    <value>Modificar Receptor</value>
+  </data>
 </root>

@@ -126,7 +126,7 @@
                     <MudTd Style="max-width: 8vw;" Class="nat-text nat-td nat-right" DataLabel="@Resources.lioL_Nbr">@context.ioDcModel?.ivlngCbte</MudTd>
                     <MudTd Style="max-width: 8vw;" Class="nat-text nat-td" DataLabel="@Resources.lioL_Date">@context.ioDcModel?.ivdtmEmision?.ToString(ioState.GetListParam("Format", "UxDtm"))</MudTd>
                     <MudTd Style="max-width: 10vw;" Class="nat-text nat-td nat-right" DataLabel="@Resources.lioL_Emisor" title="@context.ioDcModel?.ivlngDoc">@context.ioDcModel?.ivlngCuitEmisor</MudTd>
-                    <MudTd Style="max-width: 30vw;" Class="nat-text nat-td" DataLabel="@Resources.lioL_Rs">@context.ioDcModel?.ivstrRazonSocial</MudTd>
+                    <MudTd Style="max-width: 30vw;" Class="nat-text nat-td" DataLabel="@Resources.lioL_Rs">@context.ioDcModel?.ivstrRazonSocialE</MudTd>
                     <MudTd Style="max-width: 10vw;" Class="nat-text nat-td nat-right" DataLabel="@Resources.lioL_Importe">@context.ioDcModel?.ivdblImporte.ToString("N2", System.Globalization.CultureInfo.GetCultureInfo("es-AR"))</MudTd>
                     <MudTd Style="max-width: 5vw; text-align:center" Class="nat-text nat-td " DataLabel="@Resources.lioL_Moneda">@context.ioDcModel?.ivstrMoneda</MudTd>
                     @if (context.ioDcModel?.ivnroStatus == 10)
@@ -400,7 +400,7 @@
         await iIJS.InvokeVoidAsync(
             "downloadBase64File",
             $"Export_{DateTime.Now.ToString("yyyyMMddhhmmss")}.xlsx",
-            await ioState.PostToStr(EAuthType.Token, null, "Export", mioFilter));
+            await ioState.PostToStr(EAuthType.Token, null, "ExportR", mioFilter));
     }
     #endregion
     #region Tareas Rows
