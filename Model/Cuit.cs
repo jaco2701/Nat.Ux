@@ -36,6 +36,8 @@ namespace Applet.Nat.Ux.Models
         public short[] cvnroDocTypes { get; set; }
         public bool? ivblnTaxInLines { get; set; }
         public bool? ivblnCalcPermisoExistente { get; set; }
+        public bool? ivblnMapping { get; set; }
+        public bool? ivblnSaveOnLoad { get; set; }
     }
     public class ServiceMapperItem
     {
