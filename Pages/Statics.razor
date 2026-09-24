@@ -183,7 +183,7 @@ else
             {
                 MaxWidth = MaxWidth.ExtraLarge
             };
-            IDialogReference lioDialogResponse = await DialogService.ShowAsync<NatDialog>(Resources.lioL_Cnfg, lioDialogParameters, lioDialogOptions);
+            IDialogReference lioDialogResponse = await DialogService.ShowAsync<NatDialog>(Resources.lioL_Statics, lioDialogParameters, lioDialogOptions);
             DialogResult lioDialogResult = await lioDialogResponse.Result;
             if (!lioDialogResult.Canceled)
                 await Post(mioDialogModel.ioList);

@@ -26,6 +26,7 @@ namespace Applet.Nat.Ux.Models
         public string? ivstrMoneda { get; set; }
         public string? ivstrRazonSocial { get; set; }
         public string? ivstrSR { get; set; }
+        public string? ivstrRazonSocialE { get; set; }
     }
     public class DocumentTask
     {

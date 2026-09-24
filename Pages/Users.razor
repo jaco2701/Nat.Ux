@@ -31,7 +31,7 @@ else
             </div>
             <MudSpacer />
             <div class="nat-bocmd-container">
-                <MudIconButton Icon="@Icons.Material.Filled.Add" Class="nat-icon-verde" title=@Resources.lioL_Add @onclick="Add" Edge="Edge.End"></MudIconButton>
+                <MudIconButton Icon="@Icons.Material.Filled.Add" Class="nat-icon-verde" title=@Resources.lioL_AddU @onclick="Add" Edge="Edge.End"></MudIconButton>
                 <MudIconButton Icon="@Icons.Material.Filled.Search" title=@Resources.lioL_Find Class="nat-icon-fondoverde" @onclick="Find" Edge="Edge.End"></MudIconButton>
                 <MudIconButton Icon="@Icons.Material.Filled.FilterAltOff" Class="nat-icon-rojoborde" title=@Resources.lioL_Clr @onclick="Clr" Edge="Edge.End"></MudIconButton>
             </div>
@@ -70,7 +70,7 @@ else
     {
         if (!ioState.ivblnLogin)
             NavigationManager.NavigateTo("login");
-        ioState.ivstrName = Resources.lioL_Cnfg;
+        ioState.ivstrName = Resources.lioL_Users;
         mioDialogModel = new DialogModel();
         Clr();
     }
@@ -151,7 +151,7 @@ else
             {
                 MaxWidth = MaxWidth.ExtraLarge
             };
-            IDialogReference lioDialogResponse = await DialogService.ShowAsync<NatDialog>(Resources.lioL_Cnfg, lioDialogParameters, lioDialogOptions);
+            IDialogReference lioDialogResponse = await DialogService.ShowAsync<NatDialog>(Resources.lioL_Users, lioDialogParameters, lioDialogOptions);
             DialogResult lioDialogResult = await lioDialogResponse.Result;
             if (!lioDialogResult.Canceled)
             {

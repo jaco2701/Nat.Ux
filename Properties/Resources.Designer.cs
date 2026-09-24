@@ -214,6 +214,33 @@ namespace Nat.Ux.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Agregar C.U.I.T..
+        /// </summary>
+        internal static string lioL_AddC {
+            get {
+                return ResourceManager.GetString("lioL_AddC", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Agregar Receptor.
+        /// </summary>
+        internal static string lioL_AddR {
+            get {
+                return ResourceManager.GetString("lioL_AddR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Agregar Usuario.
+        /// </summary>
+        internal static string lioL_AddU {
+            get {
+                return ResourceManager.GetString("lioL_AddU", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Es Administrador?.
         /// </summary>
         internal static string lioL_Adm {
@@ -349,6 +376,15 @@ namespace Nat.Ux.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Modificar Receptor.
+        /// </summary>
+        internal static string lioL_CuitRM {
+            get {
+                return ResourceManager.GetString("lioL_CuitRM", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Operando con CUIT.
         /// </summary>
         internal static string lioL_CurrentCuit {
@@ -444,6 +480,15 @@ namespace Nat.Ux.Properties {
         internal static string lioL_DeleteCuitR {
             get {
                 return ResourceManager.GetString("lioL_DeleteCuitR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Eliminar Receptor.
+        /// </summary>
+        internal static string lioL_DeleteR {
+            get {
+                return ResourceManager.GetString("lioL_DeleteR", resourceCulture);
             }
         }
         

@@ -29,10 +29,10 @@ else
         <div class="nat-cmdbar-container">
             @if (mcoSelectedOs.Count() > 0)
             {
-                <MudIconButton Icon="@Icons.Material.Outlined.Delete" Class="nat-icon-rojo" title=@Resources.lioL_Delete @onclick="Delete" Edge="Edge.Start"></MudIconButton>
+                <MudIconButton Icon="@Icons.Material.Outlined.Delete" Class="nat-icon-rojo" title=@Resources.lioL_DeleteR @onclick="Delete" Edge="Edge.Start"></MudIconButton>
                 @if (mcoSelectedOs.Count == 1)
                 {
-                    <MudIconButton Icon="@Icons.Material.Filled.Edit" Class="nat-icon-verde" title=@Resources.lioL_Tracking @onclick="Detail" Edge="Edge.Start"></MudIconButton>
+                    <MudIconButton Icon="@Icons.Material.Filled.Edit" Class="nat-icon-verde" title=@Resources.lioL_CuitRM @onclick="Detail" Edge="Edge.Start"></MudIconButton>
                 }
             }
             <MudSpacer />
@@ -43,7 +43,7 @@ else
                 <MudTextField Typo=Typo.body2 @bind-Value=mivstrRs Label=@Resources.lioL_Rs Class="nat-text3" Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.Start"></MudTextField>
             </div>
             <div class="nat-cuitrcmd-container">
-                <MudIconButton Icon="@Icons.Material.Filled.Add" title=@Resources.lioL_Add @onclick="Add" Edge="Edge.End"  Class="@(@ioState.ioUser.Can(15) ? "nat-icon-verde" : "d-none")"></MudIconButton>
+                <MudIconButton Icon="@Icons.Material.Filled.Add" title=@Resources.lioL_AddR @onclick="Add" Edge="Edge.End"  Class="@(@ioState.ioUser.Can(15) ? "nat-icon-verde" : "d-none")"></MudIconButton>
                 <MudIconButton Icon="@Icons.Material.Filled.Search" title=@Resources.lioL_Find Class="nat-icon-fondoverde" @onclick="Find" Edge="Edge.End"></MudIconButton>
                 <MudIconButton Icon="@Icons.Material.Filled.FilterAltOff" Class="nat-icon-rojoborde" title=@Resources.lioL_Clr @onclick="Clr" Edge="Edge.End"></MudIconButton>
             </div>
@@ -82,7 +82,7 @@ else
     {
         if (!ioState.ivblnLogin)
             NavigationManager.NavigateTo("login");
-        ioState.ivstrName = Resources.lioL_Cnfg;
+        ioState.ivstrName = Resources.lioL_Cuitr;
         mioDialogModel = new DialogModel();
         mcoSelectedOs = new HashSet<CuitCuit>();
 
@@ -212,7 +212,7 @@ else
             };
             mioDialogModel.ieDialogButtoms = eDialogButtoms.OkCancel;
             lioDialogParameters = new DialogParameters<NatDialog> { { x => x.vioDialogModel, mioDialogModel } };
-            lioDialogResponse = await DialogService.ShowAsync<NatDialog>(Resources.lioL_Cnfg, lioDialogParameters, lioDialogOptions);
+            lioDialogResponse = await DialogService.ShowAsync<NatDialog>(Resources.lioL_Cuitr, lioDialogParameters, lioDialogOptions);
 
         }
         DialogResult lioDialogResult = await lioDialogResponse.Result;
